@@ -1,6 +1,7 @@
-# quick_car
+# QuickCar
 
-A new Flutter application.
+Flutter application.
+Application of short-term car rental.
 
 ## Getting Started
 
