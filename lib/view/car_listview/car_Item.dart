@@ -1,13 +1,13 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'file:///C:/Users/oripo/AndroidStudioProjects/quick_car/lib/view/car_listview/car_data.dart';
-import 'file:///C:/Users/oripo/AndroidStudioProjects/quick_car/lib/api/api.dart';
-import '../../models/car_model.dart';
+import 'package:quick_car/data_class/tests/car_model.dart';
 
-class CarSearchView extends StatelessWidget {
+import 'car_data.dart';
+
+class CarItemView extends StatelessWidget {
   final Car myCar;
-  CarSearchView({this.myCar});
+  CarItemView({this.myCar});
   @override
   Widget build(BuildContext context) {
     return Container (
@@ -25,6 +25,7 @@ class CarSearchView extends StatelessWidget {
                     child: AspectRatio(
                       aspectRatio: 1,
                       child: Image.network(myCar.imgUrl.replaceAll("http", "https")),
+//                    child: Text("image"),
                     ),
                   )
               )

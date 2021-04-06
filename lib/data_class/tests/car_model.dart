@@ -4,18 +4,20 @@
 
 import 'dart:convert';
 
-CarMetadata welcomeFromJson(String str) => CarMetadata.fromJson(json.decode(str));
+import 'package:quick_car/data_class/car_model.dart';
 
-String welcomeToJson(CarMetadata data) => json.encode(data.toJson());
+Welcome welcomeFromJson(String str) => Welcome.fromJson(json.decode(str));
 
-class CarMetadata {
-  CarMetadata({
+String welcomeToJson(Welcome data) => json.encode(data.toJson());
+
+class Welcome {
+  Welcome({
     this.cars,
   });
 
   List<Car> cars;
 
-  factory CarMetadata.fromJson(Map<String, dynamic> json) => CarMetadata(
+  factory Welcome.fromJson(Map<String, dynamic> json) => Welcome(
     cars: List<Car>.from(json["cars"].map((x) => Car.fromJson(x))),
   );
 
@@ -26,7 +28,7 @@ class CarMetadata {
 
 class Car {
   Car({
-    this.year,
+//    this.year,
     this.id,
     this.horsepower,
     this.make,
@@ -35,7 +37,7 @@ class Car {
     this.imgUrl,
   });
 
-  int year;
+//  int year;
   int id;
   int horsepower;
   String make;
@@ -44,7 +46,7 @@ class Car {
   String imgUrl;
 
   factory Car.fromJson(Map<String, dynamic> json) => Car(
-    year: json["year"],
+//    year: json["year"],
     id: json["id"],
     horsepower: json["horsepower"],
     make: json["make"],
@@ -54,7 +56,7 @@ class Car {
   );
 
   Map<String, dynamic> toJson() => {
-    "year": year,
+//    "year": year,
     "id": id,
     "horsepower": horsepower,
     "make": make,
