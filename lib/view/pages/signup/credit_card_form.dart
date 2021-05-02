@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
+import 'package:flow_builder/flow_builder.dart';
+import 'package:quick_car/states/signup_state.dart';
+import 'package:quick_car/view/widgets/buttons.dart';
 
 class CreditCard extends StatefulWidget {
-  Function func;
-  CreditCard(this.func);
+  CreditCard();
   @override
   _CreditCardState createState() => _CreditCardState();
 }
@@ -17,17 +19,19 @@ class _CreditCardState extends State<CreditCard> {
   bool isCvvFocused = false;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  @override
+  void _continuePressed() {
+    context.flow<SignUpState>().complete((signupState) {
+      return signupState.copyWith(creditCardCompleted: true);
+    });
+  }
 
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Credit Card View Demo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Scaffold(
+    return Scaffold(
         resizeToAvoidBottomInset: true,
+        appBar: AppBar(
+          title: Text("Credit Card details"),
+        ),
         body: SafeArea(
           child: Column(
             children: <Widget>[
@@ -94,9 +98,10 @@ class _CreditCardState extends State<CreditCard> {
                           ),
                         ),
                         onPressed: () {
-                          widget.func();
+                          _continuePressed();
                         },
-                      )
+                      ),
+                      skipButton(onPressed: () => _continuePressed())
                     ],
                   ),
                 ),
@@ -104,7 +109,6 @@ class _CreditCardState extends State<CreditCard> {
             ],
           ),
         ),
-      ),
     );
   }
 

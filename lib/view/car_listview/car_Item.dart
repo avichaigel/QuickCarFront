@@ -1,7 +1,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:quick_car/data_class/tests/car_model.dart';
+import 'package:quick_car/data_class/quick_car/cars_list_model.dart';
 
 import 'car_data.dart';
 
@@ -24,7 +24,7 @@ class CarItemView extends StatelessWidget {
                     ),
                     child: AspectRatio(
                       aspectRatio: 1,
-                      child: Image.network(myCar.imgUrl.replaceAll("http", "https")),
+                      //child: Image.network(myCar.imgUrl.replaceAll("http", "https")),
 //                    child: Text("image"),
                     ),
                   )

@@ -1,9 +1,11 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:quick_car/api/api.dart';
-import 'package:quick_car/data_class/tests/car_model.dart';
+import 'package:quick_car/api/quick_car_api/cars_api.dart';
+import 'package:quick_car/constants/globals.dart';
+import 'package:quick_car/data_class/quick_car/cars_list_model.dart';
 import 'package:quick_car/view/search_parameters.dart';
+import 'package:http/http.dart' as http;
 
 import 'car_listview/car_Item.dart';
 
@@ -19,7 +21,8 @@ void initState() {
 }
 @override
 Widget build(BuildContext context) {
-  return Column(
+  return SafeArea(
+      child: Column(
     children: [
       SizedBox(height: 40,),
       InkWell(
@@ -37,12 +40,12 @@ Widget build(BuildContext context) {
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: Colors.black87),
           ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 1,vertical: 10),
-          child: Row(
-            children: <Widget>[
-              SizedBox(
-                width: 10,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 1,vertical: 10),
+            child: Row(
+              children: <Widget>[
+                SizedBox(
+                  width: 10,
                 ),
                 Icon(Icons.search),
                 SizedBox(
@@ -59,10 +62,11 @@ Widget build(BuildContext context) {
       Expanded (
           child: SizedBox(
               height: 100.0,
-                child: ListCreator()
+              child: ListCreator()
           )
       )
     ],
+  )
   );
 
 }
@@ -77,18 +81,18 @@ class ListCreator extends StatefulWidget {
 }
 
 class ListCreatorWidget extends State<ListCreator> {
-
-  Future<Welcome> _carsList;
-
+  Future<Cars> _carsList;
   @override
   void initState() {
-    _carsList = API().getCars();
+    CarsApi _carsListApi = Globals.carsListApi;
+    _carsList = _carsListApi.getCars();
     super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Welcome>(future: _carsList, builder: (context, snapshot) {
+    return FutureBuilder<Cars>(
+        future: _carsList,
+        builder: (context, snapshot) {
       if (snapshot.hasData) {
         return ListView.builder(
             itemCount: snapshot.data.cars.length,

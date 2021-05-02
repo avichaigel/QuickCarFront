@@ -5,20 +5,19 @@
 
 import 'dart:convert';
 
-import 'package:quick_car/data_class/car_model.dart';
 
-Welcome welcomeFromJson(String str) => Welcome.fromJson(json.decode(str));
+Cars carsFromJson(String str) => Cars.fromJson(json.decode(str));
 
-String welcomeToJson(Welcome data) => json.encode(data.toJson());
+String carsToJson(Cars data) => json.encode(data.toJson());
 
-class Welcome {
-  Welcome({
+class Cars {
+  Cars({
     this.cars,
   });
 
   List<Car> cars;
 
-  factory Welcome.fromJson(Map<String, dynamic> json) => Welcome(
+  factory Cars.fromJson(Map<String, dynamic> json) => Cars(
     cars: List<Car>.from(json["cars"].map((x) => Car.fromJson(x))),
   );
 

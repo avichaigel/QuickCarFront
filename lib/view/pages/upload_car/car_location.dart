@@ -1,3 +1,4 @@
+import 'package:flow_builder/flow_builder.dart';
 
 import 'dart:collection';
 
@@ -5,21 +6,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:quick_car/api/api_tester.dart';
-import 'package:quick_car/view/pages/upload_car/car_photos.dart';
-import 'package:quick_car/view/widgets/country_list_pick.dart';
+import 'package:quick_car/states/new_car_state.dart';
 
-class PlayGroundPage extends StatefulWidget {
+class CarLocationPage extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => PalyGround();
+  State<StatefulWidget> createState() => CarLocation();
 
 }
 
-class PalyGround extends State<PlayGroundPage> {
+class CarLocation extends State<CarLocationPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: CarPhotos()
+        child: Center(
+            child: GeoListenPage()
+        )
     );
   }
 
@@ -48,11 +49,16 @@ class _GeoListenPageState extends State<GeoListenPage> {
 
 
   }
-
+  void _continuePressed() {
+    print("in cp");
+    context
+        .flow<NewCarState>()
+        .update((carState) => carState.copywith(latitude: _location.latitude, longitude: _location.longitude));
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(),
+      appBar: AppBar(),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(12),
         child: Column(
@@ -62,26 +68,26 @@ class _GeoListenPageState extends State<GeoListenPage> {
             SizedBox(
               height: 30,
             ),
-              TextField(
-                onTap: onTapTextField,
-                controller: _streetController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Street',
-                ),
+            TextField(
+              onTap: onTapTextField,
+              controller: _streetController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Street',
               ),
+            ),
             SizedBox(
               height: 30,
             ),
             TextField(
               onTap: onTapTextField,
               controller: _numberController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Number',
-                ),
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Number',
               ),
+            ),
             SizedBox(
               height: 30,
             ),
@@ -90,13 +96,13 @@ class _GeoListenPageState extends State<GeoListenPage> {
               onTap: onTapTextField,
               focusNode: _cityFocusNode,
               controller: _cityController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'City',
-                ),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'City',
               ),
+            ),
 
-          Padding(
+            Padding(
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
                 onLongPress: () => print("hello from long press"),
@@ -109,11 +115,11 @@ class _GeoListenPageState extends State<GeoListenPage> {
                   style: TextStyle(color: Colors.black),
                 ),
 
-               onPressed: () async {
+                onPressed: () async {
                   this._cityFocusNode.unfocus();
                   try {
                     List<Location> locations = await locationFromAddress(
-                      _streetController.text + _numberController.text + ", " + _cityController.text
+                        _streetController.text + _numberController.text + ", " + _cityController.text
                     );
                     setState(() {
                       print("in set state");
@@ -125,16 +131,15 @@ class _GeoListenPageState extends State<GeoListenPage> {
                     print("address is not found");
                     setState(() {
                       _locNotFound = true;
-
                     });
                   }
-                  },
-                ),
+                },
               ),
+            ),
             Visibility(
               child: Text("Address is not found",
                 style: TextStyle(
-                  color: Colors.red
+                    color: Colors.red
                 ),
               ),
               maintainSize: true,
@@ -154,21 +159,21 @@ class _GeoListenPageState extends State<GeoListenPage> {
     return showDialog(context: context, builder: (context) {
       Set<Marker> _markers = HashSet<Marker>();
       _markers.add(
-        Marker(
+          Marker(
             markerId: MarkerId("0"),
             position: latLng,
-        )
+          )
       );
 
       return Column(
-          children: [
-            Container(
-                decoration: BoxDecoration(
-                    border: Border.all(
+        children: [
+          Container(
+              decoration: BoxDecoration(
+                  border: Border.all(
                       width: 3,
                       color: Colors.black
-                    )
-                ),
+                  )
+              ),
               child: GoogleMap(
                 initialCameraPosition: CameraPosition(
                   target: latLng,
@@ -179,24 +184,27 @@ class _GeoListenPageState extends State<GeoListenPage> {
                 myLocationButtonEnabled: true,
               ),
               height: MediaQuery.of(context).size.height/2
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context, false),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context, false);
+                    _continuePressed();
+                    } ,
                   child: Text("confirm")
-                ),
-                ElevatedButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: Text("back")
-                ),
+              ),
+              ElevatedButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text("back")
+              ),
 
-              ],
-            )
+            ],
+          )
 
-          ],
-        );
+        ],
+      );
     });
   }
 }

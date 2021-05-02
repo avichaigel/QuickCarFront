@@ -1,8 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_car/api/quick_car_api/sign_in.dart';
+import 'package:quick_car/constants/globals.dart';
+import 'package:quick_car/constants/strings.dart';
 import 'package:quick_car/data_class/quick_car/user_signin.dart';
+import 'package:quick_car/data_class/quick_car/user_signup.dart';
 import 'package:quick_car/states/user_state.dart';
 
 
@@ -13,8 +15,15 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  BoxDecoration customDecoration ()
-  {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  void initState() {
+    super.initState();
+    myFocusNode = FocusNode();
+  }
+
+  BoxDecoration customDecoration () {
     return BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(8),
@@ -26,10 +35,13 @@ class _LoginState extends State<Login> {
         )],
     );
   }
+  FocusNode myFocusNode;
 
   @override
   Widget build(BuildContext context) {
     final userState = Provider.of<UserState>(context);
+    String _email;
+    String _password;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -48,18 +60,21 @@ class _LoginState extends State<Login> {
                     fit: BoxFit.scaleDown,
                   ),
                 ),
-                Text("Welcome To ",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500),),
+                SizedBox(height: 25,),
+                Text("Welcome To QuickCar", textAlign: TextAlign.center ,style: TextStyle(fontSize: 26,fontWeight: FontWeight.w500),),
                 SizedBox(height: 25,),
                   Container(
                     margin: EdgeInsets.only(bottom: 20),
                     decoration: customDecoration(),
                     child: TextField(
                       decoration: InputDecoration(
-                          hintText: "User name",
+                          hintText: "Email",
                           border: InputBorder.none,
                           hintStyle: TextStyle(color: Colors.grey),
-                          prefixIcon: Icon(Icons.person_outline,color: Colors.blue,)
+                          prefixIcon: Icon(IconData(0xe6f3, fontFamily: 'MaterialIcons'), color: Colors.blue,)
                       ),
+                      keyboardType: TextInputType.emailAddress,
+                      controller: emailController,
                     ),
                   ),
                 Container(
@@ -73,6 +88,7 @@ class _LoginState extends State<Login> {
                         hintStyle: TextStyle(color: Colors.grey),
                         prefixIcon: Icon(Icons.lock_outline,color: Colors.blue,)
                     ),
+                    controller: passwordController,
                   ),
                 ),
                 Padding(
@@ -82,14 +98,19 @@ class _LoginState extends State<Login> {
                         child: Text("Forgot password ?",style: TextStyle(color: Colors.blue,fontSize: 12),)),
                   ),
                 InkWell(
-                  onTap: () {
-                    userState.setIsLoggedIn(true);
-                    print("login tapped");
-                    UserSignIn usi = UserSignIn();
-                    usi.username = "1";
-                    usi.password = "5";
-                    UserApi().signIn(usi);
-                    Navigator.pushReplacementNamed(context, '/');
+                  onTap: () async {
+                      var token;
+                      Globals.userApi.login(UserSignIn(email: emailController.text, password: passwordController.text))
+                          .then((value) {
+                            token = value;
+                            userState.setToken(token);
+                            print("token gotton after login ${token}");
+                            Strings.TOKEN = token;
+                            // should ask for all the personal details and put them in the state
+                            userState.setFirstName("Ori");
+                            userState.setIsLoggedIn(true);
+                            Navigator.pushReplacementNamed(context, '/');
+                          }).catchError((error, stackTrace) => print("error:" +error.toString()));
                   },
                   borderRadius: BorderRadius.circular(20),
                   splashColor: Colors.white,

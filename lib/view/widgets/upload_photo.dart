@@ -17,7 +17,7 @@ class _UploadPhotoState extends State<UploadPhoto> {
 
   @override
   void dispose() {
-    print("dispose");
+    print("in upload photo dispose");
     _controller.dispose();
     super.dispose();
   }
@@ -34,6 +34,7 @@ class _UploadPhotoState extends State<UploadPhoto> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black12,
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
@@ -62,6 +63,7 @@ class _UploadPhotoState extends State<UploadPhoto> {
           }
         },
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

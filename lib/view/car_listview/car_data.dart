@@ -1,7 +1,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:quick_car/data_class/tests/car_model.dart';
+import 'package:quick_car/data_class/quick_car/cars_list_model.dart';
 
 class CarDataView extends StatelessWidget {
   final Car myCar;
@@ -20,11 +20,11 @@ class CarDataView extends StatelessWidget {
                 children: [
                   Align(
                     alignment: Alignment.topCenter,
-                    child:  Text(myCar.make.toString(),style: TextStyle(color: Colors.red,fontSize: 18,fontWeight: FontWeight.w400),overflow: TextOverflow.fade,),
+                    child:  Text(myCar.type.toString(),style: TextStyle(color: Colors.red,fontSize: 18,fontWeight: FontWeight.w400),overflow: TextOverflow.fade,),
                   ),
                   Align(
                     alignment: Alignment.topCenter,
-                    child:  Text(myCar.model,style: TextStyle(color: Colors.black87,fontSize: 18,fontWeight: FontWeight.w400),overflow: TextOverflow.visible,),
+                    child:  Text(myCar.year,style: TextStyle(color: Colors.black87,fontSize: 18,fontWeight: FontWeight.w400),overflow: TextOverflow.visible,),
                   ),
                   Align(
                     alignment: Alignment.topCenter,

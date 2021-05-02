@@ -1,14 +1,15 @@
-import 'package:country_list_pick/country_list_pick.dart';
+import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:quick_car/models/new_user.dart';
-import 'package:quick_car/models/new_user.dart';
+import 'package:quick_car/constants/globals.dart';
+import 'package:quick_car/data_class/quick_car/user_signup.dart';
+import 'package:quick_car/states/signup_state.dart';
+import 'package:quick_car/view/widgets/buttons.dart';
 import 'package:quick_car/view/widgets/country_list_pick.dart';
+import 'package:quick_car/view/widgets/decorations.dart';
 
 
 class SignUpForm extends StatefulWidget {
-  NewUser user;
-  SignUpForm(this.user);
   @override
   State<StatefulWidget> createState() {
     return SignUpFormState();
@@ -27,23 +28,10 @@ class SignUpFormState extends State<SignUpForm> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _passwordController = TextEditingController();
-  BoxDecoration customDecoration ()
-  {
-    return BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(8),
-      boxShadow: [
-        BoxShadow(
-          offset: Offset(0,2),
-          color: Colors.grey[300],
-          blurRadius: 5,
-        )],
-    );
-  }
 
   Widget _buildFirstName() {
     return TextFormField(
-          decoration: InputDecoration(labelText: 'First name'),
+      decoration: InputDecoration(labelText: 'First Name'),
           maxLength: 10,
           validator: (String value) {
             if (value.isEmpty) {
@@ -52,14 +40,13 @@ class SignUpFormState extends State<SignUpForm> {
             return null;
           },
           onSaved: (String value) {
-            print("in saved");
             _firstName = value;
           },
     );
   }
   Widget _buildLastName() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Last name'),
+      decoration: InputDecoration(labelText: 'Last Name'),
       maxLength: 10,
       validator: (String value) {
         if (value.isEmpty) {
@@ -115,6 +102,7 @@ class SignUpFormState extends State<SignUpForm> {
   }
 
   Widget _buildPassword() {
+    int minPwdLen = 2;
     return TextFormField(
       obscureText: true,
       decoration: InputDecoration(labelText: 'Password'),
@@ -125,8 +113,8 @@ class SignUpFormState extends State<SignUpForm> {
         if (value.isEmpty) {
           return 'Password is Required';
         }
-        if (value.length < 8) {
-          return "Password must be atleast 8 characters long";
+        if (value.length < minPwdLen) {
+          return "Password must be at least ${minPwdLen} characters long";
         }
 
         return null;
@@ -139,7 +127,7 @@ class SignUpFormState extends State<SignUpForm> {
   Widget _buildPasswordVaildation() {
     return TextFormField(
       obscureText: true,
-      decoration: InputDecoration(labelText: 'Confirm password'),
+      decoration: InputDecoration(labelText: 'Confirm Password'),
       keyboardType: TextInputType.visiblePassword,
       validator: (String value) {
         if (value.isEmpty) {
@@ -183,8 +171,26 @@ class SignUpFormState extends State<SignUpForm> {
   }
 
   @override
+  void dispose() {
+    print("in signup form dispose");
+    super.dispose();
+  }
+
+  void _continuePressed() {
+    UserSignUp nu = UserSignUp();
+    nu.username = _email;
+    nu.firstName = _firstName;
+    nu.lastName = _lastName;
+    nu.email = _email;
+    nu.password = _password;
+    Globals.signUpApi.signUpNewUser(nu);
+    context
+        .flow<SignUpState>()
+        .update((signUpState) => signUpState.copyWith(formCompleted: true));
+  }
+
+  @override
   Widget build(BuildContext context) {
-    NewUser newUser = NewUser();
     return Scaffold(
       appBar: AppBar(title: Text("Sign up")),
       body: SingleChildScrollView(
@@ -201,28 +207,18 @@ class SignUpFormState extends State<SignUpForm> {
                 children: <Widget>[
                   _buildFirstName(),
                   _buildLastName(),
-                  _buildUserName(),
                   _buildEmail(),
                   _buildPassword(),
                   _buildPasswordVaildation(),
-                  _buildCountry(),
                   SizedBox(height: 100),
-                  TextButton(
-                    style: TextButton.styleFrom(backgroundColor: Colors.blue),
-                    child: Text(
-                      'Next',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(context,
-                          '/license');
-                      print(_country);
+                  nextButton(onPressed: () {
                       if (!_formKey.currentState.validate()) {
                         return;
                       }
                       _formKey.currentState.save();
-                      },
-                  )
+                      _continuePressed();
+                    },
+                  ),
                 ],
               ),
             ),

@@ -10,20 +10,20 @@ String signInUserToJson(UserSignIn data) => json.encode(data.toJson());
 
 class UserSignIn {
   UserSignIn({
-    this.username,
+    this.email,
     this.password,
   });
 
-  String username;
+  String email;
   String password;
 
   factory UserSignIn.fromJson(Map<String, dynamic> json) => UserSignIn(
-    username: json["username"],
+    email: json["username"],
     password: json["password"],
   );
 
   Map<String, dynamic> toJson() => {
-    "username": username,
+    "username": email,
     "password": password,
   };
 }

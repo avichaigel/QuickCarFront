@@ -33,6 +33,13 @@ dependencies:
   provider: ^5.0.0
   camera: ^0.8.1
   flutter_credit_card: ^2.0.0
+  flow_builder: ^0.0.2
+  image_picker: ^0.6.2
+  geocoding: ^1.0.5
+  flutter_typeahead: ^2.0.0
+  dropdown_search: ^0.5.0
+
+
 
 
 
@@ -59,7 +66,12 @@ dev_dependencies:
 flutter:
   assets:
     - assets/car-marker.png
-
+    - assets/upload-image.png
+    - assets/logout.png
+    - assets/login.png
+    - assets/car-upload.png
+    - assets/person.png
+    - assets/cars.png
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
