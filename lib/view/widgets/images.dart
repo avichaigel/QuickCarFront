@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 
 Widget image(String imagePath) {
+
   return Container(
     width: 400,
     height: 400,
@@ -37,4 +38,7 @@ Widget imageButtons(Function onCameraPressed, Function onGalleryPressed) {
           label: Text("Gallery"))
     ],
   );
+}
+Widget gitTest() {
+  return Text("test3");
 }
