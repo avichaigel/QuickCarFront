@@ -8,6 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quick_car/api/api_tester.dart';
 import 'package:quick_car/view/pages/upload_car/car_photos.dart';
 import 'package:quick_car/view/widgets/country_list_pick.dart';
+import 'package:quick_car/view/widgets/images.dart';
 
 class PlayGroundPage extends StatefulWidget {
   @override
