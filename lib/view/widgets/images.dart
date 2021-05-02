@@ -40,5 +40,5 @@ Widget imageButtons(Function onCameraPressed, Function onGalleryPressed) {
   );
 }
 Widget gitTest() {
-  return Text("test3");
+  return Text("test4");
 }
