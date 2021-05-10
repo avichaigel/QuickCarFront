@@ -3,7 +3,7 @@ import 'package:flutter_date_pickers/flutter_date_pickers.dart' as dp;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_car/models/filter_data.dart';
-import 'package:quick_car/view/results_view.dart';
+import 'package:quick_car/view/widgets/date_picker.dart';
 
 
 class SearchParameters extends StatefulWidget {
@@ -274,23 +274,5 @@ class SearchParametersState extends State<SearchParameters> {
   bool _isSelectable(DateTime day) {
     return true;
   }
-  dp.DatePickerRangeStyles styles = dp.DatePickerRangeStyles(
-    selectedPeriodLastDecoration: BoxDecoration(
-        color: Colors.blue,
-        borderRadius: const BorderRadius.only(
-            topRight: Radius.circular(24.0),
-            bottomRight: Radius.circular(24.0))),
-    selectedPeriodStartDecoration: BoxDecoration(
-      color: Colors.blue,
-      borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24.0),
-          bottomLeft: Radius.circular(24.0)
-      ),
-    ),
-    selectedPeriodMiddleDecoration: BoxDecoration(
-        color: Colors.blue, shape: BoxShape.rectangle),
-    nextIcon: const Icon(Icons.arrow_right),
-    prevIcon: const Icon(Icons.arrow_left),
-    // dayHeaderStyleBuilder: _dayHeaderStyleBuilder
-  );
+
 }

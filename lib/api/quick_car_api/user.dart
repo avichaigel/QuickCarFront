@@ -11,7 +11,12 @@ class UserApi {
 }
 class MockUserApi implements UserApi {
   Future<String> login(userSignIn) {
+    // For test:
+    return Future.value("123");
+
+    // Mocked Sign-up users:
     List<UserSignUp> myUsers = Globals.users;
+
     for(final userSignUp in myUsers) {
       if (userSignUp.password == userSignIn.password && userSignUp.email == userSignIn.email) {
         // get somehow the full user details from the server
@@ -29,18 +34,17 @@ class QuickCarUserApi implements UserApi {
     try {
       Map body = {'username': usi.email, 'password': usi.password };
       print(body);
-      var res = await http.post(Strings.QUICKCAR_URL +"users/login/", body: body);
+      var res = await http.post(Uri.parse(Strings.QUICKCAR_URL +"users/login/"), body: body);
       if (res.statusCode == 200) {
         print("login successful");
-        var tokenResponse = await http.post(Strings.QUICKCAR_URL +"api-token-auth/", body: body);
+        var tokenResponse = await http.post(Uri.parse(Strings.QUICKCAR_URL +"api-token-auth/"), body: body);
         var map = jsonDecode(tokenResponse.body);
         return map['token'];
       } else {
+        // TODO: do the reasons of fail
         throw 'login failed';
       }
     } catch (Exception) {
-      print(Exception.toString());
-      print("login error");
       throw Exception;
     }
 

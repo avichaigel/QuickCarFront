@@ -54,7 +54,7 @@ class _CarDetailsState extends State<CarDetails> {
       },
       textFieldConfiguration: TextFieldConfiguration(
         autofocus: false,
-        keyboardType: TextInputType.text,
+          keyboardType: TextInputType.text,
         textCapitalization: TextCapitalization.words,
         controller: _companyController,
         decoration: InputDecoration(
@@ -175,17 +175,8 @@ class _CarDetailsState extends State<CarDetails> {
 
   void _continuePressed() {
     context.flow<NewCarState>().update((newCarState) => newCarState.copywith(companyName: _company, model: _model,
-      kilometers: _kilometers, manufYear: _manufYear
+      kilometers: _kilometers, manufYear: _manufYear, type: _type
     ));
-    //this how to end the process of add a new car!
-    // context.flow<NewCarState>().complete((newCarState) {
-    //   return newCarState.copywith(companyName: _company,
-    //       model: _model,
-    //       kilometers: _kilometers,
-    //       manufYear: _manufYear);
-    // });
-
-
   }
   @override
   Widget build(BuildContext context) {

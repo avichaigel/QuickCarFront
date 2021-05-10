@@ -5,12 +5,16 @@ import 'package:quick_car/states/new_car_state.dart';
 import 'package:quick_car/view/pages/upload_car/car_details.dart';
 import 'package:quick_car/view/pages/upload_car/car_location.dart';
 import 'package:quick_car/view/pages/upload_car/car_photos.dart';
+import 'package:quick_car/view/pages/upload_car/dates_availability.dart';
+import 'package:quick_car/view/pages/upload_car/set_price.dart';
 
 List<Page> onGenerateSignUpPages(NewCarState carState, List<Page> pages) {
   return [
-    MaterialPage<void>(child: CarPhotos()),
-    if (carState.latitude != null && carState.longitude != null) MaterialPage(child: CarDetails()),
+    MaterialPage<void>(child: CarLocation()),
+    if (carState.latitude != null) MaterialPage(child: CarDetails()),
     if (carState.companyName != null) MaterialPage<void>(child: CarPhotos()),
+    if (carState.imagesUploaded == true) MaterialPage(child: DatesAvailability()),
+    if (carState.availabilityDone == true) MaterialPage(child: SetPrice())
   ];
 }
 class UploadCarFlow extends StatelessWidget  {

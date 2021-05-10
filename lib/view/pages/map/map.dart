@@ -67,7 +67,6 @@ class _GMapState extends State<GMap> {
   }
   @override
   Widget build(BuildContext context) {
-    print("in build");
     return Scaffold(
       body: SafeArea(
         child: Stack(

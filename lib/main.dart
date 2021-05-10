@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_car/botton_nav.dart';
+import 'package:quick_car/states/filter_sort_state.dart';
 import 'package:quick_car/states/user_state.dart';
 import 'package:quick_car/view/pages/login/login.dart';
 import 'package:quick_car/view/pages/signup/photo_menu.dart';
@@ -29,8 +30,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _getLocationPermission();
-    return ChangeNotifierProvider(
-      create: (_) => UserState(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_)=> UserState()),
+        ChangeNotifierProvider(create: (_)=>FilterSortState())
+      ],
       child: MaterialApp(
         title: 'QuickCar',
         theme: ThemeData(

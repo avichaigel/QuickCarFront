@@ -8,5 +8,5 @@ class Globals {
   static List<UserSignUp> users = [];
   static UserApi userApi = QuickCarUserApi();
   static SignUpApi signUpApi = QuickCarSignUpApi();
-  static CarsApi carsListApi = QuickCarCarsApi();
+  static CarsApi carsListApi = MockCarsApi();
 }

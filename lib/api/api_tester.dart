@@ -17,7 +17,7 @@ void addNewCarTest() async {
   try {
     var client = http.Client();
     print("token: " + Strings.TOKEN);
-    var response = await client.post(Strings.QUICKCAR_URL + "cars/",
+    var response = await client.post(Uri.parse(Strings.QUICKCAR_URL + "cars/"),
         headers: {
           'Authorization': 'TOKEN 96f1d648cc2b4975ddb01ea2a683caedc6c9f69c',
             'Content-Type':'application/json',

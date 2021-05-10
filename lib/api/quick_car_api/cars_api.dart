@@ -1,31 +1,32 @@
+import 'package:flutter/cupertino.dart';
+import 'package:path/path.dart';
+import 'package:async/async.dart';
+import 'dart:io';
+import 'package:dio/dio.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:quick_car/constants/strings.dart';
+import 'package:quick_car/data_class/quick_car/car_data.dart';
 import 'package:quick_car/data_class/quick_car/cars_list_model.dart';
-import 'package:quick_car/states/new_car_state.dart';
 
 class CarsApi {
-  Future<Cars> getCars () {}
-  void postCar(NewCarState ncs) async {}
+  Future<List<CarData>> getCars () {}
+  Future<CarData> postCar(CarData cd) async {}
 }
 class MockCarsApi implements CarsApi {
-  List<Car> myCars = [];
-  void postCar(NewCarState ncs) async {}
-
-  MockCarsApi() {
-    print("in MockCarsListApi C'tor");
+  Future<CarData> postCar(CarData cd) async {
+    return Future.value(cd);
   }
-  Future<Cars> getCars() async {
-    Car c1 = Car(id: 1, type: "family", color: "black", year: "200000");
-    Car c2 = Car(id: 2, type: "private", color: "black", year: "1999");
-    Car c3 = Car(id: 3, type: "----", color: "black", year: "1999");
+  Future<List<CarData>> getCars() async {
+    List<CarData> myCars = [];
+    CarData c1 = CarData("Toyota", "corola", 2000, 100, 32.0, 34.0, 20, "type", null, null);
+    CarData c2 = CarData("Lamborghini", "urus", 2000, 100, 32.0, 34.0, 100, "type", null, null);
     return Future.delayed(
         Duration(seconds: 2), () {
       myCars.add(c1);
       myCars.add(c2);
-      myCars.add(c3);
-      Cars cars = Cars(cars: myCars);
-      return cars;
+
+      return myCars;
     });
   }
 
@@ -33,31 +34,43 @@ class MockCarsApi implements CarsApi {
 class QuickCarCarsApi implements CarsApi {
   var client = http.Client();
 
-  void postCar(NewCarState ncs) async {
-    try {
-      int year = int.parse(ncs.manufYear);
-      var response = await client.post(Strings.QUICKCAR_URL + "cars/",
-          headers: {
-            'Authorization': 'TOKEN ${Strings.TOKEN}'
-//             'Content-Type':'application/json',
-          },
-          body: json.encode(ncs));
-      if (response.statusCode == 201) {
-        print("New car successfully added");
-      }
-      print("status code " + response.statusCode.toString());
-    } catch (e) {
-      print("Error: " + e.toString());
+  Future<CarData> postCar(CarData cd) async {
+    var stream = new http.ByteStream(DelegatingStream.typed(cd.image1.openRead()));
+    var length = await cd.image1.length();
+
+    var uri = Uri.parse(Strings.QUICKCAR_URL + "cars/");
+
+    var request = http.MultipartRequest("POST", uri)
+    ..fields['year'] = cd.year.toString()..fields['type'] = cd.type..fields['brand'] = cd.brand
+    ..fields['model']=cd.model..fields['kilometers']=cd.kilometers.toString()..fields['longitude'
+      ]=cd.longitude.toString()..fields['latitude']=cd.latitude.toString()..
+      fields['price_per_day_usd']=cd.pricePerDayUsd.toString();
+    var multipartFile = http.MultipartFile('image1', stream, length,
+        filename: basename(cd.image1.path));
+    //contentType: new MediaType('image', 'png'));
+    request.files.add(multipartFile);
+    request.headers['Authorization']= 'TOKEN ' + Strings.TOKEN;
+    print("requset" +request.fields.toString());
+    final response = await request.send();
+    print(response.statusCode);
+    if (response.statusCode == 201) {
+      response.stream.transform(utf8.decoder).listen((value) {
+        print(value);
+      });
+      return cd;
     }
+    throw Exception("Failed to post car");
 
   }
-  Future<Cars> getCars() async {
+
+
+  Future<List<CarData>> getCars() async {
     var client = http.Client();
     var result;
 
     try {
       var url = Strings.QUICKCAR_URL + "cars/";
-      var response = await client.get(url,  headers: {
+      var response = await client.get(Uri.parse(url),  headers: {
         'Authorization': 'TOKEN ${Strings.TOKEN}',
       });
       if (response.statusCode == 200) {

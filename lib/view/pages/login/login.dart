@@ -40,8 +40,6 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     final userState = Provider.of<UserState>(context);
-    String _email;
-    String _password;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -110,7 +108,7 @@ class _LoginState extends State<Login> {
                             userState.setFirstName("Ori");
                             userState.setIsLoggedIn(true);
                             Navigator.pushReplacementNamed(context, '/');
-                          }).catchError((error, stackTrace) => print("error:" +error.toString()));
+                          }).catchError((error, stackTrace) => print("error: " +error.toString()));
                   },
                   borderRadius: BorderRadius.circular(20),
                   splashColor: Colors.white,

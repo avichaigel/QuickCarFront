@@ -20,15 +20,17 @@ class PhotoMenu extends StatefulWidget {
 class _PhotoMenuState extends State<PhotoMenu> {
   String imagePath;
   File tmpFile;
-  Future<File> file;
-
+  Future<PickedFile> file;
+  ImagePicker _picker;
   chooseImage() {
-    file = ImagePicker.pickImage(source: ImageSource.gallery);
+    file =  _picker.getImage(source: ImageSource.gallery);
     file.then((value) {
       imagePath = value.path;
       setState(() {});
     });
-  }
+
+    }
+
 //https://www.coderzheaven.com/2019/04/30/upload-image-in-flutter-using-php/ send picture to server
   String base64Image;
 
@@ -108,33 +110,34 @@ class _PhotoMenuState extends State<PhotoMenu> {
     super.dispose();
   }
   Widget showImage() {
-    return FutureBuilder<File>(
-      future: file,
-      builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done &&
-            null != snapshot.data) {
-          tmpFile = snapshot.data;
-          base64Image = base64Encode(snapshot.data.readAsBytesSync());
-          imagePath = tmpFile.path;
-          return Flexible(
-            child: Image.file(
-              snapshot.data,
-              fit: BoxFit.fill,
-            ),
-          );
-        } else if (null != snapshot.error) {
-          return const Text(
-            'Error Picking Image',
-            textAlign: TextAlign.center,
-          );
-        } else {
-          return const Text(
-            'No Image Selected',
-            textAlign: TextAlign.center,
-          );
-        }
-      },
-    );
+    return Text("show image");
+    // return File>(
+    //   future: file,
+    //   builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+    //     if (snapshot.connectionState == ConnectionState.done &&
+    //         null != snapshot.data) {
+    //       tmpFile = snapshot.data;
+    //       base64Image = base64Encode(snapshot.data.readAsBytesSync());
+    //       imagePath = tmpFile.path;
+    //       return Flexible(
+    //         child: Image.file(
+    //           snapshot.data,
+    //           fit: BoxFit.fill,
+    //         ),
+    //       );
+    //     } else if (null != snapshot.error) {
+    //       return const Text(
+    //         'Error Picking Image',
+    //         textAlign: TextAlign.center,
+    //       );
+    //     } else {
+    //       return const Text(
+    //         'No Image Selected',
+    //         textAlign: TextAlign.center,
+    //       );
+    //     }
+    //   },
+    // );
   }
 
 

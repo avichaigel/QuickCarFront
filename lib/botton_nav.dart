@@ -1,11 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_car/playground.dart';
-import 'package:quick_car/view/pages/login/login.dart';
+import 'package:quick_car/view/pages/cars_list/results_view.dart';
 import 'package:quick_car/view/pages/map/map.dart';
 import 'package:quick_car/view/pages/profile/profile.dart';
-import 'package:quick_car/view/pages/signup/photo_menu.dart';
-import 'package:quick_car/view/results_view.dart';
 
 class BottomNavigation extends StatefulWidget {
   @override
@@ -13,7 +11,7 @@ class BottomNavigation extends StatefulWidget {
 }
 
 class _BottomNavigationState extends State<BottomNavigation> {
-  final tabs = [ ResultsPage(),
+  final tabs = [ ResultsView(),
     GMap(), Profile(), PlayGroundPage()];
   int _currentIndex = 0;
 

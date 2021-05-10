@@ -8,13 +8,13 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quick_car/states/new_car_state.dart';
 
-class CarLocationPage extends StatefulWidget {
+class CarLocation extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => CarLocation();
+  State<StatefulWidget> createState() => _CarLocationState();
 
 }
 
-class CarLocation extends State<CarLocationPage> {
+class _CarLocationState extends State<CarLocation> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -46,11 +46,8 @@ class _GeoListenPageState extends State<GeoListenPage> {
   @override
   void initState() {
     super.initState();
-
-
   }
   void _continuePressed() {
-    print("in cp");
     context
         .flow<NewCarState>()
         .update((carState) => carState.copywith(latitude: _location.latitude, longitude: _location.longitude));
@@ -58,7 +55,9 @@ class _GeoListenPageState extends State<GeoListenPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("Car location"),
+      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(12),
         child: Column(
@@ -70,6 +69,7 @@ class _GeoListenPageState extends State<GeoListenPage> {
             ),
             TextField(
               onTap: onTapTextField,
+              keyboardType: TextInputType.text,
               controller: _streetController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
@@ -116,11 +116,12 @@ class _GeoListenPageState extends State<GeoListenPage> {
                 ),
 
                 onPressed: () async {
+                  _locNotFound = false;
                   this._cityFocusNode.unfocus();
                   try {
-                    List<Location> locations = await locationFromAddress(
-                        _streetController.text + _numberController.text + ", " + _cityController.text
-                    );
+                    var x = _streetController.text + " " + _numberController.text + ", " + _cityController.text;
+                    print("address: " + x);
+                    List<Location> locations = await locationFromAddress(x);
                     setState(() {
                       print("in set state");
                       createMapDialog(LatLng(locations[0].latitude, locations[0].longitude));
@@ -128,6 +129,7 @@ class _GeoListenPageState extends State<GeoListenPage> {
                     });
 
                   } catch (e) {
+                    print(e);
                     print("address is not found");
                     setState(() {
                       _locNotFound = true;
@@ -193,15 +195,15 @@ class _GeoListenPageState extends State<GeoListenPage> {
                     Navigator.pop(context, false);
                     _continuePressed();
                     } ,
-                  child: Text("confirm")
+                  child: Text("Confirm Location")
               ),
               ElevatedButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: Text("back")
+                  child: Text("Back")
               ),
 
             ],
-          )
+          ),
 
         ],
       );

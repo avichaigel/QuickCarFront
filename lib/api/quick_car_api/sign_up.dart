@@ -50,7 +50,8 @@ class QuickCarSignUpApi implements SignUpApi {
     try {
       print(str);
       var map = {'car_license': str};
-      var response = await client.put(Strings.QUICKCAR_URL + "user",
+      String url = Strings.QUICKCAR_URL + "user";
+      var response = await client.put(Uri.parse(url),
           headers: {
             'Content-Type':'application/json',
             // 'Authorization': "TOKEN 6a0e8231a37806b025940b9047d2fe3ad6a204c7",
@@ -70,7 +71,8 @@ class QuickCarSignUpApi implements SignUpApi {
   Future<UserSignUp> signUpNewUser(UserSignUp user) async {
     print("in signUpNewUser:");
     try {
-      var response = await client.post(Strings.QUICKCAR_URL + "users/",
+      String url = Strings.QUICKCAR_URL + "users/";
+      var response = await client.post(Uri.parse(url),
           headers: {
             'Content-Type':'application/json',
           },

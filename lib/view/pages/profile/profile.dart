@@ -3,21 +3,48 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_car/api/quick_car_api/cars_api.dart';
 import 'package:quick_car/constants/globals.dart';
+import 'package:quick_car/data_class/quick_car/car_data.dart';
 import 'package:quick_car/states/new_car_state.dart';
 import 'package:quick_car/states/user_state.dart';
+import 'package:quick_car/view/pages/my_cars/MyCars.dart';
 import 'package:quick_car/view/pages/upload_car/upload_car_flow.dart';
 
 class Profile extends StatelessWidget {
+
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    void _showDialog (String title, String body) {
+      print("in show dialog");
+      showDialog(context: context, builder: (context) {
+      return AlertDialog(
+        title: new Text(title),
+        content: new Text(body),
+        actions: <Widget>[
+          // usually buttons at the bottom of the dialog
+          ElevatedButton(
+            child: Text("Close"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    });
+    }
+    return SingleChildScrollView(
+
       child: Consumer<UserState>(
         builder: (context, userState, child) {
           if (userState.isLoggedIn()) {
-            return Center(
+            return SafeArea(child:
+              Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  SizedBox(
+                    height: 30,
+                  ),
                   SizedBox(
                     height: 180,
                     child: Column(
@@ -46,11 +73,21 @@ class Profile extends StatelessWidget {
                     child: ListTile(
                       onTap: () async {
                           final NewCarState newCar = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => UploadCarFlow()));
-                          CarsApi _carsListApi = Globals.carsListApi;
+                          CarData cd = CarData(newCar.companyName, newCar.model, int.parse(newCar.manufYear),
+                              newCar.kilometers, newCar.longitude, newCar.latitude, newCar.pricePerDay, newCar.type,
+                              newCar.image1, newCar.images);
+                          Globals.carsListApi.postCar(cd).
+                          then((value) {
+                              _showDialog("Upload car success", "You can now see it in your car list...");
+                              value.lastUpdate = DateTime.now();
+                              print("value image: "+ value.image1.path);
+                              userState.addUserCar(value);
+                          } ).
+                          onError((error, stackTrace) {
+                              _showDialog("Upload car failed", "There was an error with the connection the the server");
+                          });
 
-                          print("in profile after flow finished: ${newCar.companyName}");
-                          _carsListApi.postCar(newCar);
-                        },
+                      },
                       title: Text("Upload new car"),
                       leading: CircleAvatar(
                         backgroundImage: AssetImage('assets/car-upload.png'),
@@ -60,7 +97,7 @@ class Profile extends StatelessWidget {
                   ),
                   Card(
                     child: ListTile(
-                      onTap: () {},
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyCars())),
                       title: Text("My cars"),
                       leading: CircleAvatar(
                         backgroundImage: AssetImage('assets/cars.png'),
@@ -68,6 +105,16 @@ class Profile extends StatelessWidget {
                       ),
                     ),
 
+                  ),
+                  Card(
+                    child: ListTile(
+                      onTap: () => print("on my reservations"),
+                      title: Text("My reservations"),
+                      leading: CircleAvatar(
+                        backgroundImage: AssetImage('assets/car-reservation.png'),
+                        backgroundColor: Colors.white,
+                      ),
+                    ),
                   ),
                   Card(
                     child: ListTile(
@@ -93,13 +140,17 @@ class Profile extends StatelessWidget {
                   )
                 ],
               ),
+            )
             );
           } else {
-            return Center(
+            return SafeArea(child: Center(
                 child: SizedBox(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          SizedBox(
+                            height: 30,
+                          ),
                           CircleAvatar(
                             radius: 40.0,
                             backgroundImage: AssetImage("assets/car-marker.png"),
@@ -133,7 +184,8 @@ class Profile extends StatelessWidget {
                         ],
                     )
             )
-          );
+          )
+            );
 
           }
         },
