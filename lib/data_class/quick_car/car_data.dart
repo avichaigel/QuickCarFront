@@ -1,27 +1,31 @@
 
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_date_pickers/flutter_date_pickers.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:quick_car/data_class/quick_car/cars_list_model.dart';
 
 class CarData {
   CarData(String brand,
     String model,
     int year,
     int kilometers,
-    double longitude,
     double latitude,
+    double longitude,
     int pricePerDayUsd,
     String type,
     File image1,
     List<File> images,
-  ) {
+      ) {
     this.brand = brand;
     this.model = model;
     this.year = year;
     this.kilometers = kilometers;
-    this.longitude = longitude;
     this.latitude = latitude;
+    this.longitude = longitude;
     this.pricePerDayUsd = pricePerDayUsd;
     this.type = type;
     this.image1 = image1;
@@ -29,16 +33,72 @@ class CarData {
 
   }
 
+  CarData.fromCarData({
+    this.id,
+    this.brand,
+    this.model,
+    this.year,
+    this.kilometers,
+    this.owner,
+    this.latitude,
+    this.longitude,
+    this.pricePerDayUsd,
+    this.type,
+    this.image1,
+    this.image2,
+    this.image3,
+    this.image4,
+    this.cardates
+});
+
+  int id;
   String brand;
   String model;
   int year;
   int kilometers;
-  double longitude;
+  String owner;
   double latitude;
+  double longitude;
   int pricePerDayUsd;
   String type;
   File image1;
+  File image2;
+  File image3;
+  File image4;
+  List<DatePeriod> cardates;
   List<File> images;
   DateTime lastUpdate;
 
+  List<Placemark> placeMarks;
+  double distanceFromLocation;
+
+  factory CarData.fromJson(Map<dynamic, dynamic> json) {
+    double d1;
+    double d2;
+    int i;
+    try {
+    d1 = double.parse(json["latitude"]);
+    d2 = double.parse(json["longitude"]);
+    } catch (e) {}
+    return CarData.fromCarData(
+        id: json["id"],
+        brand: json["brand"],
+        model: json["model"],
+        year: json["year"],
+        kilometers: json["kilometers"],
+        owner: json["owner"],
+        latitude: d1,
+        longitude: d2,
+        pricePerDayUsd: json["price_per_day_usd"] as int,
+        type: json["type"],
+      image1: File(json["image1"]),
+      // image2: File(json["image2"]),
+      // image3: File(json["image3"]),
+      // image4: File(json["image4"]),
+
+
+
+
+    );
+  }
 }

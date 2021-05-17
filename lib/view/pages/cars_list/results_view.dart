@@ -2,13 +2,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_car/api/quick_car_api/cars_api.dart';
 import 'package:quick_car/constants/globals.dart';
+
 import 'package:quick_car/data_class/quick_car/car_data.dart';
 
 import 'package:http/http.dart' as http;
-import 'package:quick_car/states/filter_sort_state.dart';
+import 'package:quick_car/states/search_state.dart';
 import 'package:quick_car/view/pages/cars_list/car_Item.dart';
+import 'package:quick_car/view/pages/cars_list/search_parameters.dart';
 import 'package:quick_car/view/pages/cars_list/sort.dart';
 
 
@@ -17,27 +18,16 @@ class ResultsView extends StatefulWidget {
   State<StatefulWidget> createState() => ResultsViewState();
 }
 class ResultsViewState extends State<ResultsView> {
-  //SHOULD BE HERE:
-  // final Future<List<CarData>> carsList = Globals.carsListApi.getCars();
-
   @override
 Widget build(BuildContext context) {
-    final Future<List<CarData>> carsList = Globals.carsListApi.getCars();
-
-    return Consumer<FilterSortState>(
-        builder: (context, params, child) {
-          return   SafeArea(
+    return Consumer<SearchState>(
+        builder: (context, searchState, child) {
+          return SafeArea(
               child: Column(
                 children: [
                   SizedBox(height: 10,),
                   InkWell(
                     borderRadius: BorderRadius.circular(20),
-                    // onTap: () {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(builder: (context) => SearchParameters()),
-                    //   );
-                    // },
                     splashColor: Colors.white,
                     child: Container(
                       decoration: BoxDecoration(
@@ -51,6 +41,7 @@ Widget build(BuildContext context) {
                             SizedBox(
                               width: 10,
                             ),
+                            // TDOD: search with search icon, filter by car company
                             Icon(Icons.search),
                             SizedBox(
                               width: 10,
@@ -59,6 +50,16 @@ Widget build(BuildContext context) {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Spacer(),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 12.0, right: 12),
+                              child: GestureDetector(
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => SearchParameters()),
+                                ),
+                                child: Icon(Icons.filter_alt),
+                              ),
+                            ),
                             Padding(
                               padding: const EdgeInsets.only(right: 8.0),
                               child: GestureDetector(
@@ -72,15 +73,13 @@ Widget build(BuildContext context) {
                       ),
                     ),
                   ),
-                  Text("Sort by: " + params.sortBy ),
                   Expanded (
                       child: SizedBox(
                           height: 100.0,
                           child: FutureBuilder<List<CarData>>(
-                              future: carsList,
+                              future: searchState.carsList,
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
-                                  print("len: " + snapshot.data.length.toString());
                                   return ListView.builder(
                                       itemCount: snapshot.data.length,
                                       itemBuilder: (context, index) {

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +9,7 @@ import 'package:quick_car/data_class/quick_car/car_data.dart';
 import 'package:quick_car/states/new_car_state.dart';
 import 'package:quick_car/states/user_state.dart';
 import 'package:quick_car/view/pages/my_cars/MyCars.dart';
+import 'package:quick_car/view/pages/upload_car/dates_availability.dart';
 import 'package:quick_car/view/pages/upload_car/upload_car_flow.dart';
 
 class Profile extends StatelessWidget {
@@ -76,11 +79,11 @@ class Profile extends StatelessWidget {
                           CarData cd = CarData(newCar.companyName, newCar.model, int.parse(newCar.manufYear),
                               newCar.kilometers, newCar.longitude, newCar.latitude, newCar.pricePerDay, newCar.type,
                               newCar.image1, newCar.images);
-                          Globals.carsListApi.postCar(cd).
+                          Globals.carsApi.postCar(cd).
                           then((value) {
                               _showDialog("Upload car success", "You can now see it in your car list...");
                               value.lastUpdate = DateTime.now();
-                              print("value image: "+ value.image1.path);
+                              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => DatesAvailability(value.id)));
                               userState.addUserCar(value);
                           } ).
                           onError((error, stackTrace) {

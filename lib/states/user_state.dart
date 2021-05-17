@@ -4,6 +4,7 @@ import 'package:quick_car/data_class/quick_car/car_data.dart';
 class UserState extends ChangeNotifier {
   bool _isLoggedIn = false;
   bool isLoggedIn() => _isLoggedIn;
+  bool isCarLicenseUploaded() => true;
   String _token;
   String _firstName;
   String getFirstName() => _firstName;

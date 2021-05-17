@@ -35,20 +35,3 @@ Widget image(String imagePath) {
   );
 }
 
-Widget imageButtons(Function onCameraPressed, Function onGalleryPressed) {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    children: [
-      TextButton.icon(
-          onPressed: () => onCameraPressed(ImageSource.camera),
-          label: Text("Camera"),
-          icon: Icon(Icons.camera_alt),
-
-      ),
-      TextButton.icon(
-          onPressed: () => onGalleryPressed(ImageSource.gallery),
-          icon: Icon(Icons.image),
-          label: Text("Gallery"))
-    ],
-  );
-}

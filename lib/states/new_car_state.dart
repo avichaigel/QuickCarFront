@@ -3,7 +3,6 @@ import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 
 class NewCarState {
   // 1
-  //longitude latitude
   final double latitude;
   final double longitude;
 
@@ -17,21 +16,17 @@ class NewCarState {
   // 3
   final bool imagesUploaded;
   final File image1;
+  final String path1;
   final List<File> images;
 
   // 4
-  final DatePeriod availability;
-  final bool availabilityDone;
-
-  // 5
   final int pricePerDay;
 
   const NewCarState({this.latitude, this.longitude, this.companyName, this.model, this.kilometers, this.manufYear,
-    this.type, this.imagesUploaded, this.image1, this.images, this.availability, this.availabilityDone, this.pricePerDay});
+    this.type, this.imagesUploaded, this.image1, this.path1, this.images, this.pricePerDay});
 
   NewCarState copywith({double latitude, double longitude, String companyName, String model, int kilometers,
-    String manufYear, String type, bool imagesUploaded, List<File> images, File image1, DatePeriod availability,
-    bool availabilityDone, int pricePerDay}) {
+    String manufYear, String type, bool imagesUploaded, List<File> images, File image1, String path1, int pricePerDay}) {
     return NewCarState(
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
@@ -43,9 +38,8 @@ class NewCarState {
       imagesUploaded: imagesUploaded ?? this.imagesUploaded,
       images: images ?? this.images,
       image1: image1 ?? this.image1,
-      availability: availability ?? this.availability,
-      availabilityDone: availabilityDone ?? this.availabilityDone,
-      pricePerDay: pricePerDay ?? this.pricePerDay
+        path1: path1 ?? this.path1,
+        pricePerDay: pricePerDay ?? this.pricePerDay
 
     );
   }

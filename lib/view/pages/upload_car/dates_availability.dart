@@ -5,24 +5,36 @@ import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
+import 'package:quick_car/constants/globals.dart';
 import 'package:quick_car/states/new_car_state.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
 import 'package:quick_car/view/widgets/date_picker.dart';
 
 class DatesAvailability extends StatefulWidget {
+  int carId;
+  DatesAvailability(this.carId);
   @override
   _DatesAvailabilityState createState() => _DatesAvailabilityState();
 }
 
 class _DatesAvailabilityState extends State<DatesAvailability> {
-  DatePeriod _datePeriod = DatePeriod(DateTime.now().add(Duration(days: 4)), DateTime.now());
+  DatePeriod _currDatePeriod = DatePeriod(DateTime.now().add(Duration(days: 4)), DateTime.now());
   int _number;
   String _period = "Months";
-  bool _noLimit = false;
+  bool _noAvailability = false;
+  bool _isLoading = false;
+  List<dp.DatePeriod> _availabilityDates;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _availabilityDates = [];
+
+  }
 
   void onChangeDate(datePeriod) {
   setState(() {
-  _datePeriod = datePeriod;
+  _currDatePeriod = datePeriod;
   });
 
   }
@@ -45,11 +57,7 @@ class _DatesAvailabilityState extends State<DatesAvailability> {
 
       }
   }
-  void _continuePressed() {
-    context
-        .flow<NewCarState>()
-        .update((carState) => carState.copywith(availability: _datePeriod, availabilityDone: true));
-  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -60,7 +68,7 @@ class _DatesAvailabilityState extends State<DatesAvailability> {
       body: SingleChildScrollView(
         // child: Center(
 
-          child: Column(
+          child: !_isLoading ? Column(
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -69,21 +77,7 @@ class _DatesAvailabilityState extends State<DatesAvailability> {
               SizedBox(
                 height: 20,
               ),
-              Padding(
-                padding: const EdgeInsets.all(2),
-                child: CheckboxListTile(
-                    title: Text("No dates limitation"),
-                    value: _noLimit,
-                    onChanged: (value){
-                      setState(() {
-                        _noLimit = value;
-                      });
-                    }),
-              ),
-              AnimatedOpacity(
-                  opacity: _noLimit ? 0.0 : 1.0,
-                  duration: Duration(milliseconds: 500),
-                  child:  Column(
+              Column(
               children: [
               Text(
               "Available for the next",
@@ -104,7 +98,6 @@ class _DatesAvailabilityState extends State<DatesAvailability> {
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           isDense: true,
-                          border: OutlineInputBorder(),
                         ),
                       ),
                     ),
@@ -136,7 +129,7 @@ class _DatesAvailabilityState extends State<DatesAvailability> {
               ),
               Container(
                 child: dp.RangePicker(
-                  selectedPeriod: _datePeriod,
+                  selectedPeriod: _currDatePeriod,
                   onChanged: onChangeDate,
                   // selectableDayPredicate: _isSelectable,
                   datePickerStyles: styles,
@@ -146,26 +139,93 @@ class _DatesAvailabilityState extends State<DatesAvailability> {
                 ),
               ),
 
-              Text("Start date: " + DateFormat("yyyy-MM-dd").format(_datePeriod.start)  +
-                  "\nEnd date: " + DateFormat("yyyy-MM-dd").format(_datePeriod.end),
-                style: TextStyle(fontSize: 20),
+              Text("Start date: " + DateFormat("yyyy-MM-dd").format(_currDatePeriod.start)  +
+                  "\nEnd date: " + DateFormat("yyyy-MM-dd").format(_currDatePeriod.end),
+                style: TextStyle(fontSize: 18),
 
               ),
             ],
-          )
-              ),
+          ),
               SizedBox(
                 height: 15,
               ),
+              TextButton(
+                  onPressed: () {
+                    if (_noAvailability == true) {
+                      return;
+                    }
+                    setState(() {
+                      _availabilityDates.add(_currDatePeriod);
+                    });
+                  },
+                  child: Text("Add")
+              ),
 
-              nextButton(onPressed: () => {
-                _continuePressed()
-              }),
+              Padding(
+                padding: const EdgeInsets.all(4),
+                child: createTable()
+              ),
+              Padding(
+                padding: const EdgeInsets.all(2),
+                child: CheckboxListTile(
+                    title: Text("Car will not be available"),
+                    value: _noAvailability,
+                    onChanged: (value){
+                      setState(() {
+                        _noAvailability = value;
+                        if (_noAvailability == true) {
+                          _availabilityDates = [];
+                        }
+                      });
+                    }),
+              ),
+              TextButton(
+                  style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.lightBlue),
+                  foregroundColor: MaterialStateProperty.all(Colors.white)),
+                  onPressed: () async {
+                    if (_noAvailability == true) {
+                      Navigator.pop(context);
+                      return;
+                    }
+                    setState(() {
+                      _isLoading = true;
+                    });
+                    await Globals.carsApi.postCarDates(widget.carId, _availabilityDates[0]);
+                    setState(() {
+                      _isLoading = false;
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: Text("Submit")
+              )
             ],
-          ),
+          ) : Center(child:CircularProgressIndicator()),
         // ),
       ) ,
     );
 
+  }
+
+  Table createTable() {
+    List<TableRow> rows = [];
+    rows.add( TableRow(
+      children: [
+      Text("Start date", style: TextStyle(fontWeight: FontWeight.bold),),
+      Text("End date", style: TextStyle(fontWeight: FontWeight.bold),),
+    ]
+    )
+    );
+    for (int i = 0; i < _availabilityDates.length; i++) {
+      rows.add(TableRow(
+        children: [
+          Text(DateFormat("yyyy-MM-dd").format(_availabilityDates[i].start)),
+          Text(DateFormat("yyyy-MM-dd").format(_availabilityDates[i].end)),
+        ]
+      ));
+    }
+    return Table(
+      border: TableBorder.all(),
+      children: rows,
+    );
   }
 }

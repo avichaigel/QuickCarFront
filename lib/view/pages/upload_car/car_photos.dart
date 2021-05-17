@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'dart:async';
 import 'package:flow_builder/flow_builder.dart';
@@ -23,38 +26,27 @@ class _CarPhotosState extends State<CarPhotos> {
   List<File> images = [];
   bool _errorVisibility = false;
   int currIndex = 0;
-  Future<File> file;
   final _picker = ImagePicker();
+  String applicationDocumentsDirectoryPath;
 
-  chooseImage(ImageSource source) async {
+  void uploadPhoto(ImageSource source) async {
+      PickedFile image = await _picker.getImage(
+          source: source);
+    if (image == null) {
+      return;
+    }
+    File imageFile = File(image.path);
+      int number = Random().nextInt(100000);
+      try {
+        File newImage = await imageFile.copy('$applicationDocumentsDirectoryPath/image$number.png');
+        await imageFile.delete();
+       images[currIndex] = newImage;
 
-    PickedFile image = await _picker.getImage(source: source);
+      } catch (e) {
+        print("exception: " + e.toString());
+      }
 
-      setState(() {
-        if (image == null) {
-          return;
-        }
-        images[currIndex] = File(image.path);
-      });
-  }
-  void takePhoto(ImageSource source) async {
-    await _picker.getImage(
-               source: source);
-        //
-    // try {
-    //   print("in take photo 1");
-    //   PickedFile pickedFile = await _picker.getImage(
-    //       source: source);
-    //
-    //     setState(() {
-    //       if (pickedFile == null) {
-    //         return;
-    //       }
-    //       images[currIndex] = File(pickedFile.path);
-    //     });
-    // } catch (Exception) {
-    //   print("exception in take photo: " + Exception.toString() );
-    // }
+    setState(() {});
   }
 
   @override
@@ -64,8 +56,6 @@ class _CarPhotosState extends State<CarPhotos> {
     images.add(_imageFile2);
     images.add(_imageFile3);
     images.add(_imageFile4);
-
-
   }
   Border imageBorder(int imageIdx) {
     return Border.all(
@@ -92,11 +82,15 @@ class _CarPhotosState extends State<CarPhotos> {
   void _continuePressed() {
     context
         .flow<NewCarState>()
-        .update((carState) => carState.copywith(image1: images[0], images: images, imagesUploaded: true ));
+        .update((carState) => carState.copywith(image1: images[0], imagesUploaded: true ));
   }
-
+  void setApplicationDocumentsDirectoryPath() async {
+    final Directory directory = await getApplicationDocumentsDirectory();
+    applicationDocumentsDirectoryPath = directory.path;
+  }
   @override
   Widget build(BuildContext context) {
+    setApplicationDocumentsDirectoryPath();
     return Scaffold(
       appBar: AppBar(
         title: Text("Upload photos"),
@@ -116,7 +110,22 @@ class _CarPhotosState extends State<CarPhotos> {
                         decoration: BoxDecoration(
                             border: imageBorder(0)),
                         child: GestureDetector(
-                          child: images[0] != null ? newImage(Image.file(images[0])) : newImage(null),
+                          // child: Text(pathes[0]),
+                          child: Container(
+                            width: 300,
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.black)
+                            ),
+                            child: images[0] == null  ? Image(
+                              image: AssetImage("assets/upload-image.png"),
+                            ) : FittedBox(
+                              // child: Image.file(images[0]),
+                              // fit: BoxFit.fill,
+                              child: Image(
+                                image: FileImage(images[0]),
+                              ),
+                            ),
+                          ),
                           onTap: () => setState(() => currIndex = 0),
                         ),
                       ),
@@ -127,7 +136,19 @@ class _CarPhotosState extends State<CarPhotos> {
                         decoration: BoxDecoration(
                             border: imageBorder(1)),
                         child: GestureDetector(
-                          child: images[1] != null ? newImage(Image.file(images[1])) : newImage(null),
+                          child: Container(
+                            width: 300,
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.black)
+                            ),
+                            child: images[1] == null  ? Image(
+                              image: AssetImage("assets/upload-image.png"),
+                            ) : FittedBox(
+                              child: Image(
+                                image: FileImage(images[1]),
+                              ),
+                            ),
+                          ),
                           onTap: () => setState(() => currIndex = 1),
 
                         ),
@@ -139,7 +160,20 @@ class _CarPhotosState extends State<CarPhotos> {
                         decoration: BoxDecoration(
                             border: imageBorder(2)),
                         child: GestureDetector(
-                          child: images[2] != null ? newImage(Image.file(images[2])) : newImage(null),
+                          child: Container(
+                            width: 300,
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.black)
+                            ),
+                            child: images[2] == null  ? Image(
+                              image: AssetImage("assets/upload-image.png"),
+                            ) : FittedBox(
+                              child: Image(
+                                image: FileImage(images[2]),
+                              ),
+                            ),
+                          ),
+                          // child: images[2] != null ? newImage(Image.file(images[2])) : newImage(null),
                           onTap: () => setState(() => currIndex = 2),
 
                         ),
@@ -152,7 +186,20 @@ class _CarPhotosState extends State<CarPhotos> {
                               border: imageBorder(3)
                           ),
                         child: GestureDetector(
-                          child: images[3] != null ? newImage(Image.file(images[3])) : newImage(null),
+                          child: Container(
+                            width: 300,
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.black)
+                            ),
+                            child: images[3] == null  ? Image(
+                              image: AssetImage("assets/upload-image.png"),
+                            ) : FittedBox(
+                              child: Image(
+                                image: FileImage(images[3]),
+                              ),
+                            ),
+                          ),
+                          // child: images[3] != null ? newImage(Image.file(images[3])) : newImage(null),
                           onTap: () => setState(() => currIndex = 3),
 
                         ),
@@ -162,20 +209,50 @@ class _CarPhotosState extends State<CarPhotos> {
                   ],
                 ),
               ),
-              imageButtons(takePhoto, chooseImage),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton.icon(
+                    onPressed: () => uploadPhoto(ImageSource.camera),
+                    label: Text("Camera"),
+                    icon: Icon(Icons.camera_alt),
+
+                  ),
+                  TextButton.icon(
+                      onPressed: () => uploadPhoto(ImageSource.gallery),
+                      icon: Icon(Icons.image),
+                      label: Text("Gallery")
+                  ),
+                  TextButton.icon(
+                      onPressed: () async{
+                        if (images[currIndex] != null) {
+                          try {
+                            await images[currIndex]
+                                .delete();
+                            images[currIndex] = null;
+                            setState(() { });
+                          } catch (e) {
+                            print("exception " + e.toString());
+                          }
+                        }
+                      },
+                      icon: Icon(Icons.delete),
+                      label: Text("Delete"))
+                ],
+              ),
               errorWidget(),
               SizedBox(
                 height: 100,
               ),
               nextButton(onPressed: () {
-                // for(var i=0;i<2;i++){
-                //   if (images[i] == null) {
-                //     setState(() {
-                //     _errorVisibility = true;
-                //     });
-                //     return;
-                //   }
-                // }
+                for(var i = 0; i < 2; i++){
+                  if (images[i] == null) {
+                    setState(() {
+                    _errorVisibility = true;
+                    });
+                    return;
+                  }
+                }
                 _continuePressed();
               })
             ],
