@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_car/data_class/quick_car/car_data.dart';
-import 'package:quick_car/data_class/quick_car/cars_list_model.dart';
 import 'package:quick_car/models/distance.dart';
 import 'package:quick_car/states/user_state.dart';
-import 'package:quick_car/view/pages/reserve_car/confirm_dates.dart';
+import 'package:quick_car/view/pages/reserve_car/choose_dates.dart';
 import 'package:location/location.dart' as loc;
 
 import 'car_details.dart';
@@ -32,18 +31,17 @@ class CarItemView extends StatelessWidget {
                         ),
                         child: AspectRatio(
                           aspectRatio: 1,
-                          // not working:
-                          // child: myCar.image1 != null ? Image.network(myCar.image1.path + ".jpg") : Text("no image"),
-                          child: Text("no image"),
+                          child: myCar.image1 != null ? Image.network(myCar.image1.path) : Text("no image"),
                         ),
                       ),
                       onTap: () async {
-                        try {
-                          this.myCar.placeMarks = await placemarkFromCoordinates(this.myCar.latitude, this.myCar.longitude);
-                        } catch (e) {
-                          print("no location found");
-                        }
-                        Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => CarDetails(this.myCar))); },
+                        // try {
+                        //   this.myCar.placeMarks = await placemarkFromCoordinates(this.myCar.latitude, this.myCar.longitude);
+                        // } catch (e) {
+                        //   print("no location found");
+                        // }
+                        // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => CarDetails(this.myCar)));
+                        },
                     ),
                   ),
 
@@ -97,17 +95,13 @@ class CarItemView extends StatelessWidget {
                     ),
                     child: InkWell(
                       child: Text("Book now",style: TextStyle(color: Colors.white),),
-                      onTap: () {
-                        if (!state.isLoggedIn()) {
-                          print("user is not logged in");
-                          return;
-                        }
-                        if (!state.isCarLicenseUploaded()) {
-                          print("car license is not uploaded");
-                          return;
-                        }
-                        Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => ConfirmDates()));
-
+                      onTap: () async {
+                          try {
+                            this.myCar.placeMarks = await placemarkFromCoordinates(this.myCar.latitude, this.myCar.longitude);
+                          } catch (e) {
+                            print("no location found");
+                          }
+                          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => CarDetails(this.myCar)));
                       },
                     ),
                   )

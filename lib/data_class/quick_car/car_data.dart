@@ -1,12 +1,6 @@
-
-
-import 'dart:convert';
 import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:quick_car/data_class/quick_car/cars_list_model.dart';
 
 class CarData {
   CarData(String brand,
@@ -73,6 +67,17 @@ class CarData {
   double distanceFromLocation;
 
   factory CarData.fromJson(Map<dynamic, dynamic> json) {
+    List<DatePeriod> datesPeriod = [];
+    List<dynamic> dates =  json["cardates"];
+    List<String> splitDatesStr = [];
+    DateTime from;
+    DateTime to;
+    for (int i = 0; i < dates.length; i++) {
+      splitDatesStr =  dates[i].toString().split(" ");
+      from = DateTime.parse(splitDatesStr[1]);
+      to = DateTime.parse(splitDatesStr[3]);
+      datesPeriod.add(DatePeriod(from, to));
+    }
     double d1;
     double d2;
     int i;
@@ -95,6 +100,7 @@ class CarData {
       // image2: File(json["image2"]),
       // image3: File(json["image3"]),
       // image4: File(json["image4"]),
+      cardates: datesPeriod
 
 
 

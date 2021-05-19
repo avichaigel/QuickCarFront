@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_)=> UserState()),
-        ChangeNotifierProvider(create: (_)=>SearchState())
+        ChangeNotifierProvider(create: (_)=> SearchState())
       ],
       child: MaterialApp(
         title: 'QuickCar',

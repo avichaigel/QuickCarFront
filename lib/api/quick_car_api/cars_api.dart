@@ -1,3 +1,7 @@
+import 'package:http_parser/http_parser.dart' as http_parser;
+
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:geocoding/geocoding.dart';
@@ -11,9 +15,9 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:quick_car/constants/strings.dart';
 import 'package:quick_car/data_class/quick_car/car_data.dart';
-import 'package:quick_car/data_class/quick_car/cars_list_model.dart';
 import 'package:quick_car/models/distance.dart';
 
 class CarsApi {
@@ -29,6 +33,7 @@ class MockCarsApi implements CarsApi {
   Future<CarData> postCarDates(int carId, DatePeriod datePeriod) async {}
 
   Future<List<CarData>> getCars(String values) async {
+
     List<CarData> myCars = [];
     //in barcelona
     CarData c1 = CarData("Toyota", "corola", 2000, 100, 41.379442728352956, 2.1745192577523897, 20, "type", File("assets/car-marker.png"), null);
@@ -106,6 +111,7 @@ class QuickCarCarsApi implements CarsApi {
   var client = http.Client();
 
   Future<CarData> postCarDates(int carId, DatePeriod datePeriod) async {
+    print("in post");
     var uri = Uri.parse(Strings.QUICKCAR_URL + "cars/cardates/");
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
     print("date: " + formatter.format(datePeriod.start));
@@ -136,9 +142,12 @@ class QuickCarCarsApi implements CarsApi {
     ..fields['model']=cd.model..fields['kilometers']=cd.kilometers.toString()..fields['longitude'
       ]=cd.longitude.toString()..fields['latitude']=cd.latitude.toString()..
       fields['price_per_day_usd']=cd.pricePerDayUsd.toString();
+
     var multipartFile = http.MultipartFile('image1', stream, length,
-        filename: basename(cd.image1.path));
-    //contentType: new MediaType('image', 'png'));
+        filename: basename(cd.image1.path), contentType: new http_parser.MediaType('image', 'png'));
+
+
+
     request.files.add(multipartFile);
     request.headers['Authorization']= 'TOKEN ' + Strings.TOKEN;
     print("requset" +request.fields.toString());
@@ -155,6 +164,7 @@ class QuickCarCarsApi implements CarsApi {
     throw Exception("Failed to post car");
 
   }
+
   void setLocation(loc.LocationData _myLoc, CarData cd) {
     if (cd.longitude == null || cd.latitude == null) {
       return;
@@ -172,6 +182,7 @@ class QuickCarCarsApi implements CarsApi {
       if (cd.latitude == null || cd.longitude == null) {
         continue;
       }
+
       list.add(cd);
     }
     return list;
