@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
@@ -241,7 +238,6 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                                 content: Text("Error occurred"),
                                 duration: Duration(seconds: 2),
                               ),
-
                             );
 
                           }
