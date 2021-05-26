@@ -1,4 +1,3 @@
-import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart' as dp;
 import 'package:intl/intl.dart';
 
@@ -6,8 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:quick_car/constants/globals.dart';
-import 'package:quick_car/states/new_car_state.dart';
-import 'package:quick_car/view/widgets/buttons.dart';
 import 'package:quick_car/view/widgets/date_picker.dart';
 
 class DatesAvailability extends StatefulWidget {
@@ -190,7 +187,7 @@ class _DatesAvailabilityState extends State<DatesAvailability> {
                     setState(() {
                       _isLoading = true;
                     });
-                    await Globals.carsApi.postCarDates(widget.carId, _availabilityDates[0]);
+                    await Globals.carsApi.postCarDates(widget.carId, _availabilityDates);
                     setState(() {
                       _isLoading = false;
                     });
@@ -199,7 +196,7 @@ class _DatesAvailabilityState extends State<DatesAvailability> {
                   child: Text("Submit")
               )
             ],
-          ) : Center(child:CircularProgressIndicator()),
+          ) : Center(child:Center(child: CircularProgressIndicator())),
         // ),
       ) ,
     );

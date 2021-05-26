@@ -1,16 +1,14 @@
 import 'dart:math';
-
-import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'dart:async';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter/cupertino.dart';
+import 'package:quick_car/constants/cars_globals.dart';
+import 'package:quick_car/constants/strings.dart';
 import 'package:quick_car/states/new_car_state.dart';
+import 'package:quick_car/view/widgets/camera_demo.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
-import 'package:quick_car/view/widgets/images.dart';
 
 class CarPhotos extends StatefulWidget {
   @override
@@ -26,11 +24,20 @@ class _CarPhotosState extends State<CarPhotos> {
   List<File> images = [];
   bool _errorVisibility = false;
   int currIndex = 0;
-  final _picker = ImagePicker();
-  String applicationDocumentsDirectoryPath;
 
+  void callBack(String path) {
+    images[currIndex] = File(path);
+  }
+
+  void uploadPhotoNew() async {
+    await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => CameraDemo(callBack)));
+    setState(() {
+
+    });
+
+  }
   void uploadPhoto(ImageSource source) async {
-      PickedFile image = await _picker.getImage(
+      PickedFile image = await CarsGlobals.picker.getImage(
           source: source);
     if (image == null) {
       return;
@@ -38,7 +45,7 @@ class _CarPhotosState extends State<CarPhotos> {
     File imageFile = File(image.path);
       int number = Random().nextInt(100000);
       try {
-        File newImage = await imageFile.copy('$applicationDocumentsDirectoryPath/image$number.png');
+        File newImage = await imageFile.copy(Strings.APPLICATION_DOCUMENTS_DIRECTORY_PATH +'/image$number.png');
         await imageFile.delete();
        images[currIndex] = newImage;
 
@@ -84,13 +91,12 @@ class _CarPhotosState extends State<CarPhotos> {
         .flow<NewCarState>()
         .update((carState) => carState.copywith(image1: images[0], imagesUploaded: true ));
   }
-  void setApplicationDocumentsDirectoryPath() async {
-    final Directory directory = await getApplicationDocumentsDirectory();
-    applicationDocumentsDirectoryPath = directory.path;
-  }
+
   @override
   Widget build(BuildContext context) {
-    setApplicationDocumentsDirectoryPath();
+    if (Strings.APPLICATION_DOCUMENTS_DIRECTORY_PATH == null) {
+      CarsGlobals.setApplicationDocumentsDirectoryPath();
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text("Upload photos"),
@@ -213,7 +219,7 @@ class _CarPhotosState extends State<CarPhotos> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   TextButton.icon(
-                    onPressed: () => uploadPhoto(ImageSource.camera),
+                    onPressed: () => uploadPhotoNew(),
                     label: Text("Camera"),
                     icon: Icon(Icons.camera_alt),
 

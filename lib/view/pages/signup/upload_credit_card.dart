@@ -3,26 +3,52 @@ import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:quick_car/states/signup_state.dart';
+import 'package:quick_car/states/user_state.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
+import 'package:stripe_payment/stripe_payment.dart';
 
-class CreditCard extends StatefulWidget {
-  CreditCard();
+class UploadCreditCard extends StatefulWidget {
+  bool addSkipButton;
+  UserState state;
+  UploadCreditCard({bool asb, UserState st}) {
+    addSkipButton = asb;
+    state = st;
+  }
   @override
-  _CreditCardState createState() => _CreditCardState();
+  _UploadCreditCardState createState() => _UploadCreditCardState();
 }
 
-class _CreditCardState extends State<CreditCard> {
+class _UploadCreditCardState extends State<UploadCreditCard> {
   String cardNumber = '';
   String cardHolderName = '';
+  // TODO: change date to int month and int year
   String expiryDate = '';
   String cvvCode = '';
   bool isCvvFocused = false;
+  bool isValid = false;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   void _continuePressed() {
-    context.flow<SignUpState>().complete((signupState) {
-      return signupState.copyWith(creditCardCompleted: true);
-    });
+    if (widget.addSkipButton) {
+      if (isValid) {
+        CreditCard creditCard = CreditCard(number: cardNumber,
+            name: cardHolderName,expMonth: 1, expYear:2024, cvc: cvvCode);
+        context.flow<SignUpState>().complete((signupState) {
+          return signupState.copyWith(creditCard: creditCard);
+        });
+      }
+      context.flow<SignUpState>().complete((signupState) {
+        return signupState;
+      });
+    } else if (widget.state != null) {
+      if (isValid) {
+        CreditCard creditCard = CreditCard(number: cardNumber,
+            name: cardHolderName,expMonth: 1, expYear:2024, cvc: cvvCode);
+        widget.state.addCreditCard(creditCard);
+        Navigator.pop(context);
+      }
+    }
+
   }
 
   @override
@@ -30,7 +56,7 @@ class _CreditCardState extends State<CreditCard> {
     return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
-          title: Text("Credit Card details"),
+          title: Text("Credit Card Details"),
         ),
         body: SafeArea(
           child: Column(
@@ -83,7 +109,7 @@ class _CreditCardState extends State<CreditCard> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
-                          primary: const Color(0xff1b447b),
+                          primary: Colors.lightBlue,
                         ),
                         child: Container(
                           margin: const EdgeInsets.all(8),
@@ -98,10 +124,12 @@ class _CreditCardState extends State<CreditCard> {
                           ),
                         ),
                         onPressed: () {
+                          // TODO: if valid
+                          isValid = true;
                           _continuePressed();
                         },
                       ),
-                      skipButton(onPressed: () => _continuePressed())
+                      addSkipButton()
                     ],
                   ),
                 ),
@@ -120,5 +148,13 @@ class _CreditCardState extends State<CreditCard> {
       cvvCode = creditCardModel.cvvCode;
       isCvvFocused = creditCardModel.isCvvFocused;
     });
+  }
+
+  Widget addSkipButton() {
+    if (widget.addSkipButton) {
+      return skipButton(onPressed: () => _continuePressed());
+    } else return SizedBox(
+      height: 5,
+    );
   }
 }

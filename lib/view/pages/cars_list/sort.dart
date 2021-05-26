@@ -15,7 +15,7 @@ class Sort extends StatefulWidget {
 class _SortState extends State<Sort> {
   List<String> _priceOptions = [Strings.SORT_BY_PRICE_CHEAP_TO_EXP, Strings.SORT_BY_PRICE_EXP_TO_CHEAP];
 
-  void setSortBy(SearchState state, String value) {
+  void setSortBy(SearchState state, String value, bool openTabs) {
     if (value == Strings.SORT_BY_PRICE_CHEAP_TO_EXP) {
       state.setSortedByPrice();
       state.sortedByName = Strings.SORT_BY_PRICE_CHEAP_TO_EXP;
@@ -26,7 +26,11 @@ class _SortState extends State<Sort> {
       state.setSortedByDist();
       state.sortedByName = Strings.SORT_BY_DISTANCE;
     }
-    state.getCars();
+    if (openTabs == true) {
+      state.refresh();
+    } else {
+      state.loadCars();
+    }
   }
   @override
   Widget build(BuildContext context) {
@@ -41,7 +45,7 @@ class _SortState extends State<Sort> {
           color: state.sortedByPrice() ? Colors.greenAccent : null,
           child: ListTile(
             onTap:() {
-              setSortBy(state, Strings.SORT_BY_PRICE_CHEAP_TO_EXP);
+              setSortBy(state, Strings.SORT_BY_PRICE_CHEAP_TO_EXP, true);
             },
             title: Text("Price"),
       )
@@ -55,7 +59,7 @@ class _SortState extends State<Sort> {
         picked: state.sortedByPrice() ? state.sortedByName : null,
           labels: _priceOptions,
           onSelected: (String selected) {
-            setSortBy(state, selected);
+            setSortBy(state, selected, false);
             Timer(Duration(seconds: 1), () {
               Navigator.pop(context);
             });
@@ -68,7 +72,7 @@ class _SortState extends State<Sort> {
         color: state.sortedByDist() ? Colors.greenAccent : null,
       child: ListTile(
       onTap:() {
-        setSortBy(state, Strings.SORT_BY_DISTANCE);
+        setSortBy(state, Strings.SORT_BY_DISTANCE, false);
         Timer(Duration(seconds: 1), () {
           // 5s over, navigate to a new page
           Navigator.pop(context);

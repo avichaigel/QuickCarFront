@@ -3,18 +3,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_car/data_class/quick_car/car_data.dart';
+import '../../../data_class/car_data.dart';
 import 'package:quick_car/models/distance.dart';
 import 'package:quick_car/states/user_state.dart';
 import 'package:quick_car/view/pages/reserve_car/choose_dates.dart';
 import 'package:location/location.dart' as loc;
 
-import 'car_details.dart';
+import '../reserve_car/reservation_details.dart';
 
 
-class CarItemView extends StatelessWidget {
+class CarItem extends StatelessWidget {
   final CarData myCar;
-  CarItemView(this.myCar);
+  CarItem(this.myCar);
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +101,7 @@ class CarItemView extends StatelessWidget {
                           } catch (e) {
                             print("no location found");
                           }
-                          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => CarDetails(this.myCar)));
+                          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => ReservationDetails(this.myCar)));
                       },
                     ),
                   )

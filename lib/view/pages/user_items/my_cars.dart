@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_car/data_class/quick_car/car_data.dart';
+import '../../../data_class/car_data.dart';
 import 'package:quick_car/states/user_state.dart';
 
 class MyCars extends StatelessWidget {
@@ -15,9 +15,9 @@ class MyCars extends StatelessWidget {
         body: Consumer<UserState>(
           builder: (context, userState, child) {
             List<CarData> myCars = userState.getMyCars();
-            return ListView.builder(
+             return ListView.builder(
               itemCount: myCars.length,
-                itemBuilder: (context, int index) {
+                  itemBuilder: (context, int index) {
                 CarData car = myCars[index];
                 return Card(
                   child: ListTile(

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:quick_car/constants/globals.dart';
 import 'package:quick_car/constants/strings.dart';
-import 'package:quick_car/data_class/quick_car/user_signup.dart';
+import '../../data_class/user_signup.dart';
 import 'package:http/http.dart' as http;
 
 
@@ -70,6 +70,7 @@ class QuickCarSignUpApi implements SignUpApi {
   }
   Future<UserSignUp> signUpNewUser(UserSignUp user) async {
     print("in signUpNewUser:");
+    print("user: " + user.toJson().toString());
     try {
       String url = Strings.QUICKCAR_URL + "users/";
       var response = await client.post(Uri.parse(url),

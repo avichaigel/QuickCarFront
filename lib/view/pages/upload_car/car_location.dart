@@ -112,7 +112,7 @@ class _GeoListenPageState extends State<GeoListenPage> {
                 ),
                 child: Text(
                   "Get Location",
-                  style: TextStyle(color: Colors.black),
+                  style: TextStyle(color: Colors.white),
                 ),
 
                 onPressed: () async {

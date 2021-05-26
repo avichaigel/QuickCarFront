@@ -1,4 +1,10 @@
 
+import 'dart:io';
+
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:quick_car/constants/strings.dart';
+
 class CarsGlobals {
   static const List<String> carTypes = <String>['Family', 'Sports', 'Mini', 'Off-road'];
   static const List<String> companies = <String>[
@@ -114,4 +120,12 @@ class CarsGlobals {
     "Zaz",
     "Zil",
   ];
+  static const double MAX_DISTANCE = 100.0;
+  static void setApplicationDocumentsDirectoryPath() async {
+    final Directory directory = await getApplicationDocumentsDirectory();
+    Strings.APPLICATION_DOCUMENTS_DIRECTORY_PATH = directory.path;
+    print("app documents directory path set successfully");
+  }
+  static final picker = ImagePicker();
+  static const List<String> startDriveAngles = ["front", "side 1", "back", "side 2"];
 }

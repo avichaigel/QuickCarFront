@@ -1,36 +1,31 @@
+import 'dart:async';
+
 import 'package:http_parser/http_parser.dart' as http_parser;
-
-import 'dart:math';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:geopoint/geopoint.dart';
 import 'package:intl/intl.dart';
 import "package:latlong/latlong.dart" as latLng;
 import 'package:location/location.dart' as loc;
 import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'dart:io';
-import 'package:dio/dio.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
 import 'package:quick_car/constants/strings.dart';
-import 'package:quick_car/data_class/quick_car/car_data.dart';
+import '../../data_class/car_data.dart';
 import 'package:quick_car/models/distance.dart';
 
 class CarsApi {
   Future<List<CarData>> getCars (String values) {}
   Future<CarData> postCar(CarData cd) async {}
-  Future<CarData> postCarDates(int carId, DatePeriod datePeriod) async {}
+  Future<CarData> postCarDates(int carId, List<DatePeriod> datePeriod) async {}
 
 }
 class MockCarsApi implements CarsApi {
   Future<CarData> postCar(CarData cd) async {
     return Future.value(cd);
   }
-  Future<CarData> postCarDates(int carId, DatePeriod datePeriod) async {}
+  Future<CarData> postCarDates(int carId, List<DatePeriod> datePeriod) async {}
 
   Future<List<CarData>> getCars(String values) async {
 
@@ -110,11 +105,11 @@ class MockCarsApi implements CarsApi {
 class QuickCarCarsApi implements CarsApi {
   var client = http.Client();
 
-  Future<CarData> postCarDates(int carId, DatePeriod datePeriod) async {
+  Future<CarData> postCarDates(int carId, List<DatePeriod> datesPeriod) async {
     print("in post");
+    DatePeriod datePeriod = datesPeriod[0];
     var uri = Uri.parse(Strings.QUICKCAR_URL + "cars/cardates/");
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
-    print("date: " + formatter.format(datePeriod.start));
     try {
       Map body = { 'dateFrom': formatter.format(datePeriod.start), 'dateTo': formatter.format(datePeriod.end),'car': carId };
       var res = await http.post(uri,
@@ -146,20 +141,21 @@ class QuickCarCarsApi implements CarsApi {
     var multipartFile = http.MultipartFile('image1', stream, length,
         filename: basename(cd.image1.path), contentType: new http_parser.MediaType('image', 'png'));
 
-
-
     request.files.add(multipartFile);
     request.headers['Authorization']= 'TOKEN ' + Strings.TOKEN;
-    print("requset" +request.fields.toString());
+    print("request: " +request.fields.toString());
     final response = await request.send();
     print(response.statusCode);
     if (response.statusCode == 201) {
       response.stream.transform(utf8.decoder).listen((value) {
-        print(value);
+        print("value returned: " + value.toString());
         cd.id = json.decode(value)['id'];
         print("id: " + cd.id.toString());
       });
+      //TODO: delete it
+      Timer(Duration(seconds: 3), () => print("after timer"));
       return cd;
+
     }
     throw Exception("Failed to post car");
 
@@ -195,15 +191,16 @@ class QuickCarCarsApi implements CarsApi {
       var url = Strings.QUICKCAR_URL + "cars/";
       var response = await client.get(Uri.parse(url));
       if (response.statusCode == 200) {
-        var jsonString = response.body;
-        jsonString = "{" + '"cars":' + jsonString + "}";
-        result = upgradeCars(jsonString);
-
+        var json = response.body;
+        json = "{" + '"cars":' + json + "}";
+        result = upgradeCars(json);
+        print("get cars successful");
+        return result;
       }
-    } catch (Exception) {
-      print("error");
+    } catch (e) {
+      print("error in get cars: " + e.toString());
+      return null;
     }
-    return result;
 
   }
 

@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_car/constants/globals.dart';
 
-import 'package:quick_car/data_class/quick_car/car_data.dart';
+import '../../../data_class/car_data.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:quick_car/states/search_state.dart';
-import 'package:quick_car/view/pages/cars_list/car_Item.dart';
+import 'package:quick_car/view/pages/cars_list/car_item.dart';
 import 'package:quick_car/view/pages/cars_list/search_parameters.dart';
 import 'package:quick_car/view/pages/cars_list/sort.dart';
 
@@ -18,10 +18,22 @@ class ResultsView extends StatefulWidget {
   State<StatefulWidget> createState() => ResultsViewState();
 }
 class ResultsViewState extends State<ResultsView> {
+
+  
+  bool _init = false;
+  void _initialize(SearchState state) {
+    if (!_init) {
+      state.loadCars();
+      _init = true;
+    }
+  }
   @override
 Widget build(BuildContext context) {
+    print("in build results view");
     return Consumer<SearchState>(
-        builder: (context, searchState, child) {
+        builder: (context, state, child) {
+          print("in build consumer results view");
+          _initialize(state);
           return SafeArea(
               child: Column(
                 children: [
@@ -41,7 +53,7 @@ Widget build(BuildContext context) {
                             SizedBox(
                               width: 10,
                             ),
-                            // TDOD: search with search icon, filter by car company
+                            // TODO: search with search icon, filter by car company
                             Icon(Icons.search),
                             SizedBox(
                               width: 10,
@@ -53,12 +65,14 @@ Widget build(BuildContext context) {
                             Padding(
                               padding: const EdgeInsets.only(left: 12.0, right: 12),
                               child: GestureDetector(
-                                onTap: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => SearchParameters()),
-                                ),
-                                child: Icon(Icons.filter_alt),
-                              ),
+                                onTap: () {
+                                  print("on pressed");
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) =>
+                                          SearchParameters()));
+                                },
+                                child:Icon(Icons.filter_alt)                              ),
                             ),
                             Padding(
                               padding: const EdgeInsets.only(right: 8.0),
@@ -74,23 +88,21 @@ Widget build(BuildContext context) {
                     ),
                   ),
                   Expanded (
-                      child: SizedBox(
-                          height: 100.0,
                           child: FutureBuilder<List<CarData>>(
-                              future: searchState.carsList,
+                              future: state.carsList,
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
                                   return ListView.builder(
                                       itemCount: snapshot.data.length,
                                       itemBuilder: (context, index) {
                                         var car = snapshot.data[index];
-                                        return CarItemView(car);
+                                        return CarItem(car);
                                       });
                                 } else {
                                   return Center(child: CircularProgressIndicator()); }
                               })
                       )
-                  )
+
                 ],
               )
           );

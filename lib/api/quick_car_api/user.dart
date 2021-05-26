@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:quick_car/constants/globals.dart';
 import 'package:quick_car/constants/strings.dart';
-import 'package:quick_car/data_class/quick_car/user_signin.dart';
-import 'package:quick_car/data_class/quick_car/user_signup.dart';
+import '../../data_class/user_signin.dart';
+import '../../data_class/user_signup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserApi {

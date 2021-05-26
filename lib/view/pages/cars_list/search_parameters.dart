@@ -1,17 +1,11 @@
-
 import 'package:flutter_date_pickers/flutter_date_pickers.dart' as dp;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_car/constants/cars_globals.dart';
-import 'package:quick_car/models/filter_data.dart';
 import 'package:quick_car/states/search_state.dart';
-import 'package:quick_car/states/user_state.dart';
 import 'package:quick_car/view/widgets/date_picker.dart';
-
-
-
 
 class SearchParameters extends StatefulWidget {
   @override
@@ -46,7 +40,7 @@ class SearchParametersState extends State<SearchParameters> {
                   child: IconButton(
                     icon: Icon(Icons.arrow_back,color: Colors.black87,size: 23,),
                     onPressed: (){
-                      state.getCars();
+                      state.loadCars();
                       Navigator.pop(context);
                     },),
                 ),
@@ -316,7 +310,7 @@ class _DistanceFilterState extends State<DistanceFilter> {
   double _value;
 
   Text distText() {
-    if (_value == 100.0) {
+    if (_value == CarsGlobals.MAX_DISTANCE) {
       return Text("No limitation");
     } else {
       return Text("${_value.toInt().toString()} km");
@@ -327,7 +321,7 @@ class _DistanceFilterState extends State<DistanceFilter> {
     return Consumer<SearchState>(
       builder: (context, state, chile) {
         if (_value == null) {
-          _value = state.distanceFilter();
+          _value = state.distanceFilter() != null ?  state.distanceFilter(): CarsGlobals.MAX_DISTANCE;
         }
         return Column(
           children: [
@@ -340,12 +334,12 @@ class _DistanceFilterState extends State<DistanceFilter> {
                     Slider(
                       value: _value,
                       min: 0.0,
-                      max: 100.0,
+                      max: CarsGlobals.MAX_DISTANCE,
                       onChanged: (value){
                         setState(() {
                           _value = value;
                         });
-                        if (_value == 100) {
+                        if (_value == CarsGlobals.MAX_DISTANCE) {
                           state.setDistFilter(null);
                         } else {
                           state.setDistFilter(_value);

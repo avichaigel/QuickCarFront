@@ -5,36 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_car/api/quick_car_api/cars_api.dart';
 import 'package:quick_car/constants/globals.dart';
-import 'package:quick_car/data_class/quick_car/car_data.dart';
+import 'package:quick_car/view/widgets/general.dart';
+import '../../../data_class/car_data.dart';
 import 'package:quick_car/states/new_car_state.dart';
 import 'package:quick_car/states/user_state.dart';
-import 'package:quick_car/view/pages/my_cars/MyCars.dart';
+import 'package:quick_car/view/pages/profile/personal_details.dart';
 import 'package:quick_car/view/pages/upload_car/dates_availability.dart';
 import 'package:quick_car/view/pages/upload_car/upload_car_flow.dart';
+import 'package:quick_car/view/pages/user_items/my_cars.dart';
+import 'package:quick_car/view/pages/user_items/my_reservations.dart';
 
 class Profile extends StatelessWidget {
 
 
   @override
   Widget build(BuildContext context) {
-    void _showDialog (String title, String body) {
-      print("in show dialog");
-      showDialog(context: context, builder: (context) {
-      return AlertDialog(
-        title: new Text(title),
-        content: new Text(body),
-        actions: <Widget>[
-          // usually buttons at the bottom of the dialog
-          ElevatedButton(
-            child: Text("Close"),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-    });
-    }
+
     return SingleChildScrollView(
 
       child: Consumer<UserState>(
@@ -76,18 +62,20 @@ class Profile extends StatelessWidget {
                     child: ListTile(
                       onTap: () async {
                           final NewCarState newCar = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => UploadCarFlow()));
+                          if (newCar.pricePerDay == null)
+                            return;
                           CarData cd = CarData(newCar.companyName, newCar.model, int.parse(newCar.manufYear),
-                              newCar.kilometers, newCar.longitude, newCar.latitude, newCar.pricePerDay, newCar.type,
+                              newCar.kilometers, newCar.latitude, newCar.longitude, newCar.pricePerDay, newCar.type,
                               newCar.image1, newCar.images);
                           Globals.carsApi.postCar(cd).
                           then((value) {
-                              _showDialog("Upload car success", "You can now see it in your car list...");
+                              myShowDialog(context, "Upload car success", "You can now see it in your car list...");
                               value.lastUpdate = DateTime.now();
                               Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => DatesAvailability(value.id)));
                               userState.addUserCar(value);
                           } ).
                           onError((error, stackTrace) {
-                              _showDialog("Upload car failed", "There was an error with the connection the the server");
+                            myShowDialog(context, "Upload car failed", "There was an error with the connection the the server");
                           });
 
                       },
@@ -111,7 +99,7 @@ class Profile extends StatelessWidget {
                   ),
                   Card(
                     child: ListTile(
-                      onTap: () => print("on my reservations"),
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyReservations())),
                       title: Text("My reservations"),
                       leading: CircleAvatar(
                         backgroundImage: AssetImage('assets/car-reservation.png'),
@@ -121,7 +109,7 @@ class Profile extends StatelessWidget {
                   ),
                   Card(
                     child: ListTile(
-                      onTap: () {},
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => PersonalDetails())),
                       title: Text("Personal details"),
                       leading: CircleAvatar(
                         backgroundImage: AssetImage('assets/person.png'),

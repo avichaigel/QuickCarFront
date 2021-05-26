@@ -23,3 +23,9 @@ Widget skipButton({@required Function onPressed}) {
       )
   );
 }
+ButtonStyle disabled() {
+  return ButtonStyle(
+    foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+    backgroundColor: MaterialStateProperty.all<Color>(Colors.black12)
+  );
+}

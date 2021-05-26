@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,9 @@ import 'package:quick_car/view/pages/signup/signup_form.dart';
 import 'package:quick_car/view/pages/signup/signup_flow.dart';
 import 'package:quick_car/view/pages/upload_car/upload_car_flow.dart';
 
+
+List<CameraDescription> cameras;
+
 class MyHttpOverrides extends HttpOverrides{
   @override
   HttpClient createHttpClient(SecurityContext context){
@@ -19,9 +23,10 @@ class MyHttpOverrides extends HttpOverrides{
       ..badCertificateCallback = (X509Certificate cert, String host, int port)=> true;
   }
 }
-void main() {
+void main() async {
   HttpOverrides.global = MyHttpOverrides();
-
+  WidgetsFlutterBinding.ensureInitialized();
+  cameras = await availableCameras();
   runApp(MyApp());
 }
 

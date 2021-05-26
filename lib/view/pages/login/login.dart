@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_car/constants/globals.dart';
 import 'package:quick_car/constants/strings.dart';
-import 'package:quick_car/data_class/quick_car/user_signin.dart';
-import 'package:quick_car/data_class/quick_car/user_signup.dart';
+import '../../../data_class/user_signin.dart';
+import '../../../data_class/user_signup.dart';
 import 'package:quick_car/states/user_state.dart';
 
 
@@ -89,6 +89,7 @@ class _LoginState extends State<Login> {
                     controller: passwordController,
                   ),
                 ),
+                // TODO: maybe delete it if will not be implemented
                 Padding(
                     padding: const EdgeInsets.only(bottom:30),
                     child: Align(
@@ -97,13 +98,11 @@ class _LoginState extends State<Login> {
                   ),
                 InkWell(
                   onTap: () async {
-                      var token;
                       Globals.userApi.login(UserSignIn(email: emailController.text, password: passwordController.text))
                           .then((value) {
-                            token = value;
-                            userState.setToken(token);
-                            print("token gotton after login ${token}");
-                            Strings.TOKEN = token;
+                            userState.setToken(value);
+                            print("token: ${value}");
+                            Strings.TOKEN = value;
                             // should ask for all the personal details and put them in the state
                             userState.setFirstName("Ori");
                             userState.setIsLoggedIn(true);
@@ -145,7 +144,8 @@ class _LoginState extends State<Login> {
                                   style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600, fontSize: 14),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
-                                      Navigator.pushNamed(context, '/signup');                                    }
+                                      Navigator.pushNamed(context, '/signup');
+                                  }
                                 )
                               ]),
                         ),
