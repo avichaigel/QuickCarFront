@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:quick_car/constants/cars_globals.dart';
 
 class CarData {
   CarData(String brand,
@@ -11,7 +12,6 @@ class CarData {
     double longitude,
     int pricePerDayUsd,
     String type,
-    File image1,
     List<File> images,
       ) {
     this.brand = brand;
@@ -38,10 +38,7 @@ class CarData {
     this.longitude,
     this.pricePerDayUsd,
     this.type,
-    this.image1,
-    this.image2,
-    this.image3,
-    this.image4,
+    this.images,
     this.cardates
 });
 
@@ -80,7 +77,12 @@ class CarData {
     }
     double d1;
     double d2;
-    int i;
+    List<File> images = [];
+    for (int i = 0; i < CarsGlobals.maximumCarImages; i++) {
+      if (json["image${i+1}"] != null) {
+        images.add(File(json["image${i+1}"]));
+      }
+    }
     try {
     d1 = double.parse(json["latitude"]);
     d2 = double.parse(json["longitude"]);
@@ -96,7 +98,7 @@ class CarData {
         longitude: d2,
         pricePerDayUsd: json["price_per_day_usd"] as int,
         type: json["type"],
-      image1: File(json["image1"]),
+      images: images,
       // image2: File(json["image2"]),
       // image3: File(json["image3"]),
       // image4: File(json["image4"]),

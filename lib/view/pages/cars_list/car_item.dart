@@ -23,26 +23,29 @@ class CarItem extends StatelessWidget {
         children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: GestureDetector(
-                      child: Card(
-                        clipBehavior: Clip.antiAlias,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                    child: myCar.images != null ? Container(
+                      child: GestureDetector(
+                        child: Card(
+                          clipBehavior: Clip.antiAlias,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: AspectRatio(
+                            aspectRatio: 1,
+                            child: myCar.images[0] != null ? Image.network(myCar.images[0].path) : Text("no image"),
+                          ),
                         ),
-                        child: AspectRatio(
-                          aspectRatio: 1,
-                          child: myCar.image1 != null ? Image.network(myCar.image1.path) : Text("no image"),
-                        ),
-                      ),
-                      onTap: () async {
-                        // try {
-                        //   this.myCar.placeMarks = await placemarkFromCoordinates(this.myCar.latitude, this.myCar.longitude);
-                        // } catch (e) {
-                        //   print("no location found");
-                        // }
-                        // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => CarDetails(this.myCar)));
+                        onTap: () async {
+                          // try {
+                          //   this.myCar.placeMarks = await placemarkFromCoordinates(this.myCar.latitude, this.myCar.longitude);
+                          // } catch (e) {
+                          //   print("no location found");
+                          // }
+                          // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => CarDetails(this.myCar)));
                         },
-                    ),
+                      ),
+                    ) : Text("car is missing images")
+
                   ),
 
           Row(
@@ -60,7 +63,7 @@ class CarItem extends StatelessWidget {
                             children: [
                               Icon(Icons.location_pin, size: 12,),
                               Text(
-                                myCar.distanceFromLocation.toInt().toString() + " km",
+                                myCar.distanceFromLocation.toInt().toString() + " km away",
                                 style: TextStyle(color: Colors.black45,fontSize: 12,fontWeight: FontWeight.w400),
                                 overflow: TextOverflow.fade,
                               ),
@@ -87,25 +90,7 @@ class CarItem extends StatelessWidget {
               ),
               Consumer<UserState>(
                 builder: (context, state, child) {
-                  return Container(
-                    padding: EdgeInsets.symmetric(horizontal: 15,vertical: 10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.blue
-                    ),
-                    child: InkWell(
-                      child: Text("Book now",style: TextStyle(color: Colors.white),),
-                      onTap: () async {
-                          try {
-                            this.myCar.placeMarks = await placemarkFromCoordinates(this.myCar.latitude, this.myCar.longitude);
-                          } catch (e) {
-                            print("no location found");
-                          }
-                          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => ReservationDetails(this.myCar)));
-                      },
-                    ),
-                  )
-                  ;
+                  return bookNowButton(myCar, context);
                 },
               )
 
@@ -119,4 +104,21 @@ class CarItem extends StatelessWidget {
     );
   }
 
+}
+ElevatedButton bookNowButton(CarData car, BuildContext context) {
+  return ElevatedButton(
+    child: Text("Book now",style: TextStyle(color: Colors.white),),
+    onPressed: () async {
+      if (car.images == null) {
+        print("car images is null");
+        return null;
+      }
+      try {
+        car.placeMarks = await placemarkFromCoordinates(car.latitude, car.longitude);
+      } catch (e) {
+        print("no location found");
+      }
+      Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => ReservationDetails(car)));
+    },
+  );
 }

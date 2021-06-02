@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import '../data_class/car_data.dart';
@@ -6,14 +7,19 @@ import 'package:stripe_payment/stripe_payment.dart';
 
 class UserState extends ChangeNotifier {
   bool _isLoggedIn = false;
+  File _carLicensePhoto;
   CreditCard _creditCard;
   bool isLoggedIn() => _isLoggedIn;
-  bool isCarLicenseUploaded() => true;
+  File getCarLicensePhoto() => _carLicensePhoto;
   CreditCard getCreditCard() => _creditCard;
   //TODO: maybe need to delete token from user state
   String _token;
   String _firstName;
+  String _lastName;
+  String _email;
+  String getEmail () => _email;
   String getFirstName() => _firstName;
+  String getLastName() => _lastName;
   String getToken() => _token;
   List<CarData> _carsAsRenterOut = [];
   List<Reservation> _reservationsAsBorrower = [];
@@ -25,6 +31,12 @@ class UserState extends ChangeNotifier {
   void addUserCar(CarData cd) {
     _carsAsRenterOut.add(cd);
     notifyListeners();
+  }
+  void setUserCars(List<CarData> carsList) {
+    for (int i = 0;i< carsList.length; i++) {
+      print(carsList[i].id);
+    }
+    _carsAsRenterOut = carsList;
   }
   void addUserReservation(Reservation r) {
     _reservationsAsBorrower.add(r);
@@ -38,7 +50,10 @@ class UserState extends ChangeNotifier {
     _reservationsAsBorrower.remove(r);
     notifyListeners();
   }
-
+  void deleteCreditCard() {
+    _creditCard = null;
+    notifyListeners();
+  }
   void setIsLoggedIn(bool value) {
     _isLoggedIn = value;
     notifyListeners();
@@ -47,8 +62,24 @@ class UserState extends ChangeNotifier {
     _firstName = fn;
     notifyListeners();
   }
+  void setLastName(String ln){
+    _lastName = ln;
+    notifyListeners();
+  }
   void addCreditCard(CreditCard cd) {
     _creditCard = cd;
+    notifyListeners();
+  }
+  void setLoginSetup(String fn, String ln, String em, bool isLoggedIn, File carLicense) {
+    _firstName = fn;
+    _lastName = ln;
+    _email = em;
+    _isLoggedIn = isLoggedIn;
+    _carLicensePhoto = carLicense;
+    notifyListeners();
+  }
+  void setCarLicensePhoto(File clp) {
+    _carLicensePhoto = clp;
     notifyListeners();
   }
 }

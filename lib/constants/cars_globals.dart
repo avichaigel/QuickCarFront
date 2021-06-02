@@ -4,9 +4,17 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:quick_car/constants/strings.dart';
-
+import 'package:quick_car/repository/repository.dart';
+import '../api/cars_api.dart';
+import '../api/user.dart';
+import '../api/sign_up.dart';
+enum carTypes { allTypes, family, sports, mini, offRoad }
 class CarsGlobals {
-  static const List<String> carTypes = <String>['Family', 'Sports', 'Mini', 'Off-road'];
+  static UserApi userApi = QuickCarUserApi();
+  static SignUpApi signUpApi = QuickCarSignUpApi();
+  static CarsApi carsApi = QuickCarCarsApi();
+  static Repository repository = Repository();
+  static const List<String> carTypes = <String>['All types', 'Family', 'Sports', 'Mini', 'Off-road'];
   static const List<String> companies = <String>[
     "Acura",
     "Alfa romeo",
@@ -128,4 +136,5 @@ class CarsGlobals {
   }
   static final picker = ImagePicker();
   static const List<String> startDriveAngles = ["front", "side 1", "back", "side 2"];
+  static const int maximumCarImages = 4;
 }

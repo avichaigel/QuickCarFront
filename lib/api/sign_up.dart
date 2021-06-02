@@ -1,8 +1,7 @@
 import 'dart:convert';
 
-import 'package:quick_car/constants/globals.dart';
 import 'package:quick_car/constants/strings.dart';
-import '../../data_class/user_signup.dart';
+import '../data_class/user_signup.dart';
 import 'package:http/http.dart' as http;
 
 
@@ -23,7 +22,6 @@ class MockSignUpApi implements SignUpApi {
   @override
   Future<UserSignUp> signUpNewUser(UserSignUp user) {
     // on success
-    Globals.users.add(user);
     return Future<UserSignUp>.value(user);
 
   }

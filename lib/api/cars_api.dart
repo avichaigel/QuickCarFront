@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart' as http_parser;
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:geocoding/geocoding.dart';
@@ -12,11 +13,11 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:quick_car/constants/strings.dart';
-import '../../data_class/car_data.dart';
+import '../data_class/car_data.dart';
 import 'package:quick_car/models/distance.dart';
 
 class CarsApi {
-  Future<List<CarData>> getCars (String values) {}
+  Future<List<CarData>> getCars (Map<String, String> values) {}
   Future<CarData> postCar(CarData cd) async {}
   Future<CarData> postCarDates(int carId, List<DatePeriod> datePeriod) async {}
 
@@ -27,29 +28,29 @@ class MockCarsApi implements CarsApi {
   }
   Future<CarData> postCarDates(int carId, List<DatePeriod> datePeriod) async {}
 
-  Future<List<CarData>> getCars(String values) async {
+  Future<List<CarData>> getCars(Object values) async {
 
     List<CarData> myCars = [];
     //in barcelona
-    CarData c1 = CarData("Toyota", "corola", 2000, 100, 41.379442728352956, 2.1745192577523897, 20, "type", File("assets/car-marker.png"), null);
+    CarData c1 = CarData("Toyota", "corola", 2000, 100, 41.379442728352956, 2.1745192577523897, 20, "type", null);
     // in haifa
-    CarData c2 = CarData("Lamborghini", "urus", 2000, 100, 32.79267669372492, 34.96627087007497, 83, "type", File("assets/car-marker.png"), null);
+    CarData c2 = CarData("Lamborghini", "urus", 2000, 100, 32.79267669372492, 34.96627087007497, 83, "type", null);
     // in natanya
-    CarData c3 = CarData("Mazda", "3", 2000, 100, 32.321729568783596, 34.853245583334164, 25, "type", File("assets/car-marker.png"), null);
+    CarData c3 = CarData("Mazda", "3", 2000, 100, 32.321729568783596, 34.853245583334164, 25, "type", null);
     // in tel aviv
-    CarData c4 = CarData("Fiat", "punto", 2000, 100, 32.06958528877455, 34.778709066764286, 42, "type", File("assets/car-marker.png"), null);
+    CarData c4 = CarData("Fiat", "punto", 2000, 100, 32.06958528877455, 34.778709066764286, 42, "type", null);
     // in bogota
-    CarData c5 = CarData("Alfa romeo", "mito", 2000, 100, 32.1849943444725, 34.87242912320865, 43, "type", File("assets/car-marker.png"), null);
+    CarData c5 = CarData("Alfa romeo", "mito", 2000, 100, 32.1849943444725, 34.87242912320865, 43, "type", null);
     // in moscow
-    CarData c6 = CarData("Maserati", "ghibli", 2000, 100, 55.7465132612745, 37.59436084180872, 51, "type", File("assets/car-marker.png"), null);
+    CarData c6 = CarData("Maserati", "ghibli", 2000, 100, 55.7465132612745, 37.59436084180872, 51, "type", null);
     // in istanbul
-    CarData c7 = CarData("Renault", "cilo", 2000, 100, 41.04538783080558, 28.91196439894364, 41, "type", File("assets/car-marker.png"), null);
+    CarData c7 = CarData("Renault", "cilo", 2000, 100, 41.04538783080558, 28.91196439894364, 41, "type", null);
     // in cairo
-    CarData c8 = CarData("Subaru", "brz", 2000, 100, 30.040450599576403, 31.23889750389139, 26, "type", File("assets/car-marker.png"), null);
+    CarData c8 = CarData("Subaru", "brz", 2000, 100, 30.040450599576403, 31.23889750389139, 26, "type", null);
     // in ramat-gan
-    CarData c9 = CarData("Opel", "astra", 2000, 100, 32.0840228760379, 34.81408500246813, 33, "type", File("assets/car-marker.png"), null);
+    CarData c9 = CarData("Opel", "astra", 2000, 100, 32.0840228760379, 34.81408500246813, 33, "type", null);
     // in bar-ilan
-    CarData c10 = CarData("Citroen", "c3", 2000, 100, 32.06840548949039, 34.84274968708446, 29, "type", File("assets/car-marker.png"), null);
+    CarData c10 = CarData("Citroen", "c3", 2000, 100, 32.06840548949039, 34.84274968708446, 29, "type", null);
 
     return Future.delayed(
         Duration(seconds: 2), () async {
@@ -126,10 +127,22 @@ class QuickCarCarsApi implements CarsApi {
 
   }
 
-  Future<CarData> postCar(CarData cd) async {
-    var stream = new http.ByteStream(DelegatingStream.typed(cd.image1.openRead()));
-    var length = await cd.image1.length();
+  Future<List<Object>> setImages(CarData cd) async {
+    List<Object> multipartFileList = [];
+    List<File> files = cd.images;
+    for (int i = 0; i < files.length; i++) {
+      var stream = new http.ByteStream(DelegatingStream.typed(files[i].openRead()));
+      var length = await files[i].length();
+      String name = (i+1).toString();
+      var multipartFile = http.MultipartFile('image' + name, stream, length,
+          filename: basename(files[i].path), contentType: new http_parser.MediaType('image', 'png'));
+      multipartFileList.add(multipartFile);
 
+    }
+    return multipartFileList;
+  }
+
+  Future<CarData> postCar(CarData cd) async {
     var uri = Uri.parse(Strings.QUICKCAR_URL + "cars/");
 
     var request = http.MultipartRequest("POST", uri)
@@ -138,15 +151,16 @@ class QuickCarCarsApi implements CarsApi {
       ]=cd.longitude.toString()..fields['latitude']=cd.latitude.toString()..
       fields['price_per_day_usd']=cd.pricePerDayUsd.toString();
 
-    var multipartFile = http.MultipartFile('image1', stream, length,
-        filename: basename(cd.image1.path), contentType: new http_parser.MediaType('image', 'png'));
-
-    request.files.add(multipartFile);
+    List<Object> filesToUpload = await setImages(cd);
+    for (int i = 0; i < filesToUpload.length; i++) {
+      request.files.add(filesToUpload[i]);
+    }
     request.headers['Authorization']= 'TOKEN ' + Strings.TOKEN;
     print("request: " +request.fields.toString());
     final response = await request.send();
     print(response.statusCode);
     if (response.statusCode == 201) {
+      print("7");
       response.stream.transform(utf8.decoder).listen((value) {
         print("value returned: " + value.toString());
         cd.id = json.decode(value)['id'];
@@ -184,12 +198,15 @@ class QuickCarCarsApi implements CarsApi {
     return list;
   }
 
-  Future<List<CarData>> getCars(String values) async {
+  Future<List<CarData>> getCars(Map<String, String> queryParameters) async {
+    String queryString = "";
+    if (!queryParameters.isEmpty)
+      queryString = "?" + Uri(queryParameters: queryParameters).query;
     var client = http.Client();
     Future<List<CarData>> result;
     try {
-      var url = Strings.QUICKCAR_URL + "cars/";
-      var response = await client.get(Uri.parse(url));
+      var uri = Strings.QUICKCAR_URL + "cars/";
+      var response = await client.get(Uri.parse(uri + queryString));
       if (response.statusCode == 200) {
         var json = response.body;
         json = "{" + '"cars":' + json + "}";

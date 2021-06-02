@@ -3,8 +3,9 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_car/api/quick_car_api/cars_api.dart';
-import 'package:quick_car/constants/globals.dart';
+import 'package:quick_car/constants/cars_globals.dart';
+import 'package:quick_car/states/map_state.dart';
+import '../../../api/cars_api.dart';
 import 'package:quick_car/view/widgets/general.dart';
 import '../../../data_class/car_data.dart';
 import 'package:quick_car/states/new_car_state.dart';
@@ -61,22 +62,38 @@ class Profile extends StatelessWidget {
                   Card(
                     child: ListTile(
                       onTap: () async {
+                        if (userState.getCreditCard() == null) {
+                          myShowDialog(context, "Error", "You need to upload your credit card before upload a new car");
+                          return;
+                        }
                           final NewCarState newCar = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => UploadCarFlow()));
                           if (newCar.pricePerDay == null)
                             return;
                           CarData cd = CarData(newCar.companyName, newCar.model, int.parse(newCar.manufYear),
                               newCar.kilometers, newCar.latitude, newCar.longitude, newCar.pricePerDay, newCar.type,
-                              newCar.image1, newCar.images);
-                          Globals.carsApi.postCar(cd).
+                              newCar.images);
+                          test(cd).
                           then((value) {
-                              myShowDialog(context, "Upload car success", "You can now see it in your car list...");
+                              myShowDialog(context, "Upload car success", "You can now see it in your car list and update it");
                               value.lastUpdate = DateTime.now();
                               Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => DatesAvailability(value.id)));
                               userState.addUserCar(value);
+                              try{
+                                Provider.of<MapState>(context, listen: false).addCar(value);
+                              } catch (e) {
+                                print(e);
+                              }
                           } ).
                           onError((error, stackTrace) {
                             myShowDialog(context, "Upload car failed", "There was an error with the connection the the server");
                           });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Uploading new car"),
+                              duration: Duration(seconds: 2),
+                            ),
+
+                          );
 
                       },
                       title: Text("Upload new car"),
@@ -88,7 +105,13 @@ class Profile extends StatelessWidget {
                   ),
                   Card(
                     child: ListTile(
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyCars())),
+                      onTap: () async {
+                        if (userState.getMyCars().length == 0) {
+                          var qp = {'owner': '1'};
+                          userState.setUserCars(await CarsGlobals.carsApi.getCars(qp));
+                        }
+                        Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyCars()));
+                      },
                       title: Text("My cars"),
                       leading: CircleAvatar(
                         backgroundImage: AssetImage('assets/cars.png'),
@@ -182,5 +205,11 @@ class Profile extends StatelessWidget {
         },
       )
     );
+
+
   }
+}
+Future<CarData> test(CarData cd) async {
+  print("in test");
+  return cd;
 }

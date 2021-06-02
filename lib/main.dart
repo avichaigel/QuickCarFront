@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_car/botton_nav.dart';
+import 'package:quick_car/states/map_state.dart';
 import 'package:quick_car/states/search_state.dart';
 import 'package:quick_car/states/user_state.dart';
 import 'package:quick_car/view/pages/login/login.dart';
@@ -38,7 +39,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_)=> UserState()),
-        ChangeNotifierProvider(create: (_)=> SearchState())
+        ChangeNotifierProvider(create: (_)=> SearchState()),
+        ChangeNotifierProvider(create: (_)=> MapState()),
       ],
       child: MaterialApp(
         title: 'QuickCar',

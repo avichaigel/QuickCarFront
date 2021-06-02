@@ -2,30 +2,32 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:quick_car/constants/cars_globals.dart';
-import 'package:quick_car/constants/globals.dart';
 import 'package:quick_car/constants/strings.dart';
+import 'package:quick_car/repository/repository.dart';
 import '../data_class/car_data.dart';
 
 class SearchState extends ChangeNotifier {
 
-  Future<List<CarData>> carsList;
-  List<CarData> testList;
+  List<CarData> carsList = [];
   SearchState() {
     setDefaultValues();
+    loadCars();
   }
   String sortedByName = '';
   double _distFilter;
+  bool _isLoading = false;
   bool _sortedByPrice;
   bool _sortedByDist;
   RangeValues _priceRange;
   DatePeriod _datePeriod;
-  List<bool> _typesChecked;
+  carTypes _typesChecked;
+  bool isLoading() => _isLoading;
   bool sortedByPrice() => _sortedByPrice;
   bool sortedByDist() => _sortedByDist;
   RangeValues priceRange() => _priceRange;
   DatePeriod datePeriod() => _datePeriod;
   double distanceFilter() => _distFilter;
-  List<bool> typesChecked() => _typesChecked;
+  carTypes getTypesChecked() => _typesChecked;
   setSortedByPrice() {
     _sortedByDist = false;
     _sortedByPrice = true;
@@ -40,7 +42,8 @@ class SearchState extends ChangeNotifier {
     _sortedByDist = false;
     _sortedByPrice = false;
     _datePeriod = DatePeriod(DateTime.now(), DateTime.now().add(Duration(days: 4)));
-    _typesChecked = List<bool>.filled(CarsGlobals.carTypes.length, true, growable: false);
+    _typesChecked = carTypes.allTypes;
+    notifyListeners();
   }
   setDistFilter(double d) {
     _distFilter = d;
@@ -51,35 +54,43 @@ class SearchState extends ChangeNotifier {
   setDatePeriod(DatePeriod dp) {
     _datePeriod = dp;
   }
-  setTypesChecked(int index) {
-    _typesChecked[index] = !_typesChecked[index];
+  setTypesChecked(carTypes type) {
+    _typesChecked = type;
+  }
+  setIsLoading(bool b) {
+    _isLoading = b;
+    notifyListeners();
   }
 
   void refresh() => notifyListeners();
 
   void loadCars() async {
-    carsList = Future.value(await Globals.carsApi.getCars(sortedByName).then<List<CarData>>((value) {
-        print("in get cars search state, list length: " + value.length.toString());
+    setIsLoading(true);
+    // var qp = {'type': CarsGlobals.carTypes[_typesChecked.index] == 0 ? "" : CarsGlobals.carTypes[_typesChecked.index]
+    //   };
+    Map<String, String> qp = {};
+    if (_typesChecked.index != 0)
+      qp["type"] = CarsGlobals.carTypes[_typesChecked.index];
+    CarsGlobals.repository.updateCars(qp);
+    carsList = await CarsGlobals.repository.carsListFuture.then<List<CarData>>((value) {
+      List<CarData> copiedList = copyList(value);
+              print("get cars search state, list length: " + copiedList.length.toString());
         if (_distFilter != null) {
-          value.removeWhere((element) => element.distanceFromLocation > _distFilter);
+          copiedList.removeWhere((element) => element.distanceFromLocation > _distFilter);
         }
-        if (_sortedByDist == true) {
-          value.sort((a, b){
-            return a.distanceFromLocation.compareTo(
-                b.distanceFromLocation.toInt()
-            );
-          });
-        } else if (_sortedByPrice == true && sortedByName == Strings.SORT_BY_PRICE_EXP_TO_CHEAP) {
-          value.sort((a, b)=> b.pricePerDayUsd.compareTo(a.pricePerDayUsd));
-        } else if (_sortedByPrice == true && sortedByName == Strings.SORT_BY_PRICE_CHEAP_TO_EXP) {
-          value.sort((a, b)=> a.pricePerDayUsd.compareTo(b.pricePerDayUsd));
-        }
-        print("list length after filter and sort: " + value.length.toString());
+        print("list length after filter and sort: " + copiedList.length.toString());
 
-        return value;
-    }));
+        return copiedList;
+    });
     // notify after completion
-    notifyListeners();
+    setIsLoading(false);
+ }
+ List<CarData> copyList(List<CarData> existList) {
+    List<CarData> newList = [];
+    for (int i = 0; i < existList.length; i++){
+      newList.add(existList[i]);
+    }
+    return newList;
  }
 
 }

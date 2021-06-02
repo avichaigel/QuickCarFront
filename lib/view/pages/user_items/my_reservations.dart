@@ -57,7 +57,7 @@ class MyReservations extends StatelessWidget {
                   return Card(
                     child: ListTile(
                       tileColor: reservation.isActive ? Colors.greenAccent : null,
-                      leading: Image.network(car.image1.path),
+                      leading: Image.network(car.images[0].path),
                         title: Text("${car.brand} ${car.model}"),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

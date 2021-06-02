@@ -2,7 +2,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_car/constants/globals.dart';
 
 import '../../../data_class/car_data.dart';
 
@@ -19,21 +18,24 @@ class ResultsView extends StatefulWidget {
 }
 class ResultsViewState extends State<ResultsView> {
 
-  
-  bool _init = false;
-  void _initialize(SearchState state) {
-    if (!_init) {
-      state.loadCars();
-      _init = true;
-    }
+  List<CarData> cars = [];
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // this.fetchInitialData();
   }
+
+
   @override
 Widget build(BuildContext context) {
     print("in build results view");
     return Consumer<SearchState>(
         builder: (context, state, child) {
+          isLoading = state.isLoading();
+          cars = state.carsList;
           print("in build consumer results view");
-          _initialize(state);
           return SafeArea(
               child: Column(
                 children: [
@@ -87,22 +89,7 @@ Widget build(BuildContext context) {
                       ),
                     ),
                   ),
-                  Expanded (
-                          child: FutureBuilder<List<CarData>>(
-                              future: state.carsList,
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  return ListView.builder(
-                                      itemCount: snapshot.data.length,
-                                      itemBuilder: (context, index) {
-                                        var car = snapshot.data[index];
-                                        return CarItem(car);
-                                      });
-                                } else {
-                                  return Center(child: CircularProgressIndicator()); }
-                              })
-                      )
-
+                  getBody()
                 ],
               )
           );
@@ -110,6 +97,27 @@ Widget build(BuildContext context) {
       );
 
 }
+  Widget getBody() {
+    if (cars.contains(null) || cars.length < 0 || isLoading) {
+      return SizedBox(
+        height: 200,
+          child: Center(child: CircularProgressIndicator())
+      );
+    }
+    if (cars.length == 0) {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text("No results found", style: TextStyle(fontSize: 20),),
+      );
+    }
+    return Expanded(
+        child:ListView.builder(
+        itemCount: cars.length,
+        itemBuilder: (context, index) {
+          return CarItem(cars[index]);
+        }));
+
+  }
 
 }
 

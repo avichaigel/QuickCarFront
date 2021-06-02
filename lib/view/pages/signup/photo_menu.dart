@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:quick_car/api/quick_car_api/sign_up.dart';
+import '../../../api/sign_up.dart';
 import 'package:quick_car/states/signup_state.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
 import 'package:quick_car/view/widgets/images.dart';

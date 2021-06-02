@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
-import 'package:quick_car/constants/globals.dart';
+import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/view/widgets/date_picker.dart';
 
 class DatesAvailability extends StatefulWidget {
@@ -157,7 +157,18 @@ class _DatesAvailabilityState extends State<DatesAvailability> {
                   },
                   child: Text("Add")
               ),
-
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                    child: Text("Availability dates table",
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold
+                  ),
+                ),
+                    )
+              ),
               Padding(
                 padding: const EdgeInsets.all(4),
                 child: createTable()
@@ -187,7 +198,7 @@ class _DatesAvailabilityState extends State<DatesAvailability> {
                     setState(() {
                       _isLoading = true;
                     });
-                    await Globals.carsApi.postCarDates(widget.carId, _availabilityDates);
+                    await CarsGlobals.carsApi.postCarDates(widget.carId, _availabilityDates);
                     setState(() {
                       _isLoading = false;
                     });
@@ -196,7 +207,11 @@ class _DatesAvailabilityState extends State<DatesAvailability> {
                   child: Text("Submit")
               )
             ],
-          ) : Center(child:Center(child: CircularProgressIndicator())),
+          ) : Center(child:SizedBox(
+            height: 30,
+              child: CircularProgressIndicator()
+          )
+          ),
         // ),
       ) ,
     );

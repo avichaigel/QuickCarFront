@@ -100,9 +100,20 @@ class _ReservationDetailsState extends State<ReservationDetails> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(12.0),
-                  child: SizedBox(
+                  child: Container(
                     height: 350,
-                    child: Image.network(car.image1.path),
+                    child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: car.images.length,
+                        itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: AspectRatio(
+                              aspectRatio: 1,
+                          child: Image.network(car.images[index].path),
+                          ),
+                        );
+                        }),
                   ),
                 ),
                 Padding(
@@ -180,7 +191,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                   child: Text("Please log-in or sign up")
                   ,
                 ) ;
-              } else if (!state.isCarLicenseUploaded()) {
+              } else if (state.getCarLicensePhoto() == null) {
                 return TextButton(
                   style: TextButton.styleFrom(
                       primary: Colors.white,

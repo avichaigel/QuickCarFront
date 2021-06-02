@@ -1,15 +1,7 @@
-import 'dart:math';
 
-import 'package:flutter_date_pickers/flutter_date_pickers.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
-import 'dart:async';
-import 'package:flow_builder/flow_builder.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter/cupertino.dart';
-import 'package:quick_car/constants/globals.dart';
 import 'package:quick_car/states/new_car_state.dart';
 import 'package:quick_car/states/start_drive_state.dart';
 import 'package:quick_car/view/pages/reservation_interaction/start_drive_flow.dart';
@@ -32,7 +24,7 @@ class _PlayGroundState extends State<PlayGroundPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Text(""),
+      body: DatesAvailability(1),
     );
   }
 }

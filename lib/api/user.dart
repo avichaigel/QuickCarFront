@@ -1,10 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:quick_car/constants/globals.dart';
 import 'package:quick_car/constants/strings.dart';
-import '../../data_class/user_signin.dart';
-import '../../data_class/user_signup.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../data_class/user_signin.dart';
 
 class UserApi {
   Future<String> login(UserSignIn usi) {}
@@ -14,17 +11,6 @@ class MockUserApi implements UserApi {
     // For test:
     return Future.value("123");
 
-    // Mocked Sign-up users:
-    List<UserSignUp> myUsers = Globals.users;
-
-    for(final userSignUp in myUsers) {
-      if (userSignUp.password == userSignIn.password && userSignUp.email == userSignIn.email) {
-        // get somehow the full user details from the server
-        return Future.value("123");
-      } else {
-        throw Exception("no user found");
-      }
-    }
   }
 }
 
@@ -35,6 +21,7 @@ class QuickCarUserApi implements UserApi {
       Map body = {'username': usi.email, 'password': usi.password };
       print(body);
       var res = await http.post(Uri.parse(Strings.QUICKCAR_URL +"users/login/"), body: body);
+      print(res.body);
       if (res.statusCode == 200) {
         print("login successful");
         var tokenResponse = await http.post(Uri.parse(Strings.QUICKCAR_URL +"api-token-auth/"), body: body);

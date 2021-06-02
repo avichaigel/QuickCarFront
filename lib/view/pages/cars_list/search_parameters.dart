@@ -129,14 +129,12 @@ class TypeFilter extends StatefulWidget {
 }
 
 class _TypeFilterState extends State<TypeFilter> {
-  List<bool> typesChecked;
+  carTypes type = carTypes.allTypes;
   @override
   Widget build(BuildContext context) {
       return Consumer<SearchState>(
         builder: (context, state, child) {
-          if (typesChecked == null) {
-            typesChecked = state.typesChecked();
-          }
+
           return Column(
             children: [
               Padding(
@@ -148,47 +146,63 @@ class _TypeFilterState extends State<TypeFilter> {
               ),
               Padding(
                 padding: const EdgeInsets.all(1),
-                child: CheckboxListTile(
-                    title: Text(CarsGlobals.carTypes[0]),
-                    value: state.typesChecked()[0],
-                    onChanged: (value){
-                      setState(() {
-                        state.setTypesChecked(0);
-                      });
-                    }),
+                child: RadioListTile(
+                  title: Text(CarsGlobals.carTypes[0]),
+                  value: carTypes.allTypes,
+                  onChanged: (value){
+                    setState(() {
+                      state.setTypesChecked(value);
+                    });
+                  },
+                  groupValue: state.getTypesChecked(),),
               ),
               Padding(
                 padding: const EdgeInsets.all(1),
-                child: CheckboxListTile(
-                    title: Text(CarsGlobals.carTypes[1]),
-                    value: state.typesChecked()[1],
-                    onChanged: (value){
-                      setState(() {
-                        state.setTypesChecked(1);
-                      });
-                    }),
+                child: RadioListTile(
+                  title: Text(CarsGlobals.carTypes[1]),
+                  value: carTypes.family,
+                  onChanged: (value){
+                    setState(() {
+                      state.setTypesChecked(value);
+                    });
+                  },
+                  groupValue: state.getTypesChecked(),),
               ),
               Padding(
                 padding: const EdgeInsets.all(1),
-                child: CheckboxListTile(
-                    title: Text(CarsGlobals.carTypes[2]),
-                    value: state.typesChecked()[2],
-                    onChanged: (value){
-                      setState(() {
-                        state.setTypesChecked(2);
-                      });
-                    }),
+                child: RadioListTile(
+                  title: Text(CarsGlobals.carTypes[2]),
+                  value: carTypes.sports,
+                  onChanged: (value){
+                    setState(() {
+                      state.setTypesChecked(value);
+                    });
+                  },
+                  groupValue: state.getTypesChecked(),),
               ),
               Padding(
                 padding: const EdgeInsets.all(1),
-                child: CheckboxListTile(
-                    title: Text(CarsGlobals.carTypes[3]),
-                    value: state.typesChecked()[3],
-                    onChanged: (value){
-                      setState(() {
-                        state.setTypesChecked(3);
-                      });
-                    }),
+                child: RadioListTile(
+                  title: Text(CarsGlobals.carTypes[3]),
+                  value: carTypes.mini,
+                  onChanged: (value){
+                    setState(() {
+                      state.setTypesChecked(value);
+                    });
+                  },
+                  groupValue: state.getTypesChecked(),),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(1),
+                child: RadioListTile(
+                  title: Text(CarsGlobals.carTypes[4]),
+                  value: carTypes.offRoad,
+                  onChanged: (value){
+                    setState(() {
+                      state.setTypesChecked(value);
+                    });
+                  },
+                  groupValue: state.getTypesChecked(),),
               ),
             ],
 
@@ -320,9 +334,8 @@ class _DistanceFilterState extends State<DistanceFilter> {
   Widget build(BuildContext context) {
     return Consumer<SearchState>(
       builder: (context, state, chile) {
-        if (_value == null) {
+        print("dist filter: " + state.distanceFilter().toString());
           _value = state.distanceFilter() != null ?  state.distanceFilter(): CarsGlobals.MAX_DISTANCE;
-        }
         return Column(
           children: [
             Padding(

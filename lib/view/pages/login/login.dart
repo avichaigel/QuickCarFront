@@ -1,10 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_car/constants/globals.dart';
+import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/constants/strings.dart';
 import '../../../data_class/user_signin.dart';
-import '../../../data_class/user_signup.dart';
 import 'package:quick_car/states/user_state.dart';
 
 
@@ -98,14 +97,13 @@ class _LoginState extends State<Login> {
                   ),
                 InkWell(
                   onTap: () async {
-                      Globals.userApi.login(UserSignIn(email: emailController.text, password: passwordController.text))
+                      CarsGlobals.userApi.login(UserSignIn(email: emailController.text, password: passwordController.text))
                           .then((value) {
                             userState.setToken(value);
                             print("token: ${value}");
                             Strings.TOKEN = value;
                             // should ask for all the personal details and put them in the state
-                            userState.setFirstName("Ori");
-                            userState.setIsLoggedIn(true);
+                            userState.setLoginSetup("Ori", "Poria","oriporia@gmail.com", true, null);
                             Navigator.pushReplacementNamed(context, '/');
                           }).catchError((error, stackTrace) => print("error: " +error.toString()));
                   },

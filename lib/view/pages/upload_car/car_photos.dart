@@ -79,7 +79,7 @@ class _CarPhotosState extends State<CarPhotos> {
             visible: _errorVisibility,
             child: AnimatedContainer(
               duration: Duration(seconds: 4),
-              child: Text("Please upload a least 4 photos"),
+              child: Text("Please upload at least 4 photos"),
             )
             ,
           ),
@@ -87,9 +87,13 @@ class _CarPhotosState extends State<CarPhotos> {
     );
   }
   void _continuePressed() {
+    print("continue pressed");
+    for (int i = 0; i < images.length; i++) {
+      print(images[i].path);
+    }
     context
         .flow<NewCarState>()
-        .update((carState) => carState.copywith(image1: images[0], imagesUploaded: true ));
+        .update((carState) => carState.copywith(images: images, imagesUploaded: true ));
   }
 
   @override
@@ -251,7 +255,7 @@ class _CarPhotosState extends State<CarPhotos> {
                 height: 100,
               ),
               nextButton(onPressed: () {
-                for(var i = 0; i < 2; i++){
+                for(var i = 0; i < 4; i++){
                   if (images[i] == null) {
                     setState(() {
                     _errorVisibility = true;

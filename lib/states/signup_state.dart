@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:quick_car/api/quick_car_api/sign_up.dart';
+import '../api/sign_up.dart';
 import 'package:stripe_payment/stripe_payment.dart';
 
 class SignUpState {

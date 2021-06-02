@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:quick_car/view/pages/user_items/my_car_details.dart';
 import '../../../data_class/car_data.dart';
 import 'package:quick_car/states/user_state.dart';
 
@@ -21,9 +23,26 @@ class MyCars extends StatelessWidget {
                 CarData car = myCars[index];
                 return Card(
                   child: ListTile(
-                    leading: Image.file(car.image1),
-                    title: Text(car.brand + " " + car.model)
-                  ),
+                    leading: Image.network(car.images[0].path,
+                        width: 40,
+                        height: 40,
+                        fit:BoxFit.fill  ),
+                    title: Text(car.brand + " " + car.model),
+                    subtitle: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                       Text("Price per day: " + car.pricePerDayUsd.toString()),
+                        InkWell(
+                          child: Icon(Icons.edit),
+                          onTap: () => Navigator.push(context, MaterialPageRoute(
+                              builder: (BuildContext context) => MyCarDetails(car)))
+                          ,
+                        )
+
+                      ],
+                    ),
+                    onTap: () => print("show details")
+                  )
                 );
             });
           }
