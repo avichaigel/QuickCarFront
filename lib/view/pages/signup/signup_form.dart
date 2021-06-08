@@ -31,6 +31,8 @@ class SignUpFormState extends State<SignUpForm> {
 
   Widget _buildFirstName() {
     return TextFormField(
+      keyboardType: TextInputType.name,
+        textCapitalization: TextCapitalization.sentences,
       decoration: InputDecoration(labelText: 'First Name'),
           maxLength: 10,
           validator: (String value) {
@@ -46,6 +48,9 @@ class SignUpFormState extends State<SignUpForm> {
   }
   Widget _buildLastName() {
     return TextFormField(
+      keyboardType: TextInputType.name,
+      textCapitalization: TextCapitalization.sentences,
+
       decoration: InputDecoration(labelText: 'Last Name'),
       maxLength: 10,
       validator: (String value) {

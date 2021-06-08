@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quick_car/constants/cars_globals.dart';
 
 import '../../../data_class/car_data.dart';
 
@@ -19,23 +20,21 @@ class ResultsView extends StatefulWidget {
 class ResultsViewState extends State<ResultsView> {
 
   List<CarData> cars = [];
-  bool isLoading = false;
+  bool isLoading;
 
   @override
   void initState() {
     super.initState();
-    // this.fetchInitialData();
   }
 
-
   @override
-Widget build(BuildContext context) {
-    print("in build results view");
+  Widget build(BuildContext context) {
+    print("build results view");
     return Consumer<SearchState>(
         builder: (context, state, child) {
           isLoading = state.isLoading();
           cars = state.carsList;
-          print("in build consumer results view");
+          print("build consumer results view");
           return SafeArea(
               child: Column(
                 children: [
@@ -89,7 +88,7 @@ Widget build(BuildContext context) {
                       ),
                     ),
                   ),
-                  getBody()
+                  body()
                 ],
               )
           );
@@ -97,7 +96,7 @@ Widget build(BuildContext context) {
       );
 
 }
-  Widget getBody() {
+  Widget body() {
     if (cars.contains(null) || cars.length < 0 || isLoading) {
       return SizedBox(
         height: 200,

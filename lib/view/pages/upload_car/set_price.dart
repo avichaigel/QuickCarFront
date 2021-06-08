@@ -10,9 +10,10 @@ class SetPrice extends StatefulWidget {
 }
 
 class _SetPriceState extends State<SetPrice> {
-  static var _controller = TextEditingController();
+  var _controller = TextEditingController();
 
   void _continuePressed() {
+    print("_continuePressed"+_controller.value.text);
     context
         .flow<NewCarState>()
         .complete((carState) => carState.copywith(pricePerDay: int.parse(_controller.value.text)));

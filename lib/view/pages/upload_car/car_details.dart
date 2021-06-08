@@ -152,6 +152,10 @@ class _CarDetailsState extends State<CarDetails> {
     );
   }
   Widget _buildType() {
+    List<String> carTypes = [];
+    for (int i = 1; i < CarsGlobals.carTypes.length; i++)
+      carTypes.add(CarsGlobals.carTypes[i]);
+
     return DropdownSearch<String>(
       validator: (v) {
         if (v == null) {
@@ -159,7 +163,7 @@ class _CarDetailsState extends State<CarDetails> {
         }
       },
       showSelectedItem: true,
-      items: CarsGlobals.carTypes,
+      items: carTypes,
       label: "Car type",
       onChanged: (String value) {
         _type = value;

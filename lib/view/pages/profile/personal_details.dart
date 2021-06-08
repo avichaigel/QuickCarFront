@@ -1,10 +1,11 @@
 import 'package:flutter_credit_card/credit_card_widget.dart';
+import 'package:quick_car/view/pages/user_items/update_car_license.dart';
 import 'package:stripe_payment/stripe_payment.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_car/states/user_state.dart';
-import 'package:quick_car/view/pages/signup/photo_menu.dart';
+import 'package:quick_car/view/pages/signup/upload_car_license.dart';
 import 'package:quick_car/view/pages/signup/upload_credit_card.dart';
 
 class PersonalDetails extends StatefulWidget {
@@ -153,13 +154,29 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                   creditCardDetails(state),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text("Car license details".toUpperCase(),style: TextStyle(color: Colors.grey,fontSize: 12,),),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text("Car license details".toUpperCase(),style: TextStyle(color: Colors.grey,fontSize: 12,),),
+                        ),
+                        Align(
+                            alignment: Alignment.centerRight,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(
+                                    builder: (BuildContext context) => UpdateCarLicense()));
+                              },
+                              child: Icon(Icons.edit, size: 20,),
+                            )
+                        )
+                      ],
                     ),
                   ),
 
-                  carLicenseDetails(state)
+                  carLicenseDetails(state),
+                  SizedBox(height: 30,)
                 ],
               ),
             );
@@ -221,11 +238,17 @@ class _PersonalDetailsState extends State<PersonalDetails> {
 
   Widget carLicenseDetails(UserState state) {
     if (state.getCarLicensePhoto() != null) {
-      return Text("CarLicenseUploaded");
+      return Container(
+        decoration: BoxDecoration(border: Border.all()),
+        width: MediaQuery.of(context).size.width/2,
+        child: Image(
+          image: FileImage(state.getCarLicensePhoto())
+        ),
+      );
     } else {
       return ElevatedButton(
           onPressed: () => Navigator.push(context, MaterialPageRoute(
-              builder: (BuildContext context) => PhotoMenu())),
+              builder: (BuildContext context) => UpdateCarLicense())),
           child: Text("Upload car license photo"));
     }
 

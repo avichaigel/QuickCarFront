@@ -221,21 +221,47 @@ class _DatesAvailabilityState extends State<DatesAvailability> {
   Table createTable() {
     List<TableRow> rows = [];
     rows.add( TableRow(
-      children: [
-      Text("Start date", style: TextStyle(fontWeight: FontWeight.bold),),
-      Text("End date", style: TextStyle(fontWeight: FontWeight.bold),),
-    ]
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: Text("Start date", style: TextStyle(fontWeight: FontWeight.bold),),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: Text("End date", style: TextStyle(fontWeight: FontWeight.bold),),
+          ),
+          Text("")
+        ]
     )
     );
     for (int i = 0; i < _availabilityDates.length; i++) {
       rows.add(TableRow(
-        children: [
-          Text(DateFormat("yyyy-MM-dd").format(_availabilityDates[i].start)),
-          Text(DateFormat("yyyy-MM-dd").format(_availabilityDates[i].end)),
-        ]
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(2.0),
+              child: Text(DateFormat("yyyy-MM-dd").format(_availabilityDates[i].start)),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(2.0),
+              child: Text(DateFormat("yyyy-MM-dd").format(_availabilityDates[i].end)),
+            ),
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _availabilityDates.removeAt(i);
+                });
+              } ,
+              child: Icon(Icons.clear),
+            )
+          ]
       ));
     }
     return Table(
+      columnWidths: {
+        0: FlexColumnWidth(4),
+        1: FlexColumnWidth(4),
+        2: FlexColumnWidth(1),
+      },
       border: TableBorder.all(),
       children: rows,
     );

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/constants/strings.dart';
+import 'package:quick_car/view/widgets/messages.dart';
 import '../../../data_class/user_signin.dart';
 import 'package:quick_car/states/user_state.dart';
 
@@ -16,6 +17,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  String _error;
 
   void initState() {
     super.initState();
@@ -68,10 +70,16 @@ class _LoginState extends State<Login> {
                           hintText: "Email",
                           border: InputBorder.none,
                           hintStyle: TextStyle(color: Colors.grey),
-                          prefixIcon: Icon(IconData(0xe6f3, fontFamily: 'MaterialIcons'), color: Colors.blue,)
+                          prefixIcon: Icon((Icons.email), color: Colors.blue,)
                       ),
                       keyboardType: TextInputType.emailAddress,
                       controller: emailController,
+                        onTap: () {
+                          if (_error != null)
+                            setState(() {
+                              _error = null;
+                            });
+                        }
                     ),
                   ),
                 Container(
@@ -86,6 +94,12 @@ class _LoginState extends State<Login> {
                         prefixIcon: Icon(Icons.lock_outline,color: Colors.blue,)
                     ),
                     controller: passwordController,
+                    onTap: () {
+                      if (_error != null)
+                        setState(() {
+                          _error = null;
+                        });
+                    },
                   ),
                 ),
                 // TODO: maybe delete it if will not be implemented
@@ -95,17 +109,42 @@ class _LoginState extends State<Login> {
                         alignment: Alignment.centerRight,
                         child: Text("Forgot password ?",style: TextStyle(color: Colors.blue,fontSize: 12),)),
                   ),
+                _error != null ?showAlert(_error, () {
+                  setState(() {
+                    _error = null;
+                  });
+                }) : Text(""),
                 InkWell(
                   onTap: () async {
+                    if (emailController.text == "") {
+                      setState(() {
+                        _error = "Email is required";
+                      });
+                      return;
+                    }
+                    if (passwordController.text == "") {
+                      setState(() {
+                        _error = "Password is required";
+                      });
+                      return;
+                    }
+
                       CarsGlobals.userApi.login(UserSignIn(email: emailController.text, password: passwordController.text))
                           .then((value) {
-                            userState.setToken(value);
+                            userState.setToken(value.token);
                             print("token: ${value}");
-                            Strings.TOKEN = value;
-                            // should ask for all the personal details and put them in the state
-                            userState.setLoginSetup("Ori", "Poria","oriporia@gmail.com", true, null);
+                            Strings.TOKEN = value.token;
+                            userState.setLoginSetup(value.id, value.firstName, value.lastName,
+                                value.email, true, value.carLicense);
                             Navigator.pushReplacementNamed(context, '/');
-                          }).catchError((error, stackTrace) => print("error: " +error.toString()));
+                          }).catchError((error, stackTrace) {
+                            setState(() {
+                              print("error:");
+                              print(error.runtimeType);
+                              if (error.runtimeType == FormatException)
+                                _error = "Wrong details";
+                            });
+                          } );
                   },
                   borderRadius: BorderRadius.circular(20),
                   splashColor: Colors.white,
@@ -158,25 +197,5 @@ class _LoginState extends State<Login> {
     );
 
 
-  }
-
-  Container ContinueWith(String image) {
-    return Container(
-      padding: EdgeInsets.all(15),
-      height: 50,
-      decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-                offset: Offset(0,3),
-                color: Colors.grey,
-                blurRadius: 5
-            )
-          ]
-
-      ),
-      child: Image.asset(image,),
-    );
   }
 }

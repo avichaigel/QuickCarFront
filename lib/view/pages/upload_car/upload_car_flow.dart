@@ -11,7 +11,7 @@ import 'package:quick_car/view/pages/upload_car/set_price.dart';
 List<Page> onGenerateSignUpPages(NewCarState carState, List<Page> pages) {
   return [
     MaterialPage<void>(child: CarPhotos()),
-    if (carState.imagesUploaded == true) MaterialPage(child: CarDetails()),
+    if (carState.images != null) MaterialPage(child: CarDetails()),
     if (carState.companyName != null) MaterialPage<void>(child: (CarLocation())),
     if (carState.latitude != null) MaterialPage(child: SetPrice())
   ];

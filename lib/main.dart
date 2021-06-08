@@ -9,7 +9,7 @@ import 'package:quick_car/states/map_state.dart';
 import 'package:quick_car/states/search_state.dart';
 import 'package:quick_car/states/user_state.dart';
 import 'package:quick_car/view/pages/login/login.dart';
-import 'package:quick_car/view/pages/signup/photo_menu.dart';
+import 'package:quick_car/view/pages/signup/upload_car_license.dart';
 import 'package:quick_car/view/pages/signup/signup_form.dart';
 import 'package:quick_car/view/pages/signup/signup_flow.dart';
 import 'package:quick_car/view/pages/upload_car/upload_car_flow.dart';

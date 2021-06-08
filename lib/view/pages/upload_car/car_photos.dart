@@ -7,8 +7,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/constants/strings.dart';
 import 'package:quick_car/states/new_car_state.dart';
-import 'package:quick_car/view/widgets/camera_demo.dart';
+import 'package:quick_car/view/widgets/camera.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
+import 'package:quick_car/view/widgets/images.dart';
 
 class CarPhotos extends StatefulWidget {
   @override
@@ -16,10 +17,6 @@ class CarPhotos extends StatefulWidget {
 }
 
 class _CarPhotosState extends State<CarPhotos> {
-  File _imageFile1;
-  File _imageFile2;
-  File _imageFile3;
-  File _imageFile4;
 
   List<File> images = [];
   bool _errorVisibility = false;
@@ -29,8 +26,8 @@ class _CarPhotosState extends State<CarPhotos> {
     images[currIndex] = File(path);
   }
 
-  void uploadPhotoNew() async {
-    await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => CameraDemo(callBack)));
+  void takePicture() async {
+    await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Camera(callBack)));
     setState(() {
 
     });
@@ -59,10 +56,9 @@ class _CarPhotosState extends State<CarPhotos> {
   @override
   void initState() {
     super.initState();
-    images.add(_imageFile1);
-    images.add(_imageFile2);
-    images.add(_imageFile3);
-    images.add(_imageFile4);
+    for (int i = 0; i < CarsGlobals.maximumCarImages; i++)
+      images.add(null);
+
   }
   Border imageBorder(int imageIdx) {
     return Border.all(
@@ -93,7 +89,7 @@ class _CarPhotosState extends State<CarPhotos> {
     }
     context
         .flow<NewCarState>()
-        .update((carState) => carState.copywith(images: images, imagesUploaded: true ));
+        .update((carState) => carState.copywith(images: images));
   }
 
   @override
@@ -126,11 +122,7 @@ class _CarPhotosState extends State<CarPhotos> {
                             decoration: BoxDecoration(
                                 border: Border.all(color: Colors.black)
                             ),
-                            child: images[0] == null  ? Image(
-                              image: AssetImage("assets/upload-image.png"),
-                            ) : FittedBox(
-                              // child: Image.file(images[0]),
-                              // fit: BoxFit.fill,
+                            child: images[0] == null  ? emptyImage() : FittedBox(
                               child: Image(
                                 image: FileImage(images[0]),
                               ),
@@ -151,9 +143,7 @@ class _CarPhotosState extends State<CarPhotos> {
                             decoration: BoxDecoration(
                                 border: Border.all(color: Colors.black)
                             ),
-                            child: images[1] == null  ? Image(
-                              image: AssetImage("assets/upload-image.png"),
-                            ) : FittedBox(
+                            child: images[1] == null  ? emptyImage() : FittedBox(
                               child: Image(
                                 image: FileImage(images[1]),
                               ),
@@ -175,15 +165,12 @@ class _CarPhotosState extends State<CarPhotos> {
                             decoration: BoxDecoration(
                                 border: Border.all(color: Colors.black)
                             ),
-                            child: images[2] == null  ? Image(
-                              image: AssetImage("assets/upload-image.png"),
-                            ) : FittedBox(
+                            child: images[2] == null ? emptyImage() : FittedBox(
                               child: Image(
                                 image: FileImage(images[2]),
                               ),
                             ),
                           ),
-                          // child: images[2] != null ? newImage(Image.file(images[2])) : newImage(null),
                           onTap: () => setState(() => currIndex = 2),
 
                         ),
@@ -201,15 +188,12 @@ class _CarPhotosState extends State<CarPhotos> {
                             decoration: BoxDecoration(
                                 border: Border.all(color: Colors.black)
                             ),
-                            child: images[3] == null  ? Image(
-                              image: AssetImage("assets/upload-image.png"),
-                            ) : FittedBox(
+                            child: images[3] == null  ? emptyImage() : FittedBox(
                               child: Image(
                                 image: FileImage(images[3]),
                               ),
                             ),
                           ),
-                          // child: images[3] != null ? newImage(Image.file(images[3])) : newImage(null),
                           onTap: () => setState(() => currIndex = 3),
 
                         ),
@@ -223,7 +207,7 @@ class _CarPhotosState extends State<CarPhotos> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   TextButton.icon(
-                    onPressed: () => uploadPhotoNew(),
+                    onPressed: () => takePicture(),
                     label: Text("Camera"),
                     icon: Icon(Icons.camera_alt),
 

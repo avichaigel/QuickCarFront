@@ -22,7 +22,6 @@ class CarData {
     this.longitude = longitude;
     this.pricePerDayUsd = pricePerDayUsd;
     this.type = type;
-    this.image1 = image1;
     this.images = images;
 
   }
@@ -39,7 +38,7 @@ class CarData {
     this.pricePerDayUsd,
     this.type,
     this.images,
-    this.cardates
+    this.carDates
 });
 
   int id;
@@ -52,11 +51,7 @@ class CarData {
   double longitude;
   int pricePerDayUsd;
   String type;
-  File image1;
-  File image2;
-  File image3;
-  File image4;
-  List<DatePeriod> cardates;
+  List<DatePeriod> carDates;
   List<File> images;
   DateTime lastUpdate;
 
@@ -98,15 +93,13 @@ class CarData {
         longitude: d2,
         pricePerDayUsd: json["price_per_day_usd"] as int,
         type: json["type"],
-      images: images,
-      // image2: File(json["image2"]),
-      // image3: File(json["image3"]),
-      // image4: File(json["image4"]),
-      cardates: datesPeriod
-
-
-
-
+        images: images,
+        carDates: datesPeriod
     );
   }
+  CarData copyWith(List<File> images, List<DatePeriod> dates, double lat, double lon) {
+    return CarData.fromCarData(images: images, carDates: dates, latitude: lat, longitude: lon);
+
+  }
+
 }

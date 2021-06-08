@@ -7,15 +7,14 @@ import 'package:quick_car/repository/repository.dart';
 import '../data_class/car_data.dart';
 
 class SearchState extends ChangeNotifier {
-
   List<CarData> carsList = [];
   SearchState() {
     setDefaultValues();
-    loadCars();
+    Future.delayed(Duration(seconds: 2), () => loadCars());
   }
   String sortedByName = '';
   double _distFilter;
-  bool _isLoading = false;
+  bool _isLoading = true;
   bool _sortedByPrice;
   bool _sortedByDist;
   RangeValues _priceRange;
@@ -71,8 +70,8 @@ class SearchState extends ChangeNotifier {
     Map<String, String> qp = {};
     if (_typesChecked.index != 0)
       qp["type"] = CarsGlobals.carTypes[_typesChecked.index];
-    CarsGlobals.repository.updateCars(qp);
-    carsList = await CarsGlobals.repository.carsListFuture.then<List<CarData>>((value) {
+    print("call repository");
+    carsList = await CarsGlobals.repository.updateCars(qp).then<List<CarData>>((value) {
       List<CarData> copiedList = copyList(value);
               print("get cars search state, list length: " + copiedList.length.toString());
         if (_distFilter != null) {

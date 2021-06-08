@@ -6,11 +6,11 @@ import 'package:quick_car/data_class/car_data.dart';
 import 'package:quick_car/data_class/reservation.dart';
 import 'package:quick_car/states/search_state.dart';
 import 'package:quick_car/states/user_state.dart';
-import '../../widgets/camera_demo.dart';
+import '../../widgets/camera.dart';
 import 'package:quick_car/view/pages/reservation_interaction/start_drive_flow.dart';
 import 'package:quick_car/view/pages/user_items/my_reservation_details.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
-import 'package:quick_car/view/widgets/general.dart';
+import 'package:quick_car/view/widgets/messages.dart';
 
 class MyReservations extends StatelessWidget {
 

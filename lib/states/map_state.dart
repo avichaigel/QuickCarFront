@@ -15,12 +15,12 @@ class MapState extends ChangeNotifier {
   }
 
   void loadCars() async {
-    CarsGlobals.carsApi.getCars({})
-      .then((value) {
-          carsList = value;
-          notifyListeners();
-        })
-      .onError((error, stackTrace) {});
+    // CarsGlobals.carsApi.getCars({})
+    //   .then((value) {
+    //       carsList = value;
+    //       notifyListeners();
+    //     })
+    //   .onError((error, stackTrace) {});
 
   }
 }

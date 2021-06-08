@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:convert';
 
 import 'package:quick_car/constants/strings.dart';
@@ -6,32 +7,9 @@ import 'package:http/http.dart' as http;
 
 
 class SignUpApi {
-  void uploadCarLicense(String str) {}
+  Future<String> uploadCarLicense(File imageFile) {}
   Future<UserSignUp> signUpNewUser(UserSignUp user) {}
 }
-class MockSignUpApi implements SignUpApi {
-  var client = http.Client();
-  MockSignUpApi._() {
-    print("in c'tor of mock signup api");
-  }
-  static final MockSignUpApi _instance = MockSignUpApi._();
-  factory MockSignUpApi() {
-    return _instance;
-  }
-
-  @override
-  Future<UserSignUp> signUpNewUser(UserSignUp user) {
-    // on success
-    return Future<UserSignUp>.value(user);
-
-  }
-
-  @override
-  void uploadCarLicense(String str) {
-    // TODO: implement uploadCarLicense
-  }
-}
-
 
 
 class QuickCarSignUpApi implements SignUpApi {
@@ -44,10 +22,11 @@ class QuickCarSignUpApi implements SignUpApi {
     return _instance;
   }
 
-  void uploadCarLicense(String str) async {
+  Future<String> uploadCarLicense(File imageFile) async {
+    return "car license uploaded";
     try {
-      print(str);
-      var map = {'car_license': str};
+      print(imageFile.path);
+      var map = {'car_license': imageFile.path};
       String url = Strings.QUICKCAR_URL + "user";
       var response = await client.put(Uri.parse(url),
           headers: {

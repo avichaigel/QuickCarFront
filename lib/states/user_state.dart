@@ -17,12 +17,16 @@ class UserState extends ChangeNotifier {
   String _firstName;
   String _lastName;
   String _email;
+  int _id;
+  int getId () => _id;
   String getEmail () => _email;
   String getFirstName() => _firstName;
   String getLastName() => _lastName;
   String getToken() => _token;
   List<CarData> _carsAsRenterOut = [];
   List<Reservation> _reservationsAsBorrower = [];
+  // should be only from server with photos from amazon
+  // TODO: smart caching for the cars after uploading
   List<CarData> getMyCars() => _carsAsRenterOut;
   List<Reservation> getMyReservation() => _reservationsAsBorrower;
   void setToken(String token) {
@@ -33,7 +37,7 @@ class UserState extends ChangeNotifier {
     notifyListeners();
   }
   void setUserCars(List<CarData> carsList) {
-    for (int i = 0;i< carsList.length; i++) {
+    for (int i = 0; i < carsList.length; i++) {
       print(carsList[i].id);
     }
     _carsAsRenterOut = carsList;
@@ -70,7 +74,8 @@ class UserState extends ChangeNotifier {
     _creditCard = cd;
     notifyListeners();
   }
-  void setLoginSetup(String fn, String ln, String em, bool isLoggedIn, File carLicense) {
+  void setLoginSetup(int id, String fn, String ln, String em, bool isLoggedIn, File carLicense) {
+    _id = id;
     _firstName = fn;
     _lastName = ln;
     _email = em;

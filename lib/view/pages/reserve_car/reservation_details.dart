@@ -1,8 +1,12 @@
+import 'dart:collection';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:quick_car/view/pages/user_items/update_car_license.dart';
 import '../../../data_class/car_data.dart';
 import '../../../data_class/reservation.dart';
 import 'package:quick_car/services/payment_service.dart';
@@ -127,7 +131,6 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                         width: 30,
                       ),
                       Flexible(child: Text(car.pricePerDayUsd.toString() + "\$ per day",
-
                         style: TextStyle(
                             fontSize: 22,
                             color: Colors.black45
@@ -166,6 +169,33 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                       locationText()),
                 ),
                 Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(border: Border.all()),
+                    child: Stack(
+                      children: [
+                        Container(
+                          height: MediaQuery.of(context).size.width/1.2,
+                          width: MediaQuery.of(context).size.width/1.2,
+                          child: GoogleMap(
+                            initialCameraPosition: CameraPosition(
+                              target: LatLng(car.latitude, car.longitude),
+                              zoom: 16,
+                            ),
+                              markers: {(Marker(
+                                markerId: MarkerId(car.id.toString()),
+                                position: LatLng(car.latitude, car.longitude))
+                                )
+                              },
+                            myLocationEnabled: true,
+
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
                   padding: const EdgeInsets.all(2.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
@@ -187,7 +217,14 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                       backgroundColor: Colors.lightBlue
                   ),
 
-                  onPressed: () => print("clicked on please log-in"),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("In order to book you have to be logged in"),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  },
                   child: Text("Please log-in or sign up")
                   ,
                 ) ;
@@ -198,7 +235,9 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                       backgroundColor: Colors.lightBlue
                   ),
 
-                  onPressed: () => print("clicked on upload car license"),
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => UpdateCarLicense()));
+                  },
                   child: Text("Upload car license")
                   ,
                 ) ;
@@ -213,7 +252,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                     ),
                     onPressed: () async {
                       dates = await Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => ChooseDates(selectedDatePeriod: dates, carDatePeriods: car.cardates)));
+                          builder: (context) => ChooseDates(selectedDatePeriod: dates, carDatePeriods: car.carDates)));
                       setState(() {
                       });
                     },

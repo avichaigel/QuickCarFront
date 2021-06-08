@@ -8,14 +8,14 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../main.dart';
 
-class CameraDemo extends StatefulWidget {
+class Camera extends StatefulWidget {
   final Function(String) callback;
-  CameraDemo(this.callback);
+  Camera(this.callback);
   @override
-  _CameraDemoState createState() => _CameraDemoState();
+  _CameraState createState() => _CameraState();
 }
 
-class _CameraDemoState extends State<CameraDemo> {
+class _CameraState extends State<Camera> {
   CameraController _control;
   Future<void> _future;
   double sizeWidth;
@@ -39,7 +39,6 @@ class _CameraDemoState extends State<CameraDemo> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _control.dispose();
   }
@@ -84,12 +83,6 @@ class _CameraDemoState extends State<CameraDemo> {
         onPressed: () async {
           try {
             await _future;
-
-            // final path = join(
-            //   (await getTemporaryDirectory()).path,
-            //   '${DateTime.now()}.png',
-            // );
-
             await _control.takePicture().then((value) async => widget.callback(await _resizePhoto(value.path)));
             Navigator.pop(context);
           } catch (e) {

@@ -20,7 +20,7 @@ class GMap extends StatefulWidget {
 }
 
 class _GMapState extends State<GMap> {
-  Set<Marker> _markers = HashSet<Marker>();
+    Set<Marker> _markers = HashSet<Marker>();
   bool _showMapStyle = false;
   CarData currCar;
   bool _isCardVisible = false;
@@ -68,7 +68,7 @@ class _GMapState extends State<GMap> {
             position: LatLng(element.latitude, element.longitude),
             infoWindow: InfoWindow(
               title: "${element.brand} ${element.model}",
-              snippet: "${element.distanceFromLocation.toInt()} km away",
+              snippet: element.distanceFromLocation != null ? "${element.distanceFromLocation.toInt()} km away" : "",
             ),
             onTap: () {
               setState(() {

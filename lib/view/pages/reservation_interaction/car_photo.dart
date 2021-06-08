@@ -9,7 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/constants/strings.dart';
 import 'package:quick_car/states/start_drive_state.dart';
-import '../../widgets/camera_demo.dart';
+import '../../widgets/camera.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
 
 class CarPhoto extends StatefulWidget {
@@ -36,7 +36,7 @@ class _CarPhotoState extends State<CarPhoto> {
   }
 
   void _uploadPhotoNew() async {
-    await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => CameraDemo(callBack)));
+    await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Camera(callBack)));
     setState(() {
 
     });

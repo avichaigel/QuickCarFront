@@ -44,19 +44,37 @@ class ChooseDatesState extends State<ChooseDates> {
 
   }
   Table createTable() {
+    const double textPadding = 2.0;
+    const double textSize = 18;
     List<TableRow> rows = [];
     rows.add( TableRow(
         children: [
-          Text("Start date", style: TextStyle(fontWeight: FontWeight.bold),),
-          Text("End date", style: TextStyle(fontWeight: FontWeight.bold),),
+          Padding(
+            padding: const EdgeInsets.all(textPadding),
+            child: Text("Start date", style: TextStyle(fontWeight: FontWeight.bold, fontSize: textSize),),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(textPadding),
+            child: Text("End date", style: TextStyle(fontWeight: FontWeight.bold,  fontSize: textSize),),
+          ),
         ]
     )
     );
     for (int i = 0; i < carDatePeriods.length; i++) {
       rows.add(TableRow(
           children: [
-            Text(DateFormat("yyyy-MM-dd").format(carDatePeriods[i].start)),
-            Text(DateFormat("yyyy-MM-dd").format(carDatePeriods[i].end)),
+            Padding(
+              padding: const EdgeInsets.all(textPadding),
+              child: Text(DateFormat("yyyy-MM-dd").format(carDatePeriods[i].start),
+                  style: TextStyle(fontSize: textSize)
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(textPadding),
+              child: Text(DateFormat("yyyy-MM-dd").format(carDatePeriods[i].end),
+                  style: TextStyle(fontSize: textSize)
+              ),
+            ),
           ]
       ));
     }

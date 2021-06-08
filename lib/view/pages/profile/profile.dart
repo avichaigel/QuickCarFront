@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/states/map_state.dart';
 import '../../../api/cars_api.dart';
-import 'package:quick_car/view/widgets/general.dart';
+import 'package:quick_car/view/widgets/messages.dart';
 import '../../../data_class/car_data.dart';
 import 'package:quick_car/states/new_car_state.dart';
 import 'package:quick_car/states/user_state.dart';
@@ -67,17 +67,18 @@ class Profile extends StatelessWidget {
                           return;
                         }
                           final NewCarState newCar = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => UploadCarFlow()));
+                        print(newCar.pricePerDay);
                           if (newCar.pricePerDay == null)
                             return;
+                          print("p"+ newCar.manufYear);
                           CarData cd = CarData(newCar.companyName, newCar.model, int.parse(newCar.manufYear),
                               newCar.kilometers, newCar.latitude, newCar.longitude, newCar.pricePerDay, newCar.type,
                               newCar.images);
-                          test(cd).
+                          CarsGlobals.carsApi.postCar(cd).
                           then((value) {
                               myShowDialog(context, "Upload car success", "You can now see it in your car list and update it");
                               value.lastUpdate = DateTime.now();
                               Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => DatesAvailability(value.id)));
-                              userState.addUserCar(value);
                               try{
                                 Provider.of<MapState>(context, listen: false).addCar(value);
                               } catch (e) {
@@ -107,10 +108,19 @@ class Profile extends StatelessWidget {
                     child: ListTile(
                       onTap: () async {
                         if (userState.getMyCars().length == 0) {
-                          var qp = {'owner': '1'};
-                          userState.setUserCars(await CarsGlobals.carsApi.getCars(qp));
+                          print("get cars from server");
+                          var qp = {'owner': Provider.of<UserState>(context, listen: false).getId().toString() };
+                          CarsGlobals.carsApi.getCars(qp)
+                              .then((value) {
+                                userState.setUserCars(value);
+                                Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyCars()));
+                              })
+                              .onError((error, stackTrace) {
+                                myShowDialog(context, "Error", "Could not load cars from server");
+                              });
+                        } else {
+                          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyCars()));
                         }
-                        Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyCars()));
                       },
                       title: Text("My cars"),
                       leading: CircleAvatar(

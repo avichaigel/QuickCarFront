@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quick_car/states/new_car_state.dart';
+import 'package:quick_car/view/widgets/messages.dart';
 
 class CarLocation extends StatefulWidget {
   @override
@@ -32,6 +33,7 @@ class _CarLocationState extends State<CarLocation> {
 class _GeoListenPageState extends State<GeoListenPage> {
   Location _location;
   bool _locNotFound = false;
+  LatLng tappedLocation;
   TextEditingController _streetController = TextEditingController();
   TextEditingController _numberController = TextEditingController();
   TextEditingController _cityController = TextEditingController();
@@ -43,17 +45,31 @@ class _GeoListenPageState extends State<GeoListenPage> {
     });
   }
 
+
   @override
   void initState() {
     super.initState();
+
   }
   void _continuePressed() {
+    _location = Location(latitude: tappedLocation.latitude, longitude: tappedLocation.longitude,
+    timestamp: DateTime.now());
     context
         .flow<NewCarState>()
-        .update((carState) => carState.copywith(latitude: _location.latitude, longitude: _location.longitude));
+        .update((carState) => carState.copywith(latitude: _location.latitude, longitude: _location.longitude)
+    );
   }
   @override
   Widget build(BuildContext context) {
+    Set<Marker> _markers;
+    if (tappedLocation != null) {
+      _markers = HashSet<Marker>();
+      _markers.add(
+          Marker(
+            markerId: MarkerId("0"),
+            position: tappedLocation,
+          )
+      );    }
     return Scaffold(
       appBar: AppBar(
         title: Text("Car location"),
@@ -123,8 +139,7 @@ class _GeoListenPageState extends State<GeoListenPage> {
                     print("address: " + x);
                     List<Location> locations = await locationFromAddress(x);
                     setState(() {
-                      print("in set state");
-                      createMapDialog(LatLng(locations[0].latitude, locations[0].longitude));
+                      tappedLocation = LatLng(locations[0].latitude, locations[0].longitude);
                       _location = locations[0];
                     });
 
@@ -139,17 +154,52 @@ class _GeoListenPageState extends State<GeoListenPage> {
               ),
             ),
             Visibility(
-              child: Text("Address is not found",
-                style: TextStyle(
-                    color: Colors.red
-                ),
-              ),
+              child: showAlert("Address is not found", () {
+                setState(() {
+                  _locNotFound = false;
+                });
+              }),
               maintainSize: true,
               maintainAnimation: true,
               maintainState: true,
               visible: _locNotFound,
             ),
+            tappedLocation != null && _markers != null ? Column(
+              children: [
+                Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 3,
+                            color: Colors.black
+                        )
+                    ),
+                    child: Stack(
+                      children: [
+                        GoogleMap(
+                          initialCameraPosition: CameraPosition(
+                            target: tappedLocation,
+                            zoom: 15,
+                          ),
+                          markers: _markers,
+                          onTap: (LatLng latLng) {
+                            setState(() {
+                              tappedLocation = latLng;
+                            });
+                          },
+                        )
+                      ],
+                    ),
+                    height: MediaQuery.of(context).size.height/2
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      _continuePressed();
+                    } ,
+                    child: Text("Confirm Location")
+                ),
 
+              ],
+            ) : Text("")
 
           ],
         ),
@@ -157,13 +207,14 @@ class _GeoListenPageState extends State<GeoListenPage> {
     );
   }
 
-  createMapDialog(LatLng latLng) {
+  createMapDialog() {
     return showDialog(context: context, builder: (context) {
+      print("in here");
       Set<Marker> _markers = HashSet<Marker>();
       _markers.add(
           Marker(
             markerId: MarkerId("0"),
-            position: latLng,
+            position: tappedLocation,
           )
       );
 
@@ -178,12 +229,17 @@ class _GeoListenPageState extends State<GeoListenPage> {
               ),
               child: GoogleMap(
                 initialCameraPosition: CameraPosition(
-                  target: latLng,
+                  target: tappedLocation,
                   zoom: 15,
                 ),
                 markers: _markers,
                 myLocationEnabled: true,
                 myLocationButtonEnabled: true,
+                onTap: (LatLng latLng) {
+                  setState(() {
+                    tappedLocation = latLng;
+                  });
+                },
               ),
               height: MediaQuery.of(context).size.height/2
           ),
