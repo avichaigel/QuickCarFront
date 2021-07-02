@@ -1,13 +1,14 @@
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:quick_car/api/quick_car_api/email_api.dart';
 import 'package:quick_car/constants/globals.dart';
 import 'package:quick_car/data_class/quick_car/user_signup.dart';
 import 'package:quick_car/states/signup_state.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
 import 'package:quick_car/view/widgets/country_list_pick.dart';
 import 'package:quick_car/view/widgets/decorations.dart';
-
+import 'package:http/http.dart' as http;
 
 class SignUpForm extends StatefulWidget {
   @override
@@ -32,18 +33,19 @@ class SignUpFormState extends State<SignUpForm> {
   Widget _buildFirstName() {
     return TextFormField(
       decoration: InputDecoration(labelText: 'First Name'),
-          maxLength: 10,
-          validator: (String value) {
-            if (value.isEmpty) {
-              return 'First name is Required';
-            }
-            return null;
-          },
-          onSaved: (String value) {
-            _firstName = value;
-          },
+      maxLength: 10,
+      validator: (String value) {
+        if (value.isEmpty) {
+          return 'First name is Required';
+        }
+        return null;
+      },
+      onSaved: (String value) {
+        _firstName = value;
+      },
     );
   }
+
   Widget _buildLastName() {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Last Name'),
@@ -59,6 +61,7 @@ class SignUpFormState extends State<SignUpForm> {
       },
     );
   }
+
   Widget _buildUserName() {
     return TextFormField(
       decoration: InputDecoration(labelText: 'User name'),
@@ -67,10 +70,9 @@ class SignUpFormState extends State<SignUpForm> {
         if (value.isEmpty) {
           return 'Last name is Required';
         }
-        if (!RegExp
-        (r"^(?=.{1,15}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$").hasMatch(value)
-        )
-          return 'Please enter a valid user name';
+        if (!RegExp(
+                r"^(?=.{1,15}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$")
+            .hasMatch(value)) return 'Please enter a valid user name';
         return null;
       },
       onSaved: (String value) {
@@ -78,6 +80,7 @@ class SignUpFormState extends State<SignUpForm> {
       },
     );
   }
+
   Widget _buildEmail() {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Email'),
@@ -88,14 +91,19 @@ class SignUpFormState extends State<SignUpForm> {
         }
 
         if (!RegExp(
-            r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+                r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
             .hasMatch(value)) {
           return 'Please enter a valid email Address';
         }
 
         return null;
       },
-      onSaved: (String value) {
+      onSaved: (String value) async {
+        print("onSaved called in buildEmail");
+        if (!(await validateEmail(value))) {
+          print("email doesn't exist");
+          return null;
+        }
         _email = value;
       },
     );
@@ -124,6 +132,7 @@ class SignUpFormState extends State<SignUpForm> {
       },
     );
   }
+
   Widget _buildPasswordVaildation() {
     return TextFormField(
       obscureText: true,
@@ -144,6 +153,7 @@ class SignUpFormState extends State<SignUpForm> {
       },
     );
   }
+
   Widget _buildCountry() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,10 +162,7 @@ class SignUpFormState extends State<SignUpForm> {
           padding: const EdgeInsets.only(top: 22.0, bottom: 2.0),
           child: Text(
             'Country',
-            style: TextStyle(
-                fontSize: 16.5,
-                color: Colors.black54
-            ),
+            style: TextStyle(fontSize: 16.5, color: Colors.black54),
           ),
         ),
         Padding(
@@ -211,7 +218,8 @@ class SignUpFormState extends State<SignUpForm> {
                   _buildPassword(),
                   _buildPasswordVaildation(),
                   SizedBox(height: 100),
-                  nextButton(onPressed: () {
+                  nextButton(
+                    onPressed: () {
                       if (!_formKey.currentState.validate()) {
                         return;
                       }
