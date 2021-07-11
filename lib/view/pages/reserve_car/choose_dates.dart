@@ -31,6 +31,8 @@ class ChooseDatesState extends State<ChooseDates> {
     DateTime end = datePeriod.end.subtract(Duration(days: 1));
     bool result = false;
     for (int i = 0; i < carDatePeriods.length; i++) {
+      if (start.isBefore(DateTime.now()) && start.day != DateTime.now().day)
+        break;
         if (start.isAfter(carDatePeriods[i].start) && end.isBefore(carDatePeriods[i].end)) {
           result = true;
           break;
@@ -38,6 +40,8 @@ class ChooseDatesState extends State<ChooseDates> {
     }
     if (result != _isLegalRange) {
       setState(() {
+        print("is leagal range:");
+        print(result);
         _isLegalRange = result;
       });
     }

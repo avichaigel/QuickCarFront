@@ -77,11 +77,10 @@ class QuickCarCarsApi implements CarsApi {
       request.files.add(filesToUpload[i]);
     }
     request.headers['Authorization']= 'TOKEN ' + Strings.TOKEN;
-    print("request: " +request.fields.toString());
+    print("request: " + request.fields.toString());
     final response = await request.send();
     print(response.statusCode);
     if (response.statusCode == 201) {
-      print("7");
       response.stream.transform(utf8.decoder).listen((value) {
         print("value returned: " + value.toString());
         cd.id = json.decode(value)['id'];

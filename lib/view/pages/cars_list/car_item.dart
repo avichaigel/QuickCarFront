@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:provider/provider.dart';
+import 'package:quick_car/view/widgets/messages.dart';
 import '../../../data_class/car_data.dart';
 import 'package:quick_car/models/distance.dart';
 import 'package:quick_car/states/user_state.dart';
@@ -112,6 +113,17 @@ ElevatedButton bookNowButton(CarData car, BuildContext context) {
       if (car.images == null) {
         print("car images is null");
         return null;
+      }
+      try {
+
+      } catch (e) {
+        print("error:");
+        print(e.toString());
+      }
+      final userState = Provider.of<UserState>(context, listen: false);
+      if (car.owner == userState.getEmail()) {
+        myShowDialog(context, "Book car failed", "You cannot book your own car");
+        return;
       }
       try {
         car.placeMarks = await placemarkFromCoordinates(car.latitude, car.longitude);

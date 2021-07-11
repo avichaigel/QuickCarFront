@@ -1,5 +1,6 @@
 import 'package:flutter_credit_card/credit_card_widget.dart';
 import 'package:quick_car/view/pages/user_items/update_car_license.dart';
+import 'package:quick_car/view/widgets/messages.dart';
 import 'package:stripe_payment/stripe_payment.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -119,7 +120,6 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                               }
                               print("new values: name: " + _nameController.value.text + " email" + _emailController.value.text);
                             },
-
                           )
                       ),
                     ],
@@ -225,12 +225,16 @@ class _PersonalDetailsState extends State<PersonalDetails> {
 
     } else {
       if (state != null) {
-        print("state from creditcaed");
+        print("state from credit card");
 
       }
       return ElevatedButton(
-          onPressed: () => Navigator.push(context, MaterialPageRoute(
-              builder: (BuildContext context) => UploadCreditCard(asb: false,st: state))),
+          onPressed: () async {
+            await Navigator.push(context, MaterialPageRoute(
+                builder: (BuildContext context) => UploadCreditCard(asb: false,st: state)));
+            myShowDialog(context, "Upload Credit Card", "Credit Card uploaded successfully");
+
+          },
           child: Text("Upload credit card details"));
     }
 
@@ -241,9 +245,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
       return Container(
         decoration: BoxDecoration(border: Border.all()),
         width: MediaQuery.of(context).size.width/2,
-        child: Image(
-          image: FileImage(state.getCarLicensePhoto())
-        ),
+        child: Image.network(state.getCarLicensePhoto().path)
       );
     } else {
       return ElevatedButton(

@@ -11,11 +11,13 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/data_class/car_data.dart';
+import 'package:quick_car/data_class/car_detection_response.dart';
 import 'package:quick_car/states/my_car_details_state.dart';
 import 'package:quick_car/states/user_state.dart';
 import 'package:quick_car/view/widgets/camera.dart';
 import 'package:quick_car/view/widgets/date_picker.dart';
 import 'package:quick_car/view/widgets/images.dart';
+import 'package:quick_car/view/widgets/messages.dart';
 
 class MyCarDetails extends StatefulWidget {
   CarData carData;
@@ -160,6 +162,15 @@ class _MyCarDetailsState extends State<MyCarDetails> {
                   child: _DatesAvailability()
               )
           ),
+          ElevatedButton(
+            onPressed: () {
+              // carsApi-> delete car id
+              state.removeCarToRentOut(carData.id);
+              Navigator.pop(context);
+            },
+            child: Text("Remove Car"),
+            style: ElevatedButton.styleFrom(primary: Colors.red),
+          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
@@ -208,7 +219,8 @@ class _CarPhotosState extends State<_CarPhotos> {
     return Border.all(
         width: 3.0, color: imageIdx == currIndex ? Colors.greenAccent : Colors.grey.withOpacity(0));
   }
-
+  String _errMsg;
+  bool _err;
   Container photoWidget(File file, int index, bool isNew) {
     return Container(
       decoration: BoxDecoration(
@@ -234,6 +246,8 @@ class _CarPhotosState extends State<_CarPhotos> {
   void initState() {
     super.initState();
     currIndex = 0;
+    _err = false;
+    _errMsg = '';
   }
   @override
   Widget build(BuildContext context) {
@@ -267,6 +281,10 @@ class _CarPhotosState extends State<_CarPhotos> {
                 ),
               ],
             ),
+          ),
+          Visibility(
+            visible: _err,
+              child: showAlert(_errMsg, () { setState(() {_err = !_err;});},)
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -303,6 +321,14 @@ class _CarPhotosState extends State<_CarPhotos> {
   void takePicture(MyCarDetailsState state) async {
     await Navigator.push(context, MaterialPageRoute(
         builder: (BuildContext context) => Camera(callBack)));
+    CarDetectionResponse cdr = await CarsGlobals.mlApi.isCar(newImage);
+    if (!cdr.isCar) {
+      setState(() {
+        _err = true;
+        _errMsg = "Image must contain a car";
+      });
+      return;
+    }
     state.updatePhoto(newImage, currIndex);
   }
   void callBack(String path) {
@@ -315,7 +341,17 @@ class _CarPhotosState extends State<_CarPhotos> {
       return;
     }
     try {
-      state.updatePhoto(File(image.path), currIndex);
+      File newImage = File(image.path);
+      CarDetectionResponse cdr = await CarsGlobals.mlApi.isCar(newImage);
+      if (!cdr.isCar) {
+        setState(() {
+          _err = true;
+          _errMsg = "Image must contain a car";
+
+        });
+        return;
+      }
+      state.updatePhoto(newImage, currIndex);
       for (int i = 0; i < 4; i++) {
         if (myImages[i]  != null)
           print(myImages[i].path);
@@ -467,7 +503,7 @@ class _DatesAvailabilityState extends State<_DatesAvailability> {
       children: [
         Consumer<MyCarDetailsState>(
           builder: (context, state, child) {
-            _availabilityDates = state.cardates;
+            _availabilityDates = state.carDates;
             return Padding(
               padding: const EdgeInsets.all(8.0),
               child: createTable(),

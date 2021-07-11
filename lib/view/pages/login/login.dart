@@ -18,10 +18,12 @@ class _LoginState extends State<Login> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   String _error;
+  bool _isLoading;
 
   void initState() {
     super.initState();
     myFocusNode = FocusNode();
+    _isLoading = false;
   }
 
   BoxDecoration customDecoration () {
@@ -109,6 +111,12 @@ class _LoginState extends State<Login> {
                         alignment: Alignment.centerRight,
                         child: Text("Forgot password ?",style: TextStyle(color: Colors.blue,fontSize: 12),)),
                   ),
+                Visibility(
+                  visible: _isLoading,
+                    child: Center(
+                      child: CircularProgressIndicator()
+                    )
+                ),
                 _error != null ?showAlert(_error, () {
                   setState(() {
                     _error = null;
@@ -129,20 +137,28 @@ class _LoginState extends State<Login> {
                       return;
                     }
 
+                    setState(() {
+                      _isLoading = true;
+                    });
                       CarsGlobals.userApi.login(UserSignIn(email: emailController.text, password: passwordController.text))
                           .then((value) {
                             userState.setToken(value.token);
                             print("token: ${value}");
                             Strings.TOKEN = value.token;
+                            print(value);
+                            print(value.carLicense);
                             userState.setLoginSetup(value.id, value.firstName, value.lastName,
                                 value.email, true, value.carLicense);
                             Navigator.pushReplacementNamed(context, '/');
                           }).catchError((error, stackTrace) {
                             setState(() {
+                              _isLoading = false;
                               print("error:");
                               print(error.runtimeType);
                               if (error.runtimeType == FormatException)
                                 _error = "Wrong details";
+                              else if (error.runtimeType.toString() == "SocketException")
+                                _error = "Bad connection with internet";
                             });
                           } );
                   },

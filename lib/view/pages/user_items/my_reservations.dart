@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:quick_car/data_class/car_data.dart';
 import 'package:quick_car/data_class/reservation.dart';
 import 'package:quick_car/states/search_state.dart';
+import 'package:quick_car/states/start_drive_state.dart';
 import 'package:quick_car/states/user_state.dart';
 import '../../widgets/camera.dart';
 import 'package:quick_car/view/pages/reservation_interaction/start_drive_flow.dart';
@@ -19,9 +20,9 @@ class MyReservations extends StatelessWidget {
       return ElevatedButton(
         onPressed: () async {
           if (readyToStart(reservation)) {
-            await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => StartDriveFlow()));
-            state.setReservationActive(reservation);
-
+            StartDriveState sds = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => StartDriveFlow()));
+            if (sds.carImages.length == 4)
+              state.setReservationActive(reservation);
           }
         }  ,
         child: Text("Start driving"),
@@ -29,8 +30,8 @@ class MyReservations extends StatelessWidget {
       );
     } else if (reservation.isActive) {
       return ElevatedButton(
-          onPressed: () async {
-            await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => StartDriveFlow()));
+          onPressed: () {
+            myShowDialog(context, "End driving", "Thank you for using this car!\n");
             state.removeReservation(reservation);
           },
           child: Text("End drive"),
@@ -64,12 +65,11 @@ class MyReservations extends StatelessWidget {
                         children: [
                           Text("${DateFormat("yyyy-MM-dd").format(reservation.datePeriod.start)} until "
                               "${DateFormat("yyyy-MM-dd").format(reservation.datePeriod.end)}"),
-                    ElevatedButton(
-                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyReservationDetails(myReservations[index]))),
-                    child: Text("Reservation details")),
-                    buttons(reservation, context, state)
-                    ,
-
+                      ElevatedButton(
+                        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyReservationDetails(myReservations[index]))),
+                        child: Text("Reservation details")
+                      ),
+                        buttons(reservation, context, state),
                         ],
                       ),
                     ),

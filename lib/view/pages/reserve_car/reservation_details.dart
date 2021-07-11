@@ -6,7 +6,9 @@ import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/view/pages/user_items/update_car_license.dart';
+import 'package:quick_car/view/widgets/messages.dart';
 import '../../../data_class/car_data.dart';
 import '../../../data_class/reservation.dart';
 import 'package:quick_car/services/payment_service.dart';
@@ -234,7 +236,6 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                       primary: Colors.white,
                       backgroundColor: Colors.lightBlue
                   ),
-
                   onPressed: () {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => UpdateCarLicense()));
                   },
@@ -289,6 +290,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                                 duration: Duration(seconds: 2),
                               ),
                             );
+                            return;
 
                           }
 
@@ -297,7 +299,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                             // on success:
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text("Successful"),
+                                content: Text("Payment Successful"),
                                 duration: Duration(seconds: 2),
                               ),
 
@@ -307,8 +309,6 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                           print("user has credit card");
                           var response = await StripeService.payViaExistingCard(
                               card: state.getCreditCard(), currency: "usd", amount: totalPrice.toString());
-
-                          // TODO: if response is true:
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                                 content: Text("Successful"),
@@ -316,56 +316,29 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                             ),
 
                           ).closed.then((_) => onPaymentSuccess(state));
-
                         }
                       },
                       child: Text("Pay"),
                     );
                 }
                 );
-
               }
             }
-
         ),
       ),
-
-
     );
   }
 
   Future<void> startDirectCharge(PaymentMethod paymentMethod) async {
-    print("Payment charge started");
-    // TODO: should be implemented in the server
-    // https://www.youtube.com/watch?v=RLs34ZcaqhA
-    // final http.Response response = await http.post(Uri.parse());
-    //
-    // if (response.body != null) {
-    //   final paymentIntent = jsonDecode(response.body);
-    //   final status = paymentIntent['paymentIntent']['status'];
-    //   final acct = paymentIntent['stripeAccount'];
-    //
-    //   if (status == 'succeeded') {
-    //     print('payment done');
-    //   } else {
-    //     StripePayment.setStripeAccount(acct);
-    //     await StripePayment.confirmPaymentIntent(PaymentIntent(
-    //       paymentMethodId: paymentIntent['paymentIntent']['payment_method'],
-    //         clientSecret: paymentIntent['paymentIntent']['client_secret']))
-    //     .then((PaymentIntentResult paymentIntentResult) async {
-    //       final paymentStatus = paymentIntentResult.status;
-    //       if (paymentStatus == 'succeeded') {
-    //         print('payment done');
-    //       }
-    //     });
-    //   }
-    // }
-    print("Payment charge ended");
+    print("Payment charge");
   }
 
-  onPaymentSuccess(UserState state) {
+  onPaymentSuccess(UserState state) async {
     Reservation reservation = Reservation(car, dates, totalPrice, numberOfDays);
     state.addUserReservation(reservation);
+    // CarsGlobals.reservationApi.postReservation(reservation)
+    //     .then((value) => state.addUserReservation(reservation))
+    //     .onError((error, stackTrace) => print("error"));
     Navigator.pop(context);
   }
 }

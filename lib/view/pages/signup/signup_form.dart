@@ -188,10 +188,14 @@ class SignUpFormState extends State<SignUpForm> {
     nu.lastName = _lastName;
     nu.email = _email;
     nu.password = _password;
-    CarsGlobals.signUpApi.signUpNewUser(nu);
-    context
+    CarsGlobals.signUpApi.signUpNewUser(nu).then((value) {
+      context
         .flow<SignUpState>()
-        .update((signUpState) => signUpState.copyWith(formCompleted: true));
+        .update((signUpState) => signUpState.copyWith(id: value.id, formCompleted: true));})
+    .onError((error, stackTrace) {
+      print("error in sign up form");
+    });
+
   }
 
   @override

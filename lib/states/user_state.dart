@@ -84,7 +84,11 @@ class UserState extends ChangeNotifier {
     notifyListeners();
   }
   void setCarLicensePhoto(File clp) {
+    print(clp.path);
     _carLicensePhoto = clp;
     notifyListeners();
+  }
+  void removeCarToRentOut(int id) {
+    _carsAsRenterOut.removeWhere((element) => element.id == id);
   }
 }

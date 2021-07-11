@@ -11,8 +11,8 @@ class MyCarDetailsState extends ChangeNotifier {
   double longitude;
   String address;
 
-  List<DatePeriod> cardates;
-  MyCarDetailsState(this.carImages, this.latitude, this.longitude, this.cardates) {
+  List<DatePeriod> carDates;
+  MyCarDetailsState(this.carImages, this.latitude, this.longitude, this.carDates) {
     isImageNew = List<bool>.filled(CarsGlobals.maximumCarImages, false);
     for (int i = carImages.length; i < CarsGlobals.maximumCarImages; i++)
       carImages.add(null);

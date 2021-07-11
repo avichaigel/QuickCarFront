@@ -1,14 +1,4 @@
-// To parse this JSON data, do
-//
-//     final welcome = welcomeFromJson(jsonString);
-
-import 'dart:convert';
-
 import 'dart:io';
-
-UserSignIn signInUserFromJson(String str) => UserSignIn.fromJson(json.decode(str));
-
-String signInUserToJson(UserSignIn data) => json.encode(data.toJson());
 
 class UserSignIn {
   UserSignIn({
@@ -16,6 +6,7 @@ class UserSignIn {
     this.password,
   });
   int id;
+  int userProfileId;
   String email;
   String password;
   String firstName;
@@ -33,7 +24,7 @@ class UserSignIn {
   });
 
   factory UserSignIn.fromJson(Map<String, dynamic> json) {
-    print("json::"+json.toString());
+    print("json:"+json.toString());
     return UserSignIn.fromUserSignIn(
       id: json["id"],
       email: json["username"],
@@ -41,6 +32,11 @@ class UserSignIn {
       firstName: json["first_name"],
       lastName: json["last_name"],
     );
+  }
+  setDetailsFromUserProfile(Map<String, dynamic> json) {
+    userProfileId = json["user"];
+    if (json["license"] != null)
+      carLicense = File(json["license"]);
   }
 
   Map<String, dynamic> toJson() => {

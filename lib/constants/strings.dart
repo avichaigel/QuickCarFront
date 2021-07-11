@@ -6,6 +6,4 @@ class Strings {
   static String SORT_BY_DISTANCE = "sort by distance";
   static String SORT_BY_PRICE_CHEAP_TO_EXP = "Cheap to expensive";
   static String SORT_BY_PRICE_EXP_TO_CHEAP = "Expensive to cheap";
-
-//  static const String QUICKCAR_URL = "https://10.0.2.2:5001/api/";
 }

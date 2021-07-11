@@ -14,6 +14,7 @@ class UserSignUp {
     this.password,
   });
 
+  int id;
   String username;
   String firstName;
   String lastName;

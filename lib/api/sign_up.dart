@@ -1,13 +1,18 @@
+import 'package:flutter/cupertino.dart';
+import 'package:path/path.dart';
 import 'dart:io';
 import 'dart:convert';
-
+import 'package:http_parser/http_parser.dart' as http_parser;
+import 'dart:async';
+import 'package:async/async.dart';
+import 'package:http/http.dart' as http;
 import 'package:quick_car/constants/strings.dart';
 import '../data_class/user_signup.dart';
 import 'package:http/http.dart' as http;
 
 
 class SignUpApi {
-  Future<String> uploadCarLicense(File imageFile) {}
+  Future<File> uploadCarLicense(File imageFile, int id) {}
   Future<UserSignUp> signUpNewUser(UserSignUp user) {}
 }
 
@@ -22,48 +27,37 @@ class QuickCarSignUpApi implements SignUpApi {
     return _instance;
   }
 
-  Future<String> uploadCarLicense(File imageFile) async {
-    return "car license uploaded";
-    try {
-      print(imageFile.path);
-      var map = {'car_license': imageFile.path};
-      String url = Strings.QUICKCAR_URL + "user";
-      var response = await client.put(Uri.parse(url),
-          headers: {
-            'Content-Type':'application/json',
-            // 'Authorization': "TOKEN 6a0e8231a37806b025940b9047d2fe3ad6a204c7",
-          },
-          body: jsonEncode(map));
-      if (response.statusCode == 200) {
-        print("user successfully added car license photo");
-      }
-      print(response.statusCode.toString());
-
-    } catch (e) {
-      print("Error: " + e.toString());
+  Future<File> uploadCarLicense(File imageFile, int id) async {
+    Completer fileCompleter = Completer<File>();
+    var uri = Uri.parse(Strings.QUICKCAR_URL + "users/usersprofiles/" + id.toString() + "/");
+    var request = http.MultipartRequest("PATCH", uri);
+    var stream = new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+    var length = await imageFile.length();
+    var multipartFile = http.MultipartFile('image1', stream, length,
+        filename: basename(imageFile.path));
+    request.files.add(multipartFile);
+    final response = await request.send();
+    print("status code: " + response.statusCode.toString());
+    if (response.statusCode == 200) {
+      response.stream.transform(utf8.decoder).listen((value) {
+        print("value from listen: " + value);
+        fileCompleter.complete(File(jsonDecode(value)['license']));
+      });
+      return fileCompleter.future;
+    } else {
+      throw Exception("Failed to upload car license to server");
     }
-
 
   }
+
   Future<UserSignUp> signUpNewUser(UserSignUp user) async {
-    print("in signUpNewUser:");
-    print("user: " + user.toJson().toString());
-    try {
-      String url = Strings.QUICKCAR_URL + "users/";
-      var response = await client.post(Uri.parse(url),
-          headers: {
-            'Content-Type':'application/json',
-          },
+    String url = Strings.QUICKCAR_URL + "users/";
+    var response = await client.post(Uri.parse(url),
+        headers: {'Content-Type':'application/json',},
         body: jsonEncode(user.toJson()));
-      if (response.statusCode == 201) {
-        print("user successfully created");
-        return UserSignUp.fromJson(jsonDecode(response.body));
-      }
-      print("status code " + response.statusCode.toString());
-    } catch (e) {
-      print("Error: " + e.toString());
+    if (response.statusCode == 201) {
+      print("user successfully created");
+      return UserSignUp.fromJson(jsonDecode(response.body));
     }
-
-
   }
 }

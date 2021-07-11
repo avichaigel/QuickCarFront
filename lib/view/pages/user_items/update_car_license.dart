@@ -44,7 +44,6 @@ class _UpdateCarLicenseState extends State<UpdateCarLicense> {
     } catch (e) {
       print("exception: " + e.toString());
     }
-
     setState(() {});
   }
 
@@ -87,14 +86,27 @@ class _UpdateCarLicenseState extends State<UpdateCarLicense> {
             ),
             ElevatedButton(
                 onPressed: () {
-                  CarsGlobals.signUpApi.uploadCarLicense(imageFile)
+                  Provider.of<UserState>(context, listen: false).setCarLicensePhoto(imageFile);
+                  Navigator.pop(context);
+                  return;
+
+                  CarsGlobals.signUpApi.
+                  uploadCarLicense(imageFile, Provider.of<UserState>(context, listen: false).getId())
                       .then((value) {
-                        Provider.of<UserState>(context, listen: false).setCarLicensePhoto(imageFile);
+                        print(value);
+                        if (value == null) {
+                          setState(() {
+                            _error = "Failed to upload photo";
+                          });
+                          return;
+                        }
+                        print("upload car license successful");
+                        Provider.of<UserState>(context, listen: false).setCarLicensePhoto(value);
                         Navigator.pop(context);
                       })
                       .onError((error, stackTrace) {
                         setState(() {
-                          _error = "Failed to upload photo";
+                          _error = error.toString();
                         });
                       });
 

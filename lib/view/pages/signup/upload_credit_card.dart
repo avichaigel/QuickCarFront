@@ -5,6 +5,7 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:quick_car/states/signup_state.dart';
 import 'package:quick_car/states/user_state.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
+import 'package:quick_car/view/widgets/messages.dart';
 import 'package:stripe_payment/stripe_payment.dart';
 
 class UploadCreditCard extends StatefulWidget {
@@ -29,6 +30,7 @@ class _UploadCreditCardState extends State<UploadCreditCard> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   void _continuePressed() {
+    // got from sign-up process
     if (widget.addSkipButton) {
       if (isValid) {
         CreditCard creditCard = CreditCard(number: cardNumber,
@@ -40,10 +42,13 @@ class _UploadCreditCardState extends State<UploadCreditCard> {
       context.flow<SignUpState>().complete((signupState) {
         return signupState;
       });
+      // got from profile
     } else if (widget.state != null) {
       if (isValid) {
+        String expStr = expiryDate;
         CreditCard creditCard = CreditCard(number: cardNumber,
-            name: cardHolderName,expMonth: 1, expYear:2024, cvc: cvvCode);
+            name: cardHolderName,expMonth: int.parse(expStr.split("/")[0]),
+            expYear:int.parse(expStr.split("/")[1]), cvc: cvvCode);
         widget.state.addCreditCard(creditCard);
         Navigator.pop(context);
       }
@@ -114,7 +119,7 @@ class _UploadCreditCardState extends State<UploadCreditCard> {
                         child: Container(
                           margin: const EdgeInsets.all(8),
                           child: const Text(
-                            'Validate',
+                            'Submit',
                             style: TextStyle(
                               color: Colors.white,
                               fontFamily: 'halter',

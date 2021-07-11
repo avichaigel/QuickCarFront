@@ -20,8 +20,7 @@ class GMap extends StatefulWidget {
 }
 
 class _GMapState extends State<GMap> {
-    Set<Marker> _markers = HashSet<Marker>();
-  bool _showMapStyle = false;
+  Set<Marker> _markers = HashSet<Marker>();
   CarData currCar;
   bool _isCardVisible = false;
   List<CarData> cars = [];
@@ -61,7 +60,6 @@ class _GMapState extends State<GMap> {
       _mapController = controller;
     }
 
-    // TODO: fetch only available for today
     cars.forEach((element) {
           _markers.add(Marker(
             markerId: MarkerId(element.id.toString()),

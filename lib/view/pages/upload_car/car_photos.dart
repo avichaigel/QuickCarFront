@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/constants/strings.dart';
+import 'package:quick_car/data_class/car_detection_response.dart';
 import 'package:quick_car/states/new_car_state.dart';
 import 'package:quick_car/view/widgets/camera.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
 import 'package:quick_car/view/widgets/images.dart';
+import 'package:quick_car/view/widgets/messages.dart';
 
 class CarPhotos extends StatefulWidget {
   @override
@@ -20,8 +22,9 @@ class _CarPhotosState extends State<CarPhotos> {
 
   List<File> images = [];
   bool _errorVisibility = false;
+  String _errorMsg = '';
   int currIndex = 0;
-
+  bool _loading = false;
   void callBack(String path) {
     images[currIndex] = File(path);
   }
@@ -75,7 +78,10 @@ class _CarPhotosState extends State<CarPhotos> {
             visible: _errorVisibility,
             child: AnimatedContainer(
               duration: Duration(seconds: 4),
-              child: Text("Please upload at least 4 photos"),
+              child: showAlert(_errorMsg, () {
+                setState(() {_errorVisibility = false;}
+                );
+              }),
             )
             ,
           ),
@@ -235,18 +241,52 @@ class _CarPhotosState extends State<CarPhotos> {
                 ],
               ),
               errorWidget(),
-              SizedBox(
-                height: 100,
-              ),
-              nextButton(onPressed: () {
+              Visibility(
+                visible: _loading,
+                  child: Column(
+                    children: [
+                      Text("Make sure all images contain a car"),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(),
+                      )
+                    ],
+                  )),
+              nextButton(onPressed: () async {
+                setState(() {
+                  _loading = true;
+                });
                 for(var i = 0; i < 4; i++){
                   if (images[i] == null) {
                     setState(() {
+                      _errorMsg = "Please upload 4 photos";
                     _errorVisibility = true;
+                    _loading = false;
                     });
                     return;
                   }
+                  CarDetectionResponse cdr = await CarsGlobals.mlApi.isCar(images[i]);
+                  if (!cdr.isCar) {
+                    setState((){
+                      _errorMsg = "Seems that image number ${i+1} does not contain car";
+                      _errorVisibility = true;
+                      _loading = false;
+                    });
+                    return;
+                  } else {
+                    // TODO: update the state of the new car's type
+                    print("Detected type:");
+                    print(cdr.type);
+                    // context
+                    //     .flow<NewCarState>()
+                    //     .update((carState) => carState.copywith(type: ));
+
+                  }
+
                 }
+                setState(() {
+                  _loading = false;
+                });
                 _continuePressed();
               })
             ],
