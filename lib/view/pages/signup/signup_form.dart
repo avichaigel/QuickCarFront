@@ -7,6 +7,7 @@ import 'package:quick_car/states/signup_state.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
 import 'package:quick_car/view/widgets/country_list_pick.dart';
 import 'package:quick_car/view/widgets/decorations.dart';
+import 'package:quick_car/api/email_api.dart';
 
 
 class SignUpForm extends StatefulWidget {
@@ -83,13 +84,46 @@ class SignUpFormState extends State<SignUpForm> {
       },
     );
   }
+
+  showAlertDialog(BuildContext context) {
+
+    // set up the button
+    Widget okButton = TextButton(
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.of(context, rootNavigator: true)
+            .pop(true); // dismisses only the dialog and returns true
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("The email you provided does not exist"),
+      content: Text("Please provide a real email address"),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+/*        Future.delayed(Duration(seconds: 3), () {
+          Navigator.of(context).pop(true);
+        });*/
+        return alert;
+      },
+    );
+  }
+
   Widget _buildEmail() {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Email'),
       keyboardType: TextInputType.emailAddress,
       validator: (String value) {
         if (value.isEmpty) {
-          return 'Email is Required';
+          return 'Email is required';
         }
 
         if (!RegExp(
@@ -97,10 +131,15 @@ class SignUpFormState extends State<SignUpForm> {
             .hasMatch(value)) {
           return 'Please enter a valid email Address';
         }
-
         return null;
       },
-      onSaved: (String value) {
+      onSaved: (String value) async {
+        print("onSaved called in buildEmail");
+        if (!(await validateEmail(value))) {
+          showAlertDialog(context);
+          print("email doesn't exist");
+          return null;
+        }
         _email = value;
       },
     );
@@ -141,7 +180,6 @@ class SignUpFormState extends State<SignUpForm> {
         if (value != _passwordController.text) {
           return 'Password must be same as above';
         }
-
         return null;
       },
       onSaved: (String value) {
