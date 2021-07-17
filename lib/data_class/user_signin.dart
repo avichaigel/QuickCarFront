@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:quick_car/models/mycurrency.dart';
+
 class UserSignIn {
   UserSignIn({
     this.email,
@@ -13,6 +15,7 @@ class UserSignIn {
   String lastName;
   File carLicense;
   String token;
+  MyCurrency currency;
 
   UserSignIn.fromUserSignIn({
     this.id,
@@ -20,7 +23,8 @@ class UserSignIn {
     this.password,
     this.firstName,
     this.lastName,
-    this.carLicense
+    this.carLicense,
+    this.currency
   });
 
   factory UserSignIn.fromJson(Map<String, dynamic> json) {
@@ -31,6 +35,7 @@ class UserSignIn {
       password: json["password"],
       firstName: json["first_name"],
       lastName: json["last_name"],
+      currency: json["currency"],
     );
   }
   setDetailsFromUserProfile(Map<String, dynamic> json) {

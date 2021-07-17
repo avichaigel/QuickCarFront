@@ -47,6 +47,7 @@ dependencies:
   path_provider: ^2.0.1
   stripe_payment: ^1.1.0
   flutter_native_image: ^0.0.6
+#  currency_picker: ^2.0.4
 
 
 
@@ -62,6 +63,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  money2: ^2.2.1
 
 dev_dependencies:
   http: ^0.13.0

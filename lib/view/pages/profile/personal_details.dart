@@ -1,4 +1,5 @@
 import 'package:flutter_credit_card/credit_card_widget.dart';
+import 'package:quick_car/models/mycurrency.dart';
 import 'package:quick_car/view/pages/user_items/update_car_license.dart';
 import 'package:quick_car/view/widgets/messages.dart';
 import 'package:stripe_payment/stripe_payment.dart';
@@ -8,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:quick_car/states/user_state.dart';
 import 'package:quick_car/view/pages/signup/upload_car_license.dart';
 import 'package:quick_car/view/pages/signup/upload_credit_card.dart';
+
 
 class PersonalDetails extends StatefulWidget {
   @override
@@ -21,6 +23,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
   bool isCvvFocused = false;
   bool showSecretDetails = false;
   bool editCreditCard = false;
+
 
   bool isEditPersonalEnable;
   @override
@@ -176,7 +179,9 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                   ),
 
                   carLicenseDetails(state),
-                  SizedBox(height: 30,)
+                  SizedBox(height: 30,),
+
+                  currencyDetails(state),
                 ],
               ),
             );
@@ -254,5 +259,43 @@ class _PersonalDetailsState extends State<PersonalDetails> {
           child: Text("Upload car license photo"));
     }
 
+  }
+
+  Widget currencyDetails(UserState state) {
+    //   if (state.getCurrency() != null) {
+    //     //TODO show the user's current currency
+    //     return 0;
+    //   }
+    //   } else {
+    //   return 1;
+    // }
+    //   //TODO make an option to change the current currency
+    //   return DropdownButton<String>(
+    //     items: <String>['A', 'B', 'C', 'D'].map((String value) {
+    //       return DropdownMenuItem<String>(
+    //         value: value,
+    //         child: new Text(value),
+    //       );
+    //     }).toList(),
+    //     onChanged: (_) {},
+    //   );
+    if (state.getCarLicensePhoto() != null) {
+      return Container(
+          decoration: BoxDecoration(border: Border.all()),
+          width: MediaQuery
+              .of(context)
+              .size
+              .width / 2,
+          child: Image.network(state
+              .getCarLicensePhoto()
+              .path)
+      );
+    } else {
+      return ElevatedButton(
+          onPressed: () =>
+              Navigator.push(context, MaterialPageRoute(
+                  builder: (BuildContext context) => UpdateCarLicense())),
+          child: Text("Upload car license photo"));
+    }
   }
 }

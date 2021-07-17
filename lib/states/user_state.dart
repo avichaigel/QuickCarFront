@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:quick_car/models/mycurrency.dart';
 import '../data_class/car_data.dart';
 import '../data_class/reservation.dart';
 import 'package:stripe_payment/stripe_payment.dart';
@@ -9,15 +10,19 @@ class UserState extends ChangeNotifier {
   bool _isLoggedIn = false;
   File _carLicensePhoto;
   CreditCard _creditCard;
+  MyCurrency _currency;
   bool isLoggedIn() => _isLoggedIn;
   File getCarLicensePhoto() => _carLicensePhoto;
   CreditCard getCreditCard() => _creditCard;
+  MyCurrency getCurrency() => _currency;
+
   //TODO: maybe need to delete token from user state
   String _token;
   String _firstName;
   String _lastName;
   String _email;
   int _id;
+
   int getId () => _id;
   String getEmail () => _email;
   String getFirstName() => _firstName;
@@ -90,5 +95,8 @@ class UserState extends ChangeNotifier {
   }
   void removeCarToRentOut(int id) {
     _carsAsRenterOut.removeWhere((element) => element.id == id);
+  }
+  void setCurrency(MyCurrency value) {
+    _currency = value;
   }
 }

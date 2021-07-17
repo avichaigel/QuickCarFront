@@ -2,6 +2,7 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_car/constants/cars_globals.dart';
+import 'package:quick_car/models/mycurrency.dart';
 import '../../../data_class/user_signup.dart';
 import 'package:quick_car/states/signup_state.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
@@ -26,6 +27,7 @@ class SignUpFormState extends State<SignUpForm> {
   String _url;
   String _phoneNumber;
   String _country;
+  MyCurrency _currency;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _passwordController = TextEditingController();
@@ -213,6 +215,20 @@ class SignUpFormState extends State<SignUpForm> {
     );
   }
 
+  Widget _buildCurrency() {
+    return DropdownButton<String>(
+      items: <String>['USD', 'EUR', 'CAD', 'ILS'].map((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: new Text(value),
+        );
+      }).toList(),
+      onChanged: (String cur) {
+        _currency = MyCurrency(cur);
+      },
+    );
+  }
+
   @override
   void dispose() {
     print("in signup form dispose");
@@ -226,6 +242,7 @@ class SignUpFormState extends State<SignUpForm> {
     nu.lastName = _lastName;
     nu.email = _email;
     nu.password = _password;
+    nu.currency = _currency;
     CarsGlobals.signUpApi.signUpNewUser(nu).then((value) {
       context
         .flow<SignUpState>()
@@ -257,6 +274,7 @@ class SignUpFormState extends State<SignUpForm> {
                   _buildEmail(),
                   _buildPassword(),
                   _buildPasswordVaildation(),
+                  _buildCurrency(),
                   SizedBox(height: 100),
                   nextButton(onPressed: () {
                       if (!_formKey.currentState.validate()) {
