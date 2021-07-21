@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_car/constants/cars_globals.dart';
+import 'package:quick_car/services/currency_service.dart';
 import 'package:quick_car/view/widgets/search_widget.dart';
 
 import '../../../data_class/car_data.dart';
@@ -155,7 +156,7 @@ class ResultsViewState extends State<ResultsView> {
     }
     if (cars.contains(null) || cars.length < 0 || _isLoading) {
       return SizedBox(
-        height: 200,
+          height: 200,
           child: Center(child: CircularProgressIndicator())
       );
     }
@@ -165,19 +166,17 @@ class ResultsViewState extends State<ResultsView> {
         child: Text("No results found", style: TextStyle(fontSize: 20),),
       );
     }
-    return Expanded(
-      child: RefreshIndicator(
-        onRefresh: () async => state.loadCars(),
-        child: ListView.builder(
-            itemCount: cars.length,
-            itemBuilder: (context, index) {
-              return CarItem(cars[index]);
-            }) ,
-      )
-    );
-
+    return  Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async => state.loadCars(),
+                child: ListView.builder(
+                    itemCount: cars.length,
+                    itemBuilder: (context, index) {
+                      return CarItem(cars[index]);
+                    }),
+              )
+          );
   }
-
 }
 
 

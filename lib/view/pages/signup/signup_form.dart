@@ -1,13 +1,15 @@
+import 'package:currency_picker/currency_picker.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_car/constants/cars_globals.dart';
+import 'package:quick_car/constants/strings.dart';
+import 'package:quick_car/view/widgets/currency_picker.dart';
 import '../../../data_class/user_signup.dart';
 import 'package:quick_car/states/signup_state.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
 import 'package:quick_car/view/widgets/country_list_pick.dart';
 import 'package:quick_car/view/widgets/decorations.dart';
-
 
 class SignUpForm extends StatefulWidget {
   @override
@@ -25,6 +27,7 @@ class SignUpFormState extends State<SignUpForm> {
   String _url;
   String _phoneNumber;
   String _country;
+  String _currencyCode = Strings.USD;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _passwordController = TextEditingController();
@@ -32,25 +35,25 @@ class SignUpFormState extends State<SignUpForm> {
   Widget _buildFirstName() {
     return TextFormField(
       keyboardType: TextInputType.name,
-        textCapitalization: TextCapitalization.sentences,
+      textCapitalization: TextCapitalization.sentences,
       decoration: InputDecoration(labelText: 'First Name'),
-          maxLength: 10,
-          validator: (String value) {
-            if (value.isEmpty) {
-              return 'First name is Required';
-            }
-            return null;
-          },
-          onSaved: (String value) {
-            _firstName = value;
-          },
+      maxLength: 10,
+      validator: (String value) {
+        if (value.isEmpty) {
+          return 'First name is Required';
+        }
+        return null;
+      },
+      onSaved: (String value) {
+        _firstName = value;
+      },
     );
   }
+
   Widget _buildLastName() {
     return TextFormField(
       keyboardType: TextInputType.name,
       textCapitalization: TextCapitalization.sentences,
-
       decoration: InputDecoration(labelText: 'Last Name'),
       maxLength: 10,
       validator: (String value) {
@@ -64,6 +67,7 @@ class SignUpFormState extends State<SignUpForm> {
       },
     );
   }
+
   Widget _buildUserName() {
     return TextFormField(
       decoration: InputDecoration(labelText: 'User name'),
@@ -72,10 +76,9 @@ class SignUpFormState extends State<SignUpForm> {
         if (value.isEmpty) {
           return 'Last name is Required';
         }
-        if (!RegExp
-        (r"^(?=.{1,15}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$").hasMatch(value)
-        )
-          return 'Please enter a valid user name';
+        if (!RegExp(
+                r"^(?=.{1,15}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$")
+            .hasMatch(value)) return 'Please enter a valid user name';
         return null;
       },
       onSaved: (String value) {
@@ -83,6 +86,7 @@ class SignUpFormState extends State<SignUpForm> {
       },
     );
   }
+
   Widget _buildEmail() {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Email'),
@@ -93,7 +97,7 @@ class SignUpFormState extends State<SignUpForm> {
         }
 
         if (!RegExp(
-            r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+                r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
             .hasMatch(value)) {
           return 'Please enter a valid email Address';
         }
@@ -129,6 +133,7 @@ class SignUpFormState extends State<SignUpForm> {
       },
     );
   }
+
   Widget _buildPasswordVaildation() {
     return TextFormField(
       obscureText: true,
@@ -149,6 +154,9 @@ class SignUpFormState extends State<SignUpForm> {
       },
     );
   }
+
+
+
   Widget _buildCountry() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,10 +165,7 @@ class SignUpFormState extends State<SignUpForm> {
           padding: const EdgeInsets.only(top: 22.0, bottom: 2.0),
           child: Text(
             'Country',
-            style: TextStyle(
-                fontSize: 16.5,
-                color: Colors.black54
-            ),
+            style: TextStyle(fontSize: 16.5, color: Colors.black54),
           ),
         ),
         Padding(
@@ -188,14 +193,17 @@ class SignUpFormState extends State<SignUpForm> {
     nu.lastName = _lastName;
     nu.email = _email;
     nu.password = _password;
+    nu.currencyCode = _currencyCode;
     CarsGlobals.signUpApi.signUpNewUser(nu).then((value) {
-      context
-        .flow<SignUpState>()
-        .update((signUpState) => signUpState.copyWith(id: value.id, formCompleted: true));})
-    .onError((error, stackTrace) {
-      print("error in sign up form");
+      context.flow<SignUpState>().update((signUpState) =>
+          signUpState.copyWith(id: value.id, formCompleted: true));
+    }).onError((error, stackTrace) {
+      print("error in sign up form: ${error}");
     });
-
+  }
+  onChooseCurrency(Currency currency){
+    _currencyCode = currency.code;
+    print("currency code: $_currencyCode");
   }
 
   @override
@@ -219,8 +227,10 @@ class SignUpFormState extends State<SignUpForm> {
                   _buildEmail(),
                   _buildPassword(),
                   _buildPasswordVaildation(),
+                  CurrencyPicker(onChooseCurrency: onChooseCurrency, currentCurrency: CurrencyService().findByCode(Strings.USD),),
                   SizedBox(height: 100),
-                  nextButton(onPressed: () {
+                  nextButton(
+                    onPressed: () {
                       if (!_formKey.currentState.validate()) {
                         return;
                       }
