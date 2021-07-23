@@ -33,7 +33,7 @@ class QuickCarSignUpApi implements SignUpApi {
     var request = http.MultipartRequest("PATCH", uri);
     var stream = new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
     var length = await imageFile.length();
-    var multipartFile = http.MultipartFile('image1', stream, length,
+    var multipartFile = http.MultipartFile('license', stream, length,
         filename: basename(imageFile.path));
     request.files.add(multipartFile);
     final response = await request.send();
@@ -56,8 +56,9 @@ class QuickCarSignUpApi implements SignUpApi {
         headers: {'Content-Type':'application/json',},
         body: jsonEncode(user.toJson()));
     if (response.statusCode == 201) {
-      print("user successfully created");
       return UserSignUp.fromJson(jsonDecode(response.body));
+    } else if (response.body.contains("A user with that username already exists.")) {
+      throw "Email already exists";
     }
   }
 }

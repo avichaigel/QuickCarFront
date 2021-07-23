@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:quick_car/states/new_car_state.dart';
-import 'package:quick_car/states/start_drive_state.dart';
-import 'package:quick_car/view/pages/reservation_interaction/start_drive_flow.dart';
+import 'package:quick_car/states/end_drive_state.dart';
+import 'package:quick_car/view/pages/reservation_interaction/end_drive_flow.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
 import 'dart:io';
 

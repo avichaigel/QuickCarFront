@@ -15,7 +15,7 @@ class MapState extends ChangeNotifier {
   }
 
   void loadCars() async {
-    CarsGlobals.carsApi.getCars({})
+    CarsGlobals.carsApi.getAllCars()
       .then((value) {
           carsList = value;
           notifyListeners();

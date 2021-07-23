@@ -7,8 +7,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_car/constants/cars_globals.dart';
+import 'package:quick_car/data_class/car_dates.dart';
 import 'package:quick_car/view/pages/user_items/update_car_license.dart';
-import 'package:quick_car/view/widgets/messages.dart';
 import '../../../data_class/car_data.dart';
 import '../../../data_class/reservation.dart';
 import 'package:quick_car/services/payment_service.dart';
@@ -25,7 +25,8 @@ class ReservationDetails extends StatefulWidget {
 
 class _ReservationDetailsState extends State<ReservationDetails> {
   CarData car;
-  DatePeriod dates;
+  DatePeriod datesSelected;
+  int idCarDatesSelected;
   int totalPrice;
   int numberOfDays;
 
@@ -69,12 +70,12 @@ class _ReservationDetailsState extends State<ReservationDetails> {
     }
   }
   Widget paymentDatesDetails() {
-    if (dates == null) {
+    if (datesSelected == null) {
       return SizedBox(
         height: 20,
       );
     }
-    numberOfDays = dates.end.difference(dates.start).inDays + 1;
+    numberOfDays = datesSelected.end.difference(datesSelected.start).inDays + 1;
     totalPrice = numberOfDays * car.pricePerDayUsd;
     return Column(
       children: [
@@ -82,8 +83,8 @@ class _ReservationDetailsState extends State<ReservationDetails> {
           height: 20,
         ),
         Text("Rental period: ", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),),
-        Text("From: " + DateFormat("yyyy-MM-dd").format(dates.start), style: TextStyle(fontSize: 20),),
-        Text("Until: " + DateFormat("yyyy-MM-dd").format(dates.end),style: TextStyle(fontSize: 20)),
+        Text("From: " + DateFormat("yyyy-MM-dd").format(datesSelected.start), style: TextStyle(fontSize: 20),),
+        Text("Until: " + DateFormat("yyyy-MM-dd").format(datesSelected.end),style: TextStyle(fontSize: 20)),
         Text("${numberOfDays} days", style: TextStyle(fontSize: 18, color: Colors.black45),),
         SizedBox(
           height: 10,
@@ -104,6 +105,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
         body: SingleChildScrollView(
           child: Column(
               children: [
+
                 Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Container(
@@ -244,7 +246,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                 ) ;
 
                 // return ;
-              } else if (dates == null) {
+              } else if (datesSelected == null) {
                 return
                   TextButton(
                     style: TextButton.styleFrom(
@@ -252,10 +254,18 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                         backgroundColor: Colors.lightBlue
                     ),
                     onPressed: () async {
-                      dates = await Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => ChooseDates(selectedDatePeriod: dates, carDatePeriods: car.carDates)));
-                      setState(() {
-                      });
+                      try {
+                        datesSelected = await Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => ChooseDates(selectedDatePeriod: datesSelected,
+                                carDatePeriods: car.carDates.map((e) => e.datePeriod).toList())
+                        )
+                        );
+                        _setIdCarDatesSelected(datesSelected, car.carDates);
+                        setState(() {
+                        });
+                      } catch(e) {
+                        print(e.toString());
+                      }
                     },
                     child: Text("Check availability"),
                   );
@@ -295,7 +305,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                           }
 
                           startDirectCharge(paymentMethod).then((value) {
-                            print("payment successful");
+                            print("Payment successful");
                             // on success:
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
@@ -334,12 +344,46 @@ class _ReservationDetailsState extends State<ReservationDetails> {
   }
 
   onPaymentSuccess(UserState state) async {
-    Reservation reservation = Reservation(car, dates, totalPrice, numberOfDays);
+    Reservation reservation = Reservation(car, datesSelected, totalPrice, numberOfDays);
+    reservation.renterId = Provider.of<UserState>(context, listen: false).getId();
+    reservation.ownerId = await CarsGlobals.userApi.getUserIdByEmail(car.owner);
+
+    // TODO: test delete it
     state.addUserReservation(reservation);
-    // CarsGlobals.reservationApi.postReservation(reservation)
-    //     .then((value) => state.addUserReservation(reservation))
-    //     .onError((error, stackTrace) => print("error"));
-    Navigator.pop(context);
+    return;
+    // post reservation to server
+    CarsGlobals.reservationApi.postReservation(reservation, idCarDatesSelected)
+        .then((value) {
+          state.addUserReservation(reservation);
+          Navigator.pop(context);
+        })
+        .onError((error, stackTrace) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.toString()),
+          duration: Duration(seconds: 2),
+        ),
+
+      );
+    });
+
   }
+
+  void _setIdCarDatesSelected(DatePeriod datesSelected, List<CarDates> carDates) {
+    for (int i = 0; i < carDates.length; i++ ){
+      DateTime start = carDates[i].datePeriod.start.subtract(Duration(days: 1));
+      DateTime end = carDates[i].datePeriod.end.add(Duration(days: 1));
+      if (datesSelected.start.isAfter(start) && datesSelected.end.isBefore(end)) {
+        idCarDatesSelected = carDates[i].id;
+        print("id of carDates:");
+        print(idCarDatesSelected);
+        return;
+      }
+
+    }
+  }
+
+
+
 }
 

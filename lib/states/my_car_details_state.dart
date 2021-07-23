@@ -12,6 +12,7 @@ class MyCarDetailsState extends ChangeNotifier {
   String address;
 
   List<DatePeriod> carDates;
+
   MyCarDetailsState(this.carImages, this.latitude, this.longitude, this.carDates) {
     isImageNew = List<bool>.filled(CarsGlobals.maximumCarImages, false);
     for (int i = carImages.length; i < CarsGlobals.maximumCarImages; i++)
@@ -31,6 +32,16 @@ class MyCarDetailsState extends ChangeNotifier {
     latitude = lat;
     longitude = lon;
     notifyListeners();
+  }
+  void addDates(DatePeriod dp) {
+    carDates.add(dp);
+    notifyListeners();
+
+  }
+  void removeDates(DatePeriod dp) {
+    carDates.removeWhere((element) => element.start == dp.start && element.end == dp.end);
+    notifyListeners();
+
   }
 
 }

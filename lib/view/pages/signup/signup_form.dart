@@ -2,6 +2,7 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_car/constants/cars_globals.dart';
+import 'package:quick_car/view/widgets/messages.dart';
 import '../../../data_class/user_signup.dart';
 import 'package:quick_car/states/signup_state.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
@@ -19,12 +20,12 @@ class SignUpForm extends StatefulWidget {
 class SignUpFormState extends State<SignUpForm> {
   String _firstName;
   String _lastName;
-  String _userName;
   String _email;
   String _password;
-  String _url;
-  String _phoneNumber;
-  String _country;
+
+  bool _isLoading = false;
+  bool _isErr = false;
+  String _errMsg = '';
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _passwordController = TextEditingController();
@@ -64,25 +65,7 @@ class SignUpFormState extends State<SignUpForm> {
       },
     );
   }
-  Widget _buildUserName() {
-    return TextFormField(
-      decoration: InputDecoration(labelText: 'User name'),
-      maxLength: 15,
-      validator: (String value) {
-        if (value.isEmpty) {
-          return 'Last name is Required';
-        }
-        if (!RegExp
-        (r"^(?=.{1,15}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$").hasMatch(value)
-        )
-          return 'Please enter a valid user name';
-        return null;
-      },
-      onSaved: (String value) {
-        _userName = value;
-      },
-    );
-  }
+
   Widget _buildEmail() {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Email'),
@@ -149,39 +132,11 @@ class SignUpFormState extends State<SignUpForm> {
       },
     );
   }
-  Widget _buildCountry() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 22.0, bottom: 2.0),
-          child: Text(
-            'Country',
-            style: TextStyle(
-                fontSize: 16.5,
-                color: Colors.black54
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: CountryList(
-            onSelectParam: (String param) {
-              _country = param;
-            },
-          ),
-        )
-      ],
-    );
-  }
-
-  @override
-  void dispose() {
-    print("in signup form dispose");
-    super.dispose();
-  }
 
   void _continuePressed() {
+    setState(() {
+      _isLoading = true;
+    });
     UserSignUp nu = UserSignUp();
     nu.username = _email;
     nu.firstName = _firstName;
@@ -193,7 +148,11 @@ class SignUpFormState extends State<SignUpForm> {
         .flow<SignUpState>()
         .update((signUpState) => signUpState.copyWith(id: value.id, formCompleted: true));})
     .onError((error, stackTrace) {
-      print("error in sign up form");
+      setState(() {
+        _isLoading = false;
+        _isErr = true;
+        _errMsg = error.toString();
+      });
     });
 
   }
@@ -219,7 +178,24 @@ class SignUpFormState extends State<SignUpForm> {
                   _buildEmail(),
                   _buildPassword(),
                   _buildPasswordVaildation(),
-                  SizedBox(height: 100),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Visibility(
+                        visible: _isLoading,
+                        child: CircularProgressIndicator()
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Visibility(
+                        visible: _isErr,
+                        child: showAlert(_errMsg, () {
+                          setState(() {
+                            _isErr = false;
+                          });
+                        })
+                    ),
+                  ),
                   nextButton(onPressed: () {
                       if (!_formKey.currentState.validate()) {
                         return;

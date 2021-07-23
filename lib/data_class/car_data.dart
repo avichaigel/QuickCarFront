@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:quick_car/constants/cars_globals.dart';
+import 'package:quick_car/data_class/car_dates.dart';
 
 class CarData {
   CarData(String brand,
@@ -51,7 +52,7 @@ class CarData {
   double longitude;
   int pricePerDayUsd;
   String type;
-  List<DatePeriod> carDates;
+  List<CarDates> carDates;
   List<File> images;
   DateTime lastUpdate;
 
@@ -59,17 +60,7 @@ class CarData {
   double distanceFromLocation;
 
   factory CarData.fromJson(Map<dynamic, dynamic> json) {
-    List<DatePeriod> datesPeriod = [];
-    List<dynamic> dates =  json["cardates"];
-    List<String> splitDatesStr = [];
-    DateTime from;
-    DateTime to;
-    for (int i = 0; i < dates.length; i++) {
-      splitDatesStr =  dates[i].toString().split(" ");
-      from = DateTime.parse(splitDatesStr[1]);
-      to = DateTime.parse(splitDatesStr[3]);
-      datesPeriod.add(DatePeriod(from, to));
-    }
+
     double d1;
     double d2;
     List<File> images = [];
@@ -94,10 +85,9 @@ class CarData {
         pricePerDayUsd: json["price_per_day_usd"] as int,
         type: json["type"],
         images: images,
-        carDates: datesPeriod
     );
   }
-  CarData copyWith(List<File> images, List<DatePeriod> dates, double lat, double lon) {
+  CarData copyWith(List<File> images, List<CarDates> dates, double lat, double lon) {
     return CarData.fromCarData(images: images, carDates: dates, latitude: lat, longitude: lon);
 
   }

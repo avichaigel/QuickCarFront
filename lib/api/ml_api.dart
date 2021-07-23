@@ -8,19 +8,17 @@ class MLApi {
     print("Check if image is car");
     var uri = Uri.parse("http://84434df4-4d6e-4025-9374-e00a4cb25e26.southcentralus.azurecontainer.io/score");
     var bytes = await image.readAsBytes();
-    try {
-      var response = await http.post(uri, body: bytes);
-      if (response.statusCode == 200) {
-        print("Successful post");
-        if (response.body == "false")
-          return CarDetectionResponse(false);
-        else {
-          String type = response.body.split("\"")[3];
-          return CarDetectionResponse(true, type: type);
-        }
+    var response = await http.post(uri, body: bytes);
+    if (response.statusCode == 200) {
+      print("Successful post");
+      if (response.body == "false")
+        return CarDetectionResponse(false);
+      else {
+        String type = response.body.split("\"")[3];
+        return CarDetectionResponse(true, type: type);
       }
-    } catch(e) {
-      print(e.toString());
+    } else {
+      throw "Service is not available";
     }
   }
 }

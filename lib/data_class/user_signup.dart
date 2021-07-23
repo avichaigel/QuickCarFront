@@ -21,14 +21,15 @@ class UserSignUp {
   String email;
   String password;
 
-  factory UserSignUp.fromJson(Map<String, dynamic> json) => UserSignUp(
-    username: json["username"],
-    firstName: json["first_name"],
-    lastName: json["last_name"],
-    email: json["email"],
-    password: json["password"],
-  );
-
+  factory UserSignUp.fromJson(Map<String, dynamic> json) {
+    return UserSignUp(
+      username: json["username"],
+      firstName: json["first_name"],
+      lastName: json["last_name"],
+      email: json["email"],
+      password: json["password"],
+      );
+  }
   Map<String, dynamic> toJson() => {
     "username": username,
     "first_name": firstName,
