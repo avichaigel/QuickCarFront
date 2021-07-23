@@ -1,19 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
+import 'package:intl/intl.dart';
 import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/constants/strings.dart';
-import 'package:quick_car/repository/repository.dart';
 import '../data_class/car_data.dart';
 
 class SearchState extends ChangeNotifier {
   List<CarData> carsList = [];
   SearchState() {
     setDefaultValues();
-    Future.delayed(Duration(seconds: 4), () => loadCars());
+    loadCars();
   }
+
   String sortedByName = '';
   double _distFilter;
+  bool _init = false;
   bool _isLoading = true;
   bool _sortedByPrice;
   bool _sortedByDist;
@@ -81,15 +83,23 @@ class SearchState extends ChangeNotifier {
   }
 
   void loadCars() async {
-    setIsLoading(true);
+    if (_init) {
+      setIsLoading(true);
+    } else {
+      _init = true;
+    }
     _setError(false, "");
     Map<String, String> qp = {};
     if (_typesChecked.index != 0)
       qp["type"] = CarsGlobals.carTypes[_typesChecked.index];
-    print("call repository");
-    carsList = await CarsGlobals.repository.updateCars(qp).then<List<CarData>>((value) {
+    qp["pricemorethen"]=_priceRange.start.toInt().toString();
+    qp["pricecheaperthen"]=_priceRange.end.toInt().toString();
+    qp["dateFrom"]=DateFormat("yyyy-MM-dd").format(_datePeriod.start);
+    qp["dateTo"]=DateFormat("yyyy-MM-dd").format(_datePeriod.end);
+
+    carsList = await CarsGlobals.carsApi.getCars(qp).then<List<CarData>>((value) {
       List<CarData> copiedList = copyList(value);
-              print("get cars search state, list length: " + copiedList.length.toString());
+      print("List length from server: " + copiedList.length.toString());
         if (_distFilter != null) {
           copiedList.removeWhere((element) => element.distanceFromLocation > _distFilter);
         }
@@ -117,7 +127,7 @@ class SearchState extends ChangeNotifier {
             }
           });
         }
-        print("list length after filter and sort: " + copiedList.length.toString());
+        print("List length after filter and sort: " + copiedList.length.toString());
 
         return copiedList;
     }).onError((error, stackTrace) {

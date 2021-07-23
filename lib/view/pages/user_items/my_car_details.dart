@@ -57,7 +57,7 @@ class _MyCarDetailsState extends State<MyCarDetails> {
       }
     }
 
-    clonedCar = carData.copyWith(cloneImages, List<dp.DatePeriod>.from(carData.carDates),
+    clonedCar = carData.copyWith(cloneImages, carData.carDates,
         carData.latitude, carData.longitude );
   }
   @override
@@ -69,8 +69,13 @@ class _MyCarDetailsState extends State<MyCarDetails> {
         return Icon(Icons.arrow_drop_down);
       }
     }
+    List<dp.DatePeriod> dates = [];
+    for (int i = 0; i < clonedCar.carDates.length; i++) {
+      dates.add(clonedCar.carDates[i].datePeriod);
+    }
+    MyCarDetailsState carDetailsState =MyCarDetailsState(clonedCar.images, clonedCar.latitude, clonedCar.longitude, dates);
     return ChangeNotifierProvider(create: (_)=>
-        MyCarDetailsState(clonedCar.images, clonedCar.latitude, clonedCar.longitude, clonedCar.carDates),
+        carDetailsState,
         child: Scaffold(
         body: SafeArea(
           child: SingleChildScrollView(
@@ -175,9 +180,7 @@ class _MyCarDetailsState extends State<MyCarDetails> {
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
               onPressed: () {
-
-                CarsGlobals.carsApi.updateCar(carData.id, clonedCar).then((value) {
-
+                CarsGlobals.carsApi.updateCar(carData.id, clonedCar, carDetailsState.carDates).then((value) {
                   carData.images = clonedCar.images;
                   carData.latitude = clonedCar.latitude;
                   carData.longitude = clonedCar.longitude;
@@ -424,7 +427,8 @@ class _CarLocationState extends State<_CarLocation> {
                   return Text("Address: " + snapshot.data);
                 else
                   return Text("Loading...");
-                }),
+                }
+                ),
           ],
         );
       } ,
@@ -448,7 +452,7 @@ class _DatesAvailabilityState extends State<_DatesAvailability> {
       _currDatePeriod = datePeriod;
     });
   }
-  Table createTable() {
+  Table createTable(MyCarDetailsState state) {
     List<TableRow> rows = [];
     rows.add( TableRow(
         children: [
@@ -477,9 +481,7 @@ class _DatesAvailabilityState extends State<_DatesAvailability> {
             ),
             InkWell(
               onTap: () {
-                setState(() {
-                  _availabilityDates.removeAt(i);
-                });
+                state.removeDates(_availabilityDates[i]);
               } ,
               child: Icon(Icons.clear),
             )
@@ -499,16 +501,14 @@ class _DatesAvailabilityState extends State<_DatesAvailability> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Consumer<MyCarDetailsState>(
+      builder: (context, state, child) {
+        _availabilityDates = state.carDates;
+        return Column(
       children: [
-        Consumer<MyCarDetailsState>(
-          builder: (context, state, child) {
-            _availabilityDates = state.carDates;
-            return Padding(
+          Padding(
               padding: const EdgeInsets.all(8.0),
-              child: createTable(),
-            );
-          },
+              child: createTable(state),
         ),
         Container(
           child: dp.RangePicker(
@@ -522,13 +522,12 @@ class _DatesAvailabilityState extends State<_DatesAvailability> {
         ),
         ElevatedButton(
             onPressed: () {
-              setState(() {
-                _availabilityDates.add(_currDatePeriod);
-              });
+              state.addDates(_currDatePeriod);
             },
             child: Text("Add")
         )
       ],
     );
+  });
   }
 }

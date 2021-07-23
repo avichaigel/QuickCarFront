@@ -86,9 +86,9 @@ class _UpdateCarLicenseState extends State<UpdateCarLicense> {
             ),
             ElevatedButton(
                 onPressed: () {
-                  Provider.of<UserState>(context, listen: false).setCarLicensePhoto(imageFile);
-                  Navigator.pop(context);
-                  return;
+                  // Provider.of<UserState>(context, listen: false).setCarLicensePhoto(imageFile);
+                  // Navigator.pop(context);
+                  // return;
 
                   CarsGlobals.signUpApi.
                   uploadCarLicense(imageFile, Provider.of<UserState>(context, listen: false).getId())

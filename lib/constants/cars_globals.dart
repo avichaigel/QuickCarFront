@@ -6,10 +6,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:quick_car/api/ml_api.dart';
 import 'package:quick_car/api/reservation_api.dart';
 import 'package:quick_car/constants/strings.dart';
-import 'package:quick_car/repository/repository.dart';
-import 'package:quick_car/services/currency_service.dart';
 import '../api/cars_api.dart';
-import '../api/user.dart';
+import '../api/user_api.dart';
 import '../api/sign_up.dart';
 enum carTypes { allTypes, family, sports, mini, offRoad }
 class CarsGlobals {
@@ -18,8 +16,7 @@ class CarsGlobals {
   static CarsApi carsApi = QuickCarCarsApi();
   static ReservationApi reservationApi = QuickCarReservationApi();
   static MLApi mlApi = MLApi();
-  static Repository repository = Repository();
-  static MyCurrencyService currencyService = MyCurrencyService();
+  //static Repository repository = Repository();
   static const List<String> carTypes = <String>['All types', 'Family', 'Sports', 'Mini', 'Off-road'];
   static const List<String> companies = <String>[
     "Acura",
@@ -141,6 +138,6 @@ class CarsGlobals {
     print("app documents directory path set successfully");
   }
   static final picker = ImagePicker();
-  static const List<String> startDriveAngles = ["front", "side 1", "back", "side 2"];
+  static const List<String> startDriveAngles = ["front", "back"];
   static const int maximumCarImages = 4;
 }
