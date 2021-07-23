@@ -7,6 +7,7 @@ import 'package:quick_car/api/ml_api.dart';
 import 'package:quick_car/api/reservation_api.dart';
 import 'package:quick_car/constants/strings.dart';
 import 'package:quick_car/repository/repository.dart';
+import 'package:quick_car/services/currency_service.dart';
 import '../api/cars_api.dart';
 import '../api/user.dart';
 import '../api/sign_up.dart';
@@ -18,6 +19,7 @@ class CarsGlobals {
   static ReservationApi reservationApi = QuickCarReservationApi();
   static MLApi mlApi = MLApi();
   static Repository repository = Repository();
+  static MyCurrencyService currencyService = MyCurrencyService();
   static const List<String> carTypes = <String>['All types', 'Family', 'Sports', 'Mini', 'Off-road'];
   static const List<String> companies = <String>[
     "Acura",

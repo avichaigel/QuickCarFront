@@ -47,6 +47,7 @@ dependencies:
   path_provider: ^2.0.1
   stripe_payment: ^1.1.0
   flutter_native_image: ^0.0.6
+  currency_picker: ^2.0.3
 
 
 
