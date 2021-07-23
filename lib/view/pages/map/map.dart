@@ -160,7 +160,7 @@ class _GMapState extends State<GMap> {
                       padding: const EdgeInsets.all(8.0),
                       child: Container(
                         child: Text(currCar.brand + " " + currCar.model, style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20,/* overflow: TextOverflow.fade*/
+                            fontWeight: FontWeight.bold, fontSize: 20, overflow: TextOverflow.fade
                         ),
                         ),
                       ),

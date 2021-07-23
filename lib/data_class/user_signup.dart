@@ -1,6 +1,4 @@
-
 import 'dart:convert';
-
 import 'package:currency_picker/currency_picker.dart';
 import 'package:quick_car/constants/strings.dart';
 
