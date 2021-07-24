@@ -5,7 +5,7 @@ import 'package:quick_car/data_class/car_detection_response.dart';
 class MLApi {
   Future<CarDetectionResponse>isCar(File image) async {
     print("Check if image is car");
-    var uri = Uri.parse("http://1a29cae6-58b5-4461-bec2-8bd5ab7728a6.centralus.azurecontainer.io/score");
+    var uri = Uri.parse('http://1a29cae6-58b5-4461-bec2-8bd5ab7728a6.centralus.azurecontainer.io/score');
     var bytes = await image.readAsBytes();
     var response = await http.post(uri, body: bytes);
     if (response.statusCode == 200) {
