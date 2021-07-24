@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/constants/strings.dart';
-import 'package:quick_car/states/start_drive_state.dart';
+import 'package:quick_car/states/end_drive_state.dart';
 import '../../widgets/camera.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
 
@@ -67,12 +67,11 @@ class _CarPhotoState extends State<CarPhoto> {
 
   }
   _continuePressed() {
-    context.flow<StartDriveState>().
-    complete((state) => state.copyWith(carImages: images));
+    context.flow<EndDriveState>().complete((state) => state.copyWith(carImages: images));
   }
   _nextPressed() {
     images.add(image);
-    if (currIndex == 3) {
+    if (currIndex == 1) {
       _continuePressed();
       return;
     }

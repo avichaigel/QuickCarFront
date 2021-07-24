@@ -69,7 +69,8 @@ class _GeoListenPageState extends State<GeoListenPage> {
             markerId: MarkerId("0"),
             position: tappedLocation,
           )
-      );    }
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text("Car location"),
