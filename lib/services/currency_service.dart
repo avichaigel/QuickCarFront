@@ -28,8 +28,10 @@ class MyCurrencyService extends ChangeNotifier {
         'x-rapidapi-host': 'fixer-fixer-currency-v1.p.rapidapi.com'
       }).timeout(Duration(seconds: 3));
       if (response.statusCode == 200) {
-        var map = jsonDecode(response.body);
-        var value = map['result'];
+        List<String> list = response.body.split("result");
+        String value = list[1];
+        value = value.substring(2, value.length - 1);
+        print("val: " + value);
         currentCurrencyRate = double.parse(value);
         if (currentCurrencyRate == 0) {
           return goBackToDollars(false);
