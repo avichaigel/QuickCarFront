@@ -26,7 +26,8 @@ class QuickCarReservationApi implements ReservationApi {
       'carRenter': r.renterId,
       'car': r.car.id,
     };
-    var response = await http.post(uri, body: jsonEncode(body), headers: {'Content-Type':'application/json'});
+    var response = await http.post(uri, body: jsonEncode(body), headers: {'Content-Type':'application/json',
+    'Authorization': 'TOKEN ' + Strings.TOKEN});
     if (response.statusCode == 201) {
       return r;
     } else {

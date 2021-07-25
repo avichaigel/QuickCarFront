@@ -101,13 +101,13 @@ class _CarDamageDetectionState extends State<CarDamageDetection> {
 
     } else if (damagesCount == 1) {
       functionalShowDialog(context, "We found a damage", "It seems that there is a damage in the car\nTherefore you will be charged"
-          "in ${CarsGlobals.currencyService.getPriceInCurrency(damageValue)}", () {
-        makePaymentProcess();
+          " ${CarsGlobals.currencyService.getPriceInCurrency(damageValue)}", () {
+        _continuePressed();
       });
     } else if (damagesCount == 2) {
       functionalShowDialog(context, "We found a damage", "It seems that there is a damage in the car\nTherefore you will be charged"
-          "in ${CarsGlobals.currencyService.getPriceInCurrency(damageValue * 2)}", () {
-        makePaymentProcess();
+          " ${CarsGlobals.currencyService.getPriceInCurrency(damageValue * 2)}", () {
+        _continuePressed();
       });
     }
 
@@ -220,37 +220,7 @@ class _CarDamageDetectionState extends State<CarDamageDetection> {
     )
     );
   }
-  makePaymentProcess() async {
-    PaymentMethod paymentMethod = PaymentMethod();
-    paymentMethod = await StripePayment.paymentRequestWithCardForm(
-      CardFormPaymentRequest(),
-    ).then((PaymentMethod paymentMethod) {
-      return paymentMethod;
-    }).catchError((e) {
-      return null;
-    });
-    if (paymentMethod == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error occurred"),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
-    startDirectCharge(paymentMethod).then((value) {
-      print("payment successful");
-      // on success:
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(
-          content: Text("Payment Successful"),
-          duration: Duration(seconds: 2),
-        ),
-      ).closed
-          .then((_) => _continuePressed());
-    });
 
-  }
+
 }
 
