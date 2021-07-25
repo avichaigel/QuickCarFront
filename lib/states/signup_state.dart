@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
-import '../api/sign_up.dart';
+import '../api/sign_up_api.dart';
 import 'package:stripe_payment/stripe_payment.dart';
 
 class SignUpState {

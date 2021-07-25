@@ -31,7 +31,6 @@ class QuickCarUserApi implements UserApi {
       }
       return user;
     } else {
-      // TODO: do the reasons of fail
       throw 'Login failed';
     }
   }

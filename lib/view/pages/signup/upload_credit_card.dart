@@ -22,7 +22,6 @@ class UploadCreditCard extends StatefulWidget {
 class _UploadCreditCardState extends State<UploadCreditCard> {
   String cardNumber = '';
   String cardHolderName = '';
-  // TODO: change date to int month and int year
   String expiryDate = '';
   String cvvCode = '';
   bool isCvvFocused = false;
@@ -122,14 +121,11 @@ class _UploadCreditCardState extends State<UploadCreditCard> {
                             'Submit',
                             style: TextStyle(
                               color: Colors.white,
-                              fontFamily: 'halter',
                               fontSize: 14,
-                              package: 'flutter_credit_card',
                             ),
                           ),
                         ),
                         onPressed: () {
-                          // TODO: if valid
                           isValid = true;
                           _continuePressed();
                         },

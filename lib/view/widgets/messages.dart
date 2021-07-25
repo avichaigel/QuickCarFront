@@ -18,6 +18,27 @@ void myShowDialog (BuildContext context, String title, String body) {
     );
   });
 }
+void functionalShowDialog (BuildContext context, String title, String body, Function f) {
+  print("in show dialog");
+  showDialog(context: context, builder: (context) {
+    return AlertDialog(
+      title: new Text(title),
+      content: new Text(body),
+      actions: <Widget>[
+        // usually buttons at the bottom of the dialog
+        ElevatedButton(
+          child: Text("Close"),
+          onPressed: () {
+            f();
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
+  });
+}
+
+
 Widget showAlert(String message, Function onPressed) {
   if (message != null) {
     return Padding(

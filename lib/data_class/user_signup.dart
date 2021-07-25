@@ -39,6 +39,6 @@ class UserSignUp {
     "last_name": lastName,
     "email": email,
     "password": password,
-    "currency": currencyCode,
+ //   "currency": currencyCode,
   };
 }

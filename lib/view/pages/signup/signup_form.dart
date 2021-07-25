@@ -4,7 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/constants/strings.dart';
+import 'package:quick_car/services/email_validate.dart';
 import 'package:quick_car/view/widgets/currency_picker.dart';
+import 'package:quick_car/view/widgets/messages.dart';
 import '../../../data_class/user_signup.dart';
 import 'package:quick_car/states/signup_state.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
@@ -21,13 +23,14 @@ class SignUpForm extends StatefulWidget {
 class SignUpFormState extends State<SignUpForm> {
   String _firstName;
   String _lastName;
-  String _userName;
   String _email;
   String _password;
-  String _url;
-  String _phoneNumber;
-  String _country;
   String _currencyCode = Strings.USD;
+
+  bool _isLoading = false;
+  bool _isErr = false;
+  String _errMsg = '';
+
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _passwordController = TextEditingController();
@@ -68,50 +71,35 @@ class SignUpFormState extends State<SignUpForm> {
     );
   }
 
-  Widget _buildUserName() {
-    return TextFormField(
-      decoration: InputDecoration(labelText: 'User name'),
-      maxLength: 15,
-      validator: (String value) {
-        if (value.isEmpty) {
-          return 'Last name is Required';
-        }
-        if (!RegExp(
-                r"^(?=.{1,15}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$")
-            .hasMatch(value)) return 'Please enter a valid user name';
-        return null;
-      },
-      onSaved: (String value) {
-        _userName = value;
-      },
-    );
-  }
-
   Widget _buildEmail() {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Email'),
       keyboardType: TextInputType.emailAddress,
       validator: (String value) {
         if (value.isEmpty) {
-          return 'Email is Required';
+          return 'Email is required';
         }
 
         if (!RegExp(
-                r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+            r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
             .hasMatch(value)) {
           return 'Please enter a valid email Address';
         }
-
         return null;
       },
-      onSaved: (String value) {
+      onSaved: (String value) async {
+        print("onSaved called in buildEmail");
+        if (!(await validateEmail(value))) {
+          _showAlertDialog(context);
+          print("email doesn't exist");
+          return null;
+        }
         _email = value;
       },
     );
   }
-
   Widget _buildPassword() {
-    int minPwdLen = 2;
+    int minPwdLen = 8;
     return TextFormField(
       obscureText: true,
       decoration: InputDecoration(labelText: 'Password'),
@@ -156,37 +144,10 @@ class SignUpFormState extends State<SignUpForm> {
   }
 
 
-
-  Widget _buildCountry() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 22.0, bottom: 2.0),
-          child: Text(
-            'Country',
-            style: TextStyle(fontSize: 16.5, color: Colors.black54),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: CountryList(
-            onSelectParam: (String param) {
-              _country = param;
-            },
-          ),
-        )
-      ],
-    );
-  }
-
-  @override
-  void dispose() {
-    print("in signup form dispose");
-    super.dispose();
-  }
-
   void _continuePressed() {
+    setState(() {
+      _isLoading = true;
+    });
     UserSignUp nu = UserSignUp();
     nu.username = _email;
     nu.firstName = _firstName;
@@ -194,16 +155,52 @@ class SignUpFormState extends State<SignUpForm> {
     nu.email = _email;
     nu.password = _password;
     nu.currencyCode = _currencyCode;
+
     CarsGlobals.signUpApi.signUpNewUser(nu).then((value) {
-      context.flow<SignUpState>().update((signUpState) =>
-          signUpState.copyWith(id: value.id, formCompleted: true));
-    }).onError((error, stackTrace) {
-      print("error in sign up form: ${error}");
+      print(value);
+      context
+          .flow<SignUpState>()
+          .update((signUpState) => signUpState.copyWith(id: value.id, formCompleted: true));})
+        .onError((error, stackTrace) {
+      setState(() {
+        _isLoading = false;
+        _isErr = true;
+        _errMsg = error.toString();
+      });
     });
+
   }
+
   onChooseCurrency(Currency currency){
     _currencyCode = currency.code;
     print("currency code: $_currencyCode");
+  }
+  _showAlertDialog(BuildContext context) {
+    // set up the button
+    Widget okButton = TextButton(
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.of(context, rootNavigator: true)
+            .pop(true); // dismisses only the dialog and returns true
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("The email you provided does not exist"),
+      content: Text("Please provide a real email address"),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   @override
@@ -228,8 +225,24 @@ class SignUpFormState extends State<SignUpForm> {
                   _buildPassword(),
                   _buildPasswordVaildation(),
                   CurrencyPicker(onChooseCurrency: onChooseCurrency, currentCurrency: CurrencyService().findByCode(Strings.USD),),
-                  SizedBox(height: 100),
-                  nextButton(
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Visibility(
+                        visible: _isLoading,
+                        child: CircularProgressIndicator()
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Visibility(
+                        visible: _isErr,
+                        child: showAlert(_errMsg, () {
+                          setState(() {
+                            _isErr = false;
+                          });
+                        })
+                    ),
+                  ),                  nextButton(
                     onPressed: () {
                       if (!_formKey.currentState.validate()) {
                         return;
