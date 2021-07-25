@@ -20,4 +20,22 @@ class MLApi {
       throw "Service is not available";
     }
   }
+  Future<bool>isCarDamaged(File image) async {
+    var uri = Uri.parse('http://f33ddebb-ea87-400c-88ef-6bf5e2e23ba0.centralus.azurecontainer.io/score');
+    var bytes = await image.readAsBytes();
+    var response = await http.post(uri, body: bytes);
+    if (response.statusCode == 200) {
+      print("Successful post");
+      if (response.body == "false") {
+        print("Car is not damaged");
+        return false;
+      }
+      else {
+        print("Car is damaged");
+        return true;
+      }
+    } else {
+      throw "Service is not available";
+    }
+  }
 }

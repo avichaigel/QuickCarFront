@@ -275,12 +275,8 @@ class _CarPhotosState extends State<CarPhotos> {
                       });
                       return;
                     } else {
-                      // TODO: update the state of the new car's type
                       print("Detected type:");
                       print(cdr.type);
-                      // context
-                      //     .flow<NewCarState>()
-                      //     .update((carState) => carState.copywith(type: ));
                     }
 
                   } catch (e) {

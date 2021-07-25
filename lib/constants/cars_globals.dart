@@ -6,17 +6,18 @@ import 'package:path_provider/path_provider.dart';
 import 'package:quick_car/api/ml_api.dart';
 import 'package:quick_car/api/reservation_api.dart';
 import 'package:quick_car/constants/strings.dart';
+import 'package:quick_car/services/currency_service.dart';
 import '../api/cars_api.dart';
 import '../api/user_api.dart';
-import '../api/sign_up.dart';
+import '../api/sign_up_api.dart';
 enum carTypes { allTypes, family, sports, mini, offRoad }
 class CarsGlobals {
   static UserApi userApi = QuickCarUserApi();
   static SignUpApi signUpApi = QuickCarSignUpApi();
   static CarsApi carsApi = QuickCarCarsApi();
+  static MyCurrencyService currencyService = MyCurrencyService();
   static ReservationApi reservationApi = QuickCarReservationApi();
   static MLApi mlApi = MLApi();
-  //static Repository repository = Repository();
   static const List<String> carTypes = <String>['All types', 'Family', 'Sports', 'Mini', 'Off-road'];
   static const List<String> companies = <String>[
     "Acura",

@@ -52,11 +52,20 @@ class QuickCarSignUpApi implements SignUpApi {
 
   Future<UserSignUp> signUpNewUser(UserSignUp user) async {
     String url = Strings.QUICKCAR_URL + "users/";
+    print(jsonEncode(user.toJson()));
     var response = await client.post(Uri.parse(url),
         headers: {'Content-Type':'application/json',},
         body: jsonEncode(user.toJson()));
     if (response.statusCode == 201) {
-      return UserSignUp.fromJson(jsonDecode(response.body));
+      UserSignUp usu = UserSignUp.fromJson(jsonDecode(response.body));
+      Map body = {'username': user.email, 'password': user.password };
+      var res = await http.post(Uri.parse(Strings.QUICKCAR_URL +"users/login/"), body: body);
+      if (res.statusCode != 200) {
+        throw 'New user was created bust cannot get it now. You can try login';
+      }
+      Map newUserDetails = json.decode(res.body) as Map<String, dynamic>;
+      usu.id = newUserDetails["id"];
+      return usu;
     } else if (response.body.contains("A user with that username already exists.")) {
       throw "Email already exists";
     }

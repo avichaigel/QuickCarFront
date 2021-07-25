@@ -17,7 +17,6 @@ class UserState extends ChangeNotifier {
   CreditCard getCreditCard() => _creditCard;
   String getCurrency() => _currency != null ? _currency : Strings.USD;
 
-  //TODO: maybe need to delete token from user state
   String _token;
   String _firstName;
   String _lastName;
@@ -30,8 +29,6 @@ class UserState extends ChangeNotifier {
   String getToken() => _token;
   List<CarData> _carsAsRenterOut = [];
   List<Reservation> _reservationsAsBorrower = [];
-  // should be only from server with photos from amazon
-  // TODO: smart caching for the cars after uploading
   List<CarData> getMyCars() => _carsAsRenterOut;
   List<Reservation> getMyReservation() => _reservationsAsBorrower;
   void setToken(String token) {

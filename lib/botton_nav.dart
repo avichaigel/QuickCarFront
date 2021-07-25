@@ -16,7 +16,7 @@ class BottomNavigation extends StatefulWidget {
 
 class _BottomNavigationState extends State<BottomNavigation> {
   final tabs = [ ResultsView(),
-    GMap(), Profile(), PlayGroundPage()];
+    GMap(), Profile()];
   int _currentIndex = 0;
 
   @override
@@ -46,11 +46,6 @@ class _BottomNavigationState extends State<BottomNavigation> {
               icon: Icon(Icons.account_circle),
               backgroundColor: Colors.blue,
               title: Text("profile")
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.adb),
-              backgroundColor: Colors.blue,
-              title: Text("playground")
           )],
         onTap: (index) {
           setState(() {
