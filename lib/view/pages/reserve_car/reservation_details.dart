@@ -62,7 +62,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
         androidPayMode: 'test'));
   }
 
-  Widget contactSellerWidget() {
+  Widget contactOwnerWidget() {
     return GestureDetector(
         onTap: () {
           emailSender.send(userName, car);
@@ -77,7 +77,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
             SizedBox(
               width: 10,
             ),
-            Text("Contact Seller",
+            Text("Contact Owner",
                 style: TextStyle(fontSize: 20, color: Colors.grey.shade700)),
           ],
         ));
@@ -222,7 +222,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                     padding: const EdgeInsets.all(2.0),
                     child: Align(
                         alignment: Alignment.centerLeft,
-                        child: contactSellerWidget()),
+                        child: contactOwnerWidget()),
                   )
                 : SizedBox(),
             Padding(
