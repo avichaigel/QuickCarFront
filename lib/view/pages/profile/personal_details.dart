@@ -1,5 +1,8 @@
+// import 'package:currency_picker/currency_picker.dart';
+import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter_credit_card/credit_card_widget.dart';
 import 'package:quick_car/view/pages/user_items/update_car_license.dart';
+import 'package:quick_car/view/widgets/currency_picker.dart';
 import 'package:quick_car/view/widgets/messages.dart';
 import 'package:stripe_payment/stripe_payment.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,6 +26,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
   bool editCreditCard = false;
 
   bool isEditPersonalEnable;
+
   @override
   void initState() {
     super.initState();
@@ -40,101 +44,131 @@ class _PersonalDetailsState extends State<PersonalDetails> {
         ),
         body: Consumer<UserState>(
           builder: (context, state, child) {
-            _nameController.value = TextEditingValue(text: state.getFirstName() + " " + state.getLastName());
+            _nameController.value = TextEditingValue(
+                text: state.getFirstName() + " " + state.getLastName());
             _emailController.value = TextEditingValue(text: state.getEmail());
             return SingleChildScrollView(
               child: Column(
                 children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text("Personal details".toUpperCase(),style: TextStyle(color: Colors.grey,fontSize: 12,),),
-                      ),
-                      Align(
-                          alignment: Alignment.centerRight,
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                isEditPersonalEnable = !isEditPersonalEnable;
-                                _formKey.currentState.validate();
-                            });
-                            },
-                            child: Icon(Icons.edit, size: 20,),
-                          )
-                      )
-                    ],
-                  ),
-                ),
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextField(
-                          controller: _nameController,
-                          style: TextStyle(fontSize: 18),
-                          onTap: () => print("on tap"),
-                          enabled: isEditPersonalEnable,
-                          decoration: InputDecoration(
-                            prefix: Text("Name: ", style: TextStyle(fontSize: 18),),
-                          ),
-
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (String value) {
-                            if (!RegExp(
-                                r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-                                .hasMatch(value)) {
-                              return 'Please enter a valid email Address';
-                            }
-
-                            return null;
-                          },
-                          controller: _emailController,
-                          style: TextStyle(fontSize: 18),
-                          onTap: () => print("on tap"),
-                          enabled: isEditPersonalEnable,
-                          decoration: InputDecoration(
-                            prefix: Text("Email: ", style: TextStyle(fontSize: 18),),
-                          ),
-
-                        ),
-                      ),
-                      Visibility(
-                          visible: isEditPersonalEnable,
-                          child: TextButton(
-                            child: Text("Submit"),
-                            onPressed: () async {
-                              if (!_formKey.currentState.validate()) {
-                                print(_emailController.text);
-                                return;
-                              }
-                              print("new values: name: " + _nameController.value.text + " email" + _emailController.value.text);
-                            },
-                          )
-                      ),
-                    ],
-                  ),
-
-                ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Align(
-
                           alignment: Alignment.centerLeft,
-                          child: Text("Credit card details".toUpperCase(),style: TextStyle(color: Colors.grey,fontSize: 12,),),
+                          child: Text(
+                            "Personal details".toUpperCase(),
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                        Align(
+                            alignment: Alignment.centerRight,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  isEditPersonalEnable = !isEditPersonalEnable;
+                                  _formKey.currentState.validate();
+                                });
+                              },
+                              child: Icon(
+                                Icons.edit,
+                                size: 20,
+                              ),
+                            ))
+                      ],
+                    ),
+                  ),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextField(
+                            controller: _nameController,
+                            style: TextStyle(fontSize: 18),
+                            onTap: () => print("on tap"),
+                            enabled: isEditPersonalEnable,
+                            decoration: InputDecoration(
+                              prefix: Text(
+                                "Name: ",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (String value) {
+                              if (!RegExp(
+                                      r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+                                  .hasMatch(value)) {
+                                return 'Please enter a valid email Address';
+                              }
+
+                              return null;
+                            },
+                            controller: _emailController,
+                            style: TextStyle(fontSize: 18),
+                            onTap: () => print("on tap"),
+                            enabled: isEditPersonalEnable,
+                            decoration: InputDecoration(
+                              prefix: Text(
+                                "Email: ",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                            visible: isEditPersonalEnable,
+                            child: TextButton(
+                              child: Text("Submit"),
+                              onPressed: () async {
+                                if (!_formKey.currentState.validate()) {
+                                  print(_emailController.text);
+                                  return;
+                                }
+                                print("new values: name: " +
+                                    _nameController.value.text +
+                                    " email" +
+                                    _emailController.value.text);
+                              },
+                            )),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CurrencyPicker(
+                          onChooseCurrency: (Currency currency) {
+                            state.setCurrency(currency.code);
+                            print(state.getCurrency());
+
+                          },
+                         currentCurrency: CurrencyService().findByCode(state.getCurrency())
+                      )
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Credit card details".toUpperCase(),
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
+                          ),
                         ),
                         Align(
                             alignment: Alignment.centerRight,
@@ -144,13 +178,14 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                                   editCreditCard = !editCreditCard;
                                 });
                               },
-                              child: Icon(Icons.edit, size: 20,),
-                            )
-                        )
+                              child: Icon(
+                                Icons.edit,
+                                size: 20,
+                              ),
+                            ))
                       ],
                     ),
                   ),
-
                   creditCardDetails(state),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -159,24 +194,36 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                       children: [
                         Align(
                           alignment: Alignment.centerLeft,
-                          child: Text("Car license details".toUpperCase(),style: TextStyle(color: Colors.grey,fontSize: 12,),),
+                          child: Text(
+                            "Car license details".toUpperCase(),
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
+                          ),
                         ),
                         Align(
                             alignment: Alignment.centerRight,
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.push(context, MaterialPageRoute(
-                                    builder: (BuildContext context) => UpdateCarLicense()));
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            UpdateCarLicense()));
                               },
-                              child: Icon(Icons.edit, size: 20,),
-                            )
-                        )
+                              child: Icon(
+                                Icons.edit,
+                                size: 20,
+                              ),
+                            ))
                       ],
                     ),
                   ),
-
                   carLicenseDetails(state),
-                  SizedBox(height: 30,)
+                  SizedBox(
+                    height: 30,
+                  )
                 ],
               ),
             );
@@ -199,60 +246,56 @@ class _PersonalDetailsState extends State<PersonalDetails> {
             },
             child: CreditCardWidget(
                 cardNumber: card.number,
-                expiryDate: card.expMonth.toString() + "/" + card.expYear.toString(),
+                expiryDate:
+                    card.expMonth.toString() + "/" + card.expYear.toString(),
                 cardHolderName: card.name,
                 cvvCode: card.cvc,
                 showBackView: isCvvFocused,
                 obscureCardNumber: true,
-                obscureCardCvv: true
-            ),
+                obscureCardCvv: true),
           ),
           Visibility(
-            visible: editCreditCard,
+              visible: editCreditCard,
               child: TextButton.icon(
                 onPressed: () {
                   state.deleteCreditCard();
                 },
                 icon: Icon(Icons.delete),
                 label: Text("Remove credit card"),
-
-              )
-          )
-
+              ))
         ],
       );
-
-
     } else {
       if (state != null) {
         print("state from credit card");
-
       }
       return ElevatedButton(
           onPressed: () async {
-            await Navigator.push(context, MaterialPageRoute(
-                builder: (BuildContext context) => UploadCreditCard(asb: false,st: state)));
-            myShowDialog(context, "Upload Credit Card", "Credit Card uploaded successfully");
-
+            await Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        UploadCreditCard(asb: false, st: state)));
+            myShowDialog(context, "Upload Credit Card",
+                "Credit Card uploaded successfully");
           },
           child: Text("Upload credit card details"));
     }
-
   }
 
   Widget carLicenseDetails(UserState state) {
     if (state.getCarLicensePhoto() != null) {
       return Container(
-        decoration: BoxDecoration(border: Border.all()),
-        width: MediaQuery.of(context).size.width/2,
-        child: Image.network(state.getCarLicensePhoto().path)
-      );
+          decoration: BoxDecoration(border: Border.all()),
+          width: MediaQuery.of(context).size.width / 2,
+          child: Image.network(state.getCarLicensePhoto().path));
     } else {
       return ElevatedButton(
-          onPressed: () => Navigator.push(context, MaterialPageRoute(
-              builder: (BuildContext context) => UpdateCarLicense())),
+          onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) => UpdateCarLicense())),
           child: Text("Upload car license photo"));
     }
-
   }
 }

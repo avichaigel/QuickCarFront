@@ -39,64 +39,70 @@ class _UpdateLocationState extends State<UpdateLocation> {
           )
       );
     }
-    return Scaffold(
-      body: Center(
-          child: Column(
-            children: [
-              Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                          width: 3,
-                          color: Colors.black
-                      )
+    return SafeArea(
+        child: Scaffold(
+          body: Center(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text("Please update car location", style: TextStyle(fontSize: 22),),
                   ),
-                  child: Stack(
-                    children: [
-                      GoogleMap(
-                        initialCameraPosition: CameraPosition(
-                          target: _tappedLocation,
-                          zoom: 15,
-                        ),
-                        markers: _markers,
-                        onTap: (LatLng latLng) {
-                          setState(() {
-                            _tappedLocation = latLng;
-                          });
-                        },
-                      )
-                    ],
+                  Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                              width: 3,
+                              color: Colors.black
+                          )
+                      ),
+                      child: Stack(
+                        children: [
+                          GoogleMap(
+                            initialCameraPosition: CameraPosition(
+                              target: _tappedLocation,
+                              zoom: 15,
+                            ),
+                            markers: _markers,
+                            onTap: (LatLng latLng) {
+                              setState(() {
+                                _tappedLocation = latLng;
+                              });
+                            },
+                          )
+                        ],
+                      ),
+                      height: MediaQuery.of(context).size.height/2
                   ),
-                  height: MediaQuery.of(context).size.height/2
-              ),
-              FutureBuilder(
-                  future: setAddress(_tappedLocation),
-                  builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                    if (snapshot.hasData)
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text("Address: " + snapshot.data),
-                      );
-                    else
-                      return Text("Loading...");
-                  }
-              ),
+                  FutureBuilder(
+                      future: setAddress(_tappedLocation),
+                      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                        if (snapshot.hasData)
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text("Address: " + snapshot.data),
+                          );
+                        else
+                          return Text("Loading...");
+                      }
+                  ),
 
-              ElevatedButton(
-                  onPressed: () {
-                    _continuePressed();
-                  } ,
-                  child: Text("Confirm New Location")
-              ),
+                  ElevatedButton(
+                      onPressed: () {
+                        _continuePressed();
+                      } ,
+                      child: Text("Confirm New Location")
+                  ),
 
-            ],
-          )
-      ),
+                ],
+              )
+          ),
+        )
     );
   }
 
   void _continuePressed() {
     context.flow<EndDriveState>().
-    update((state) => state.copyWith(latitude: _tappedLocation.latitude, longitude: _tappedLocation.longitude));
+    complete((state) => state.copyWith(latitude: _tappedLocation.latitude, longitude: _tappedLocation.longitude));
   }
 
   Future<String> setAddress(LatLng latLng) async {

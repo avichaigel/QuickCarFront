@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/data_class/car_dates.dart';
+import 'package:quick_car/services/email_sender.dart';
 import 'package:quick_car/view/pages/user_items/update_car_license.dart';
 import '../../../data_class/car_data.dart';
 import '../../../data_class/reservation.dart';
@@ -18,6 +19,7 @@ import 'package:stripe_payment/stripe_payment.dart';
 
 class ReservationDetails extends StatefulWidget {
   CarData car;
+
   ReservationDetails(this.car);
   @override
   _ReservationDetailsState createState() => _ReservationDetailsState();
@@ -29,6 +31,8 @@ class _ReservationDetailsState extends State<ReservationDetails> {
   int idCarDatesSelected;
   int totalPrice;
   int numberOfDays;
+  EmailSender emailSender = EmailSender();
+  String userName;
 
 
   // From stripe demo:
@@ -59,6 +63,27 @@ class _ReservationDetailsState extends State<ReservationDetails> {
         androidPayMode: 'test')
     );
   }
+  Widget contactSellerWidget() {
+    return GestureDetector(
+        onTap: () {
+          emailSender.send(userName, car);
+        },
+        child: Row(
+          children: [
+            Icon(
+              Icons.mail_outline,
+              size: 30.0,
+              color: Colors.grey.shade700,
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Text("Contact Seller",
+                style: TextStyle(fontSize: 20, color: Colors.grey.shade700)),
+          ],
+        ));
+  }
+
   Text locationText() {
     if (car.placeMarks != null) {
       return Text("Current location: " + car.placeMarks[0].administrativeArea +
@@ -100,12 +125,11 @@ class _ReservationDetailsState extends State<ReservationDetails> {
   }
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Column(
-              children: [
-
+    return Consumer<UserState>(builder: (context, state, child) {
+      return SafeArea(
+          child: Scaffold(
+            body: SingleChildScrollView(
+              child: Column(children: [
                 Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Container(
@@ -114,13 +138,13 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                         scrollDirection: Axis.horizontal,
                         itemCount: car.images.length,
                         itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: AspectRatio(
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: AspectRatio(
                               aspectRatio: 1,
-                          child: Image.network(car.images[index].path),
-                          ),
-                        );
+                              child: Image.network(car.images[index].path),
+                            ),
+                          );
                         }),
                   ),
                 ),
@@ -128,19 +152,18 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                   padding: const EdgeInsets.all(4.0),
                   child: Row(
                     children: [
-                      Text(car.brand + " " + car.model,
+                      Text(
+                        car.brand + " " + car.model,
                         style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(
                         width: 30,
                       ),
-                      Flexible(child: Text(car.pricePerDayUsd.toString() + "\$ per day",
-                        style: TextStyle(
-                            fontSize: 22,
-                            color: Colors.black45
-                        ),
-                      ))
-
+                      Flexible(
+                          child: Text(
+                            car.pricePerDayUsd.toString() + "\$ per day",
+                            style: TextStyle(fontSize: 22, color: Colors.black45),
+                          ))
                     ],
                   ),
                 ),
@@ -148,30 +171,43 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                   padding: const EdgeInsets.all(4.0),
                   child: Align(
                       alignment: Alignment.centerLeft,
-                      child:   Text("Year: " + car.year.toString(), style: TextStyle(fontSize: 20),)),
+                      child: Text(
+                        "Year: " + car.year.toString(),
+                        style: TextStyle(fontSize: 20),
+                      )),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(4.0),
                   child: Align(
                       alignment: Alignment.centerLeft,
-                      child:   Text("Type: " + car.type, style: TextStyle(fontSize: 20),)),
+                      child: Text(
+                        "Type: " + car.type,
+                        style: TextStyle(fontSize: 20),
+                      )),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(4.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: Text("Kilometers on road: " + car.kilometers.toString() + "km",
+                    child: Text(
+                      "Kilometers on road: " + car.kilometers.toString() + "km",
                       style: TextStyle(fontSize: 20),
                     ),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(2.0),
+                  child:
+                  Align(alignment: Alignment.centerLeft, child: locationText()),
+                ),
+                state.isLoggedIn()
+                    ? Padding(
+                  padding: const EdgeInsets.all(2.0),
                   child: Align(
                       alignment: Alignment.centerLeft,
-                      child:
-                      locationText()),
-                ),
+                      child: contactSellerWidget()),
+                )
+                    : SizedBox(),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
@@ -179,48 +215,35 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                     child: Stack(
                       children: [
                         Container(
-                          height: MediaQuery.of(context).size.width/1.2,
-                          width: MediaQuery.of(context).size.width/1.2,
+                          height: MediaQuery.of(context).size.width / 1.2,
+                          width: MediaQuery.of(context).size.width / 1.2,
                           child: GoogleMap(
                             initialCameraPosition: CameraPosition(
                               target: LatLng(car.latitude, car.longitude),
                               zoom: 16,
                             ),
-                              markers: {(Marker(
-                                markerId: MarkerId(car.id.toString()),
-                                position: LatLng(car.latitude, car.longitude))
-                                )
-                              },
+                            markers: {
+                              (Marker(
+                                  markerId: MarkerId(car.id.toString()),
+                                  position: LatLng(car.latitude, car.longitude)))
+                            },
                             myLocationEnabled: true,
-
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text("Owner email: " + car.owner,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ),
                 paymentDatesDetails()
-              ]
-          ),
-        ),
-        bottomNavigationBar: Consumer<UserState>(
-            builder: (context, state, child) {
+              ]),
+            ),
+            bottomNavigationBar:
+            Consumer<UserState>(builder: (context, state, child) {
+              userName = state.getFirstName();
               if (!state.isLoggedIn()) {
                 return TextButton(
                   style: TextButton.styleFrom(
-                      primary: Colors.white,
-                      backgroundColor: Colors.lightBlue
-                  ),
-
+                      primary: Colors.white, backgroundColor: Colors.lightBlue),
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -229,26 +252,24 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                       ),
                     );
                   },
-                  child: Text("Please log-in or sign up")
-                  ,
-                ) ;
+                  child: Text("Please log-in or sign up"),
+                );
               } else if (state.getCarLicensePhoto() == null) {
                 return TextButton(
                   style: TextButton.styleFrom(
-                      primary: Colors.white,
-                      backgroundColor: Colors.lightBlue
-                  ),
+                      primary: Colors.white, backgroundColor: Colors.lightBlue),
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => UpdateCarLicense()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => UpdateCarLicense()));
                   },
-                  child: Text("Upload car license")
-                  ,
-                ) ;
+                  child: Text("Upload car license"),
+                );
 
                 // return ;
               } else if (datesSelected == null) {
-                return
-                  TextButton(
+                return TextButton(
                     style: TextButton.styleFrom(
                         primary: Colors.white,
                         backgroundColor: Colors.lightBlue
@@ -271,72 +292,68 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                   );
 
               } else {
-                return
-                  Consumer<UserState>(
-                builder: (context, userState, child) {
-                  return
-                    TextButton(
-                      style: TextButton.styleFrom(
-                          primary: Colors.white,
-                          backgroundColor: Colors.lightBlue
-                      ),
-                      onPressed: () async {
-                        PaymentMethod paymentMethod = PaymentMethod();
-                        if (state.getCreditCard() == null) {
-                          print("user does not have a credit card");
-                          paymentMethod = await StripePayment.paymentRequestWithCardForm(
-                            CardFormPaymentRequest(),
-                          ).then((PaymentMethod paymentMethod) {
-                            // TODO: payment process
-                            print("credit card details uploaded");
-                            return paymentMethod;
-                          }).catchError((e) {
-                            return null;
-                          });
-                          if (paymentMethod == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("Error occurred"),
-                                duration: Duration(seconds: 2),
-                              ),
-                            );
-                            return;
+                return TextButton(
+                  style: TextButton.styleFrom(
+                      primary: Colors.white, backgroundColor: Colors.lightBlue),
+                  onPressed: () async {
+                    PaymentMethod paymentMethod = PaymentMethod();
+                    if (state.getCreditCard() == null) {
+                      print("user does not have a credit card");
+                      paymentMethod =
+                      await StripePayment.paymentRequestWithCardForm(
+                        CardFormPaymentRequest(),
+                      ).then((PaymentMethod paymentMethod) {
+                        print("credit card details uploaded");
+                        return paymentMethod;
+                      }).catchError((e) {
+                        return null;
+                      });
+                      if (paymentMethod == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Error occurred"),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        return;
+                      }
 
-                          }
-
-                          startDirectCharge(paymentMethod).then((value) {
-                            print("Payment successful");
-                            // on success:
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("Payment Successful"),
-                                duration: Duration(seconds: 2),
-                              ),
-
-                            ).closed.then((_) => onPaymentSuccess(state));
-                          });
-                        } else {
-                          print("user has credit card");
-                          var response = await StripeService.payViaExistingCard(
-                              card: state.getCreditCard(), currency: "usd", amount: totalPrice.toString());
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content: Text("Successful"),
-                              duration: Duration(seconds: 2),
-                            ),
-
-                          ).closed.then((_) => onPaymentSuccess(state));
-                        }
-                      },
-                      child: Text("Pay"),
-                    );
-                }
+                      startDirectCharge(paymentMethod).then((value) {
+                        print("payment successful");
+                        // on success:
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(
+                          SnackBar(
+                            content: Text("Payment Successful"),
+                            duration: Duration(seconds: 2),
+                          ),
+                        )
+                            .closed
+                            .then((_) => onPaymentSuccess(state));
+                      });
+                    } else {
+                      print("user has credit card");
+                      var response = await StripeService.payViaExistingCard(
+                          card: state.getCreditCard(),
+                          currency: "usd",
+                          amount: totalPrice.toString());
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(
+                        SnackBar(
+                          content: Text("Payment confirmed"),
+                          duration: Duration(seconds: 2),
+                        ),
+                      )
+                          .closed
+                          .then((_) => onPaymentSuccess(state));
+                    }
+                  },
+                  child: Text("Pay"),
                 );
               }
-            }
-        ),
-      ),
-    );
+            }),
+          ));
+    });
   }
 
   Future<void> startDirectCharge(PaymentMethod paymentMethod) async {
@@ -347,16 +364,11 @@ class _ReservationDetailsState extends State<ReservationDetails> {
     Reservation reservation = Reservation(car, datesSelected, totalPrice, numberOfDays);
     reservation.renterId = Provider.of<UserState>(context, listen: false).getId();
     reservation.ownerId = await CarsGlobals.userApi.getUserIdByEmail(car.owner);
-
-    // TODO: test delete it
-    state.addUserReservation(reservation);
-    return;
-    // post reservation to server
     CarsGlobals.reservationApi.postReservation(reservation, idCarDatesSelected)
         .then((value) {
-          state.addUserReservation(reservation);
-          Navigator.pop(context);
-        })
+      state.addUserReservation(reservation);
+      Navigator.pop(context);
+    })
         .onError((error, stackTrace) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -366,6 +378,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
 
       );
     });
+
 
   }
 

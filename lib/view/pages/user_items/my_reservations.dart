@@ -31,10 +31,7 @@ class MyReservations extends StatelessWidget {
           onPressed: () async {
             final EndDriveState endDriveFlow = await Navigator
                 .push(context, MaterialPageRoute(builder: (BuildContext context) => EndDriveFlow()));
-            reservation.car.longitude = endDriveFlow.longitude;
-            reservation.car.latitude = endDriveFlow.latitude;
             state.removeReservation(reservation);
-
             myShowDialog(context, "End driving", "Thank you for using this car!\n");
           },
           child: Text("End drive"),

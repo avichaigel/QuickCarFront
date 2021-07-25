@@ -253,7 +253,7 @@ class _PriceFilterState extends State<PriceFilter> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text("Prices range",style: TextStyle(fontSize: 15),),
+                      Text("Range in ${CarsGlobals.currencyService.currentCurrency.symbol}",style: TextStyle(fontSize: 15),),
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

@@ -88,7 +88,6 @@ class QuickCarCarsApi implements CarsApi {
         cd.id = json.decode(value)['id'];
         print("id: " + cd.id.toString());
       });
-      //TODO: delete it
       Timer(Duration(seconds: 3), () => print("after timer"));
       return cd;
 

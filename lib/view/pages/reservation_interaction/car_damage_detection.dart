@@ -6,24 +6,33 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/constants/strings.dart';
+import 'package:quick_car/services/currency_service.dart';
+import 'package:quick_car/services/payment_service.dart';
 import 'package:quick_car/states/end_drive_state.dart';
+import 'package:quick_car/states/user_state.dart';
+import 'package:quick_car/view/widgets/messages.dart';
+import 'package:stripe_payment/stripe_payment.dart';
 import '../../widgets/camera.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
 
-class CarPhoto extends StatefulWidget {
+class CarDamageDetection extends StatefulWidget {
 
   @override
-  _CarPhotoState createState() => _CarPhotoState();
+  _CarDamageDetectionState createState() => _CarDamageDetectionState();
 }
 
-class _CarPhotoState extends State<CarPhoto> {
+class _CarDamageDetectionState extends State<CarDamageDetection> {
 
-  File image;
+  File shownImage;
   String title;
   int currIndex;
   List<File> images = [];
+
+  bool _isLoading = false;
+  String _calculateStr = '';
 
   @override
   void initState() {
@@ -32,10 +41,10 @@ class _CarPhotoState extends State<CarPhoto> {
   }
 
   void callBack(String path) {
-    image = File(path);
+    shownImage = File(path);
   }
 
-  void _uploadPhotoNew() async {
+  void _takePicture() async {
     await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Camera(callBack)));
     setState(() {
 
@@ -43,52 +52,94 @@ class _CarPhotoState extends State<CarPhoto> {
 
   }
 
+  void _uploadGalleryPhoto() async {
+    PickedFile image = await CarsGlobals.picker.getImage(
+        source: ImageSource.gallery);
+    if (image == null) {
+      return;
+    }
+    File imageFile = File(image.path);
+    shownImage = imageFile;
 
-  // old version, with lost connection to device
-  Future<void> _uploadPhoto() async {
-    if (Strings.APPLICATION_DOCUMENTS_DIRECTORY_PATH == null) {
-      return;
-    }
-    final PickedFile pickedFile = await CarsGlobals.picker.getImage(source: ImageSource.camera);
-    if (pickedFile == null) {
-      return;
-    }
-    File imageFile = File(pickedFile.path);
     int number = Random().nextInt(100000);
     try {
-      File newImage = await imageFile.copy(Strings.APPLICATION_DOCUMENTS_DIRECTORY_PATH +'/image$number.png');
-      await imageFile.delete();
-      image = newImage;
+      // File newImage = await imageFile.copy(Strings.APPLICATION_DOCUMENTS_DIRECTORY_PATH +'/image$number.png');
+      // await imageFile.delete();
+      images[currIndex] = imageFile;
+      setState(() {
+      });
 
     } catch (e) {
       print("exception: " + e.toString());
     }
-    setState(() {});
 
+    setState(() {});
   }
   _continuePressed() {
-    context.flow<EndDriveState>().complete((state) => state.copyWith(carImages: images));
+    print("contineureccdscds");
+    context.flow<EndDriveState>().update((state) => state.copyWith(passedDamaged: true));
   }
-  _nextPressed() {
-    images.add(image);
-    if (currIndex == 1) {
+  _calculateDamage() async {
+    int damageValue = 50;
+    setState(() {
+      _isLoading = true;
+      _calculateStr = "Search for damages in the car";
+    });
+    int damagesCount = 0;
+    bool isDamaged = false;
+    for (int i = 0; i < 2; i++) {
+      isDamaged = await CarsGlobals.mlApi.isCarDamaged(images[i]);
+      if (isDamaged)
+        damagesCount += 1;
+    }
+    setState(() {
+      _isLoading = false;
+    });
+    if (damagesCount == 0) {
+      myShowDialog(context, "Damage Detection passed", "It seems you left no damage");
       _continuePressed();
+
+    } else if (damagesCount == 1) {
+      functionalShowDialog(context, "We found a damage", "It seems that there is a damage in the car\nTherefore you will be charged"
+          " ${CarsGlobals.currencyService.getPriceInCurrency(damageValue)}", () {
+        _continuePressed();
+      });
+    } else if (damagesCount == 2) {
+      functionalShowDialog(context, "We found a damage", "It seems that there is a damage in the car\nTherefore you will be charged"
+          " ${CarsGlobals.currencyService.getPriceInCurrency(damageValue * 2)}", () {
+        _continuePressed();
+      });
+    }
+
+
+
+  }
+  Future<void> startDirectCharge(PaymentMethod paymentMethod) async {
+    print("Payment charge");
+  }
+
+
+
+  _nextPressed() {
+    images.add(shownImage);
+    if (currIndex == 1) {
+      _calculateDamage();
       return;
     }
     setState(() {
-      image = null;
+      shownImage = null;
       currIndex += 1;
       title = CarsGlobals.startDriveAngles[currIndex];
     });
   }
   Widget _image() {
-    if (image == null) {
+    if (shownImage == null) {
       return Image(
           image: AssetImage("assets/upload-image.png")
       );
     } else {
       return Image(
-          image: FileImage(image)
+          image: FileImage(shownImage)
       );
     }
   }
@@ -129,7 +180,8 @@ class _CarPhotoState extends State<CarPhoto> {
                      Align(
                        alignment: Alignment.bottomRight,
                        child: FloatingActionButton(
-                         onPressed: ()=>_uploadPhotoNew(),
+                         // TODO: change to _take picture
+                         onPressed: ()=> _uploadGalleryPhoto(),
                          child: Icon(Icons.add_a_photo),
                        ),
                      )
@@ -141,14 +193,23 @@ class _CarPhotoState extends State<CarPhoto> {
               SizedBox(
                 height: 50,
               ),
+              Visibility(
+                visible: _isLoading,
+                child: Column(
+                  children: [
+                    Text(_calculateStr),
+                    CircularProgressIndicator()
+                  ],
+                ),
+              ),
               ElevatedButton(
                 onPressed: () {
-                  if (image != null) {
+                  if (shownImage != null) {
                     _nextPressed();
                   }
                 },
                 child: Text("Next"),
-                style: image == null ? disabled() : null,
+                style: shownImage == null ? disabled() : null,
               )
 
             ],
@@ -159,4 +220,7 @@ class _CarPhotoState extends State<CarPhoto> {
     )
     );
   }
+
+
 }
+

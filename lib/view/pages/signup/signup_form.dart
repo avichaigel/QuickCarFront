@@ -1,14 +1,17 @@
+import 'package:currency_picker/currency_picker.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_car/constants/cars_globals.dart';
+import 'package:quick_car/constants/strings.dart';
+import 'package:quick_car/services/email_validate.dart';
+import 'package:quick_car/view/widgets/currency_picker.dart';
 import 'package:quick_car/view/widgets/messages.dart';
 import '../../../data_class/user_signup.dart';
 import 'package:quick_car/states/signup_state.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
 import 'package:quick_car/view/widgets/country_list_pick.dart';
 import 'package:quick_car/view/widgets/decorations.dart';
-
 
 class SignUpForm extends StatefulWidget {
   @override
@@ -22,10 +25,12 @@ class SignUpFormState extends State<SignUpForm> {
   String _lastName;
   String _email;
   String _password;
+  String _currencyCode = Strings.USD;
 
   bool _isLoading = false;
   bool _isErr = false;
   String _errMsg = '';
+
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _passwordController = TextEditingController();
@@ -33,25 +38,25 @@ class SignUpFormState extends State<SignUpForm> {
   Widget _buildFirstName() {
     return TextFormField(
       keyboardType: TextInputType.name,
-        textCapitalization: TextCapitalization.sentences,
+      textCapitalization: TextCapitalization.sentences,
       decoration: InputDecoration(labelText: 'First Name'),
-          maxLength: 10,
-          validator: (String value) {
-            if (value.isEmpty) {
-              return 'First name is Required';
-            }
-            return null;
-          },
-          onSaved: (String value) {
-            _firstName = value;
-          },
+      maxLength: 10,
+      validator: (String value) {
+        if (value.isEmpty) {
+          return 'First name is Required';
+        }
+        return null;
+      },
+      onSaved: (String value) {
+        _firstName = value;
+      },
     );
   }
+
   Widget _buildLastName() {
     return TextFormField(
       keyboardType: TextInputType.name,
       textCapitalization: TextCapitalization.sentences,
-
       decoration: InputDecoration(labelText: 'Last Name'),
       maxLength: 10,
       validator: (String value) {
@@ -72,7 +77,7 @@ class SignUpFormState extends State<SignUpForm> {
       keyboardType: TextInputType.emailAddress,
       validator: (String value) {
         if (value.isEmpty) {
-          return 'Email is Required';
+          return 'Email is required';
         }
 
         if (!RegExp(
@@ -80,17 +85,16 @@ class SignUpFormState extends State<SignUpForm> {
             .hasMatch(value)) {
           return 'Please enter a valid email Address';
         }
-
         return null;
       },
-      onSaved: (String value) {
+      onSaved: (String value) async {
+        print("onSaved called in buildEmail");
         _email = value;
       },
     );
   }
-
   Widget _buildPassword() {
-    int minPwdLen = 2;
+    int minPwdLen = 8;
     return TextFormField(
       obscureText: true,
       decoration: InputDecoration(labelText: 'Password'),
@@ -112,6 +116,7 @@ class SignUpFormState extends State<SignUpForm> {
       },
     );
   }
+
   Widget _buildPasswordVaildation() {
     return TextFormField(
       obscureText: true,
@@ -133,21 +138,27 @@ class SignUpFormState extends State<SignUpForm> {
     );
   }
 
+
   void _continuePressed() {
     setState(() {
       _isLoading = true;
     });
+
+
     UserSignUp nu = UserSignUp();
     nu.username = _email;
     nu.firstName = _firstName;
     nu.lastName = _lastName;
     nu.email = _email;
     nu.password = _password;
+    nu.currencyCode = _currencyCode;
+
     CarsGlobals.signUpApi.signUpNewUser(nu).then((value) {
+      print(value);
       context
-        .flow<SignUpState>()
-        .update((signUpState) => signUpState.copyWith(id: value.id, formCompleted: true));})
-    .onError((error, stackTrace) {
+          .flow<SignUpState>()
+          .update((signUpState) => signUpState.copyWith(id: value.id, formCompleted: true));})
+        .onError((error, stackTrace) {
       setState(() {
         _isLoading = false;
         _isErr = true;
@@ -155,6 +166,38 @@ class SignUpFormState extends State<SignUpForm> {
       });
     });
 
+  }
+
+  onChooseCurrency(Currency currency){
+    _currencyCode = currency.code;
+    print("currency code: $_currencyCode");
+  }
+  _showAlertDialog(BuildContext context) {
+    // set up the button
+    Widget okButton = TextButton(
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.of(context, rootNavigator: true)
+            .pop(true); // dismisses only the dialog and returns true
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("The email you provided does not exist"),
+      content: Text("Please provide a real email address"),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   @override
@@ -178,6 +221,7 @@ class SignUpFormState extends State<SignUpForm> {
                   _buildEmail(),
                   _buildPassword(),
                   _buildPasswordVaildation(),
+                  CurrencyPicker(onChooseCurrency: onChooseCurrency, currentCurrency: CurrencyService().findByCode(Strings.USD),),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Visibility(
@@ -195,12 +239,22 @@ class SignUpFormState extends State<SignUpForm> {
                           });
                         })
                     ),
-                  ),
-                  nextButton(onPressed: () {
+                  ),                  nextButton(
+                    onPressed: () async {
                       if (!_formKey.currentState.validate()) {
                         return;
                       }
                       _formKey.currentState.save();
+                      if (!(await validateEmail(_email))) {
+                        setState(() {
+                          _isErr = true;
+                          _errMsg = "The email you provided does not exist. Please provide a valid email";
+                        });
+                        print("The email you provided does not exist. Please provide a valid email");
+                        return null;
+                      }
+
+
                       _continuePressed();
                     },
                   ),

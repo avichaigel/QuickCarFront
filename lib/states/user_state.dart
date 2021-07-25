@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:quick_car/constants/strings.dart';
 import '../data_class/car_data.dart';
 import '../data_class/reservation.dart';
 import 'package:stripe_payment/stripe_payment.dart';
@@ -9,10 +11,12 @@ class UserState extends ChangeNotifier {
   bool _isLoggedIn = false;
   File _carLicensePhoto;
   CreditCard _creditCard;
+  String _currency;
   bool isLoggedIn() => _isLoggedIn;
   File getCarLicensePhoto() => _carLicensePhoto;
   CreditCard getCreditCard() => _creditCard;
-  //TODO: maybe need to delete token from user state
+  String getCurrency() => _currency != null ? _currency : Strings.USD;
+
   String _token;
   String _firstName;
   String _lastName;
@@ -25,8 +29,6 @@ class UserState extends ChangeNotifier {
   String getToken() => _token;
   List<CarData> _carsAsRenterOut = [];
   List<Reservation> _reservationsAsBorrower = [];
-  // should be only from server with photos from amazon
-  // TODO: smart caching for the cars after uploading
   List<CarData> getMyCars() => _carsAsRenterOut;
   List<Reservation> getMyReservation() => _reservationsAsBorrower;
   void setToken(String token) {
@@ -74,13 +76,14 @@ class UserState extends ChangeNotifier {
     _creditCard = cd;
     notifyListeners();
   }
-  void setLoginSetup(int id, String fn, String ln, String em, bool isLoggedIn, File carLicense) {
+  void setLoginSetup(int id, String fn, String ln, String em, bool isLoggedIn, File carLicense, String currency) {
     _id = id;
     _firstName = fn;
     _lastName = ln;
     _email = em;
     _isLoggedIn = isLoggedIn;
     _carLicensePhoto = carLicense;
+    _currency = currency;
     notifyListeners();
   }
   void setCarLicensePhoto(File clp) {
@@ -90,5 +93,8 @@ class UserState extends ChangeNotifier {
   }
   void removeCarToRentOut(int id) {
     _carsAsRenterOut.removeWhere((element) => element.id == id);
+  }
+  void setCurrency(String currencyCode) {
+    _currency = currencyCode;
   }
 }

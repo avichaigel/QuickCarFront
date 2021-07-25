@@ -104,7 +104,6 @@ class _LoginState extends State<Login> {
                     },
                   ),
                 ),
-                // TODO: maybe delete it if will not be implemented
                 Padding(
                     padding: const EdgeInsets.only(bottom:30),
                     child: Align(
@@ -148,7 +147,8 @@ class _LoginState extends State<Login> {
                             print(value);
                             print(value.carLicense);
                             userState.setLoginSetup(value.id, value.firstName, value.lastName,
-                                value.email, true, value.carLicense);
+                                value.email, true, value.carLicense, value.currency);
+                            CarsGlobals.currencyService.setCurrentCurrency(value.currency);
                             Navigator.pushReplacementNamed(context, '/');
                           }).catchError((error, stackTrace) {
                             setState(() {
