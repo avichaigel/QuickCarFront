@@ -31,6 +31,7 @@ class ResultsViewState extends State<ResultsView> {
     super.initState();
   }
 
+
   Widget getSortDisplay(SearchState state) {
     return Container(
         height: 40,
