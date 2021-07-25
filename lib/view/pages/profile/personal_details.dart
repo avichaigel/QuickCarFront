@@ -1,3 +1,4 @@
+// import 'package:currency_picker/currency_picker.dart';
 import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter_credit_card/credit_card_widget.dart';
 import 'package:quick_car/view/pages/user_items/update_car_license.dart';
@@ -148,8 +149,12 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                       child: CurrencyPicker(
                           onChooseCurrency: (Currency currency) {
                             state.setCurrency(currency.code);
+                            print(state.getCurrency());
+
                           },
-                          currentCurrency: CurrencyService().findByCode(state.getCurrency()))),
+                         currentCurrency: CurrencyService().findByCode(state.getCurrency())
+                      )
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(

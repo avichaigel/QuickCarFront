@@ -89,11 +89,6 @@ class SignUpFormState extends State<SignUpForm> {
       },
       onSaved: (String value) async {
         print("onSaved called in buildEmail");
-        if (!(await validateEmail(value))) {
-          _showAlertDialog(context);
-          print("email doesn't exist");
-          return null;
-        }
         _email = value;
       },
     );
@@ -148,6 +143,8 @@ class SignUpFormState extends State<SignUpForm> {
     setState(() {
       _isLoading = true;
     });
+
+
     UserSignUp nu = UserSignUp();
     nu.username = _email;
     nu.firstName = _firstName;
@@ -243,11 +240,21 @@ class SignUpFormState extends State<SignUpForm> {
                         })
                     ),
                   ),                  nextButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (!_formKey.currentState.validate()) {
                         return;
                       }
                       _formKey.currentState.save();
+                      if (!(await validateEmail(_email))) {
+                        setState(() {
+                          _isErr = true;
+                          _errMsg = "The email you provided does not exist. Please provide a valid email";
+                        });
+                        print("The email you provided does not exist. Please provide a valid email");
+                        return null;
+                      }
+
+
                       _continuePressed();
                     },
                   ),

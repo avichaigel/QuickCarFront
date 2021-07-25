@@ -364,10 +364,21 @@ class _ReservationDetailsState extends State<ReservationDetails> {
     Reservation reservation = Reservation(car, datesSelected, totalPrice, numberOfDays);
     reservation.renterId = Provider.of<UserState>(context, listen: false).getId();
     reservation.ownerId = await CarsGlobals.userApi.getUserIdByEmail(car.owner);
+    CarsGlobals.reservationApi.postReservation(reservation, idCarDatesSelected)
+        .then((value) {
+      state.addUserReservation(reservation);
+      Navigator.pop(context);
+    })
+        .onError((error, stackTrace) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.toString()),
+          duration: Duration(seconds: 2),
+        ),
 
-    state.addUserReservation(reservation);
-    Navigator.of(context).pop();
-    return;
+      );
+    });
+
 
   }
 
