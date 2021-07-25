@@ -41,6 +41,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
   ScrollController _controller = ScrollController();
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
+
   void setError(dynamic error) {
     print("in error");
     ScaffoldMessenger.of(context)
