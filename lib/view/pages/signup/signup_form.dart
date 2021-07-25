@@ -32,6 +32,37 @@ class SignUpFormState extends State<SignUpForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _passwordController = TextEditingController();
 
+  showAlertDialog(BuildContext context) {
+    // set up the button
+    Widget okButton = TextButton(
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.of(context, rootNavigator: true)
+            .pop(true); // dismisses only the dialog and returns true
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("The email you provided does not exist"),
+      content: Text("Please provide a real email address"),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+/*        Future.delayed(Duration(seconds: 3), () {
+          Navigator.of(context).pop(true);
+        });*/
+        return alert;
+      },
+    );
+  }
+
   Widget _buildFirstName() {
     return TextFormField(
       keyboardType: TextInputType.name,
@@ -93,18 +124,23 @@ class SignUpFormState extends State<SignUpForm> {
       keyboardType: TextInputType.emailAddress,
       validator: (String value) {
         if (value.isEmpty) {
-          return 'Email is Required';
+          return 'Email is required';
         }
 
         if (!RegExp(
-                r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+            r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
             .hasMatch(value)) {
           return 'Please enter a valid email Address';
         }
-
         return null;
       },
-      onSaved: (String value) {
+      onSaved: (String value) async {
+        print("onSaved called in buildEmail");
+        if (!(await validateEmail(value))) {
+          showAlertDialog(context);
+          print("email doesn't exist");
+          return null;
+        }
         _email = value;
       },
     );
