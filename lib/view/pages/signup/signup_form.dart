@@ -2,6 +2,7 @@ import 'package:currency_picker/currency_picker.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:quick_car/api/email_api.dart';
 import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/constants/strings.dart';
 import 'package:quick_car/view/widgets/currency_picker.dart';
@@ -55,9 +56,6 @@ class SignUpFormState extends State<SignUpForm> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-/*        Future.delayed(Duration(seconds: 3), () {
-          Navigator.of(context).pop(true);
-        });*/
         return alert;
       },
     );
