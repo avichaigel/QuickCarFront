@@ -23,7 +23,8 @@ class MLApi {
   Future<bool>isCarDamaged(File image) async {
     var uri = Uri.parse('http://f33ddebb-ea87-400c-88ef-6bf5e2e23ba0.centralus.azurecontainer.io/score');
     var bytes = await image.readAsBytes();
-    var response = await http.post(uri, body: bytes);
+    try {
+    var response = await http.post(uri, body: bytes).timeout(Duration(seconds: 5));
     if (response.statusCode == 200) {
       print("Successful post");
       if (response.body == "false") {
@@ -36,6 +37,9 @@ class MLApi {
       }
     } else {
       throw "Service is not available";
+    }
+    } catch (Exception) {
+      return false;
     }
   }
 }

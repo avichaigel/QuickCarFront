@@ -6,13 +6,9 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
 import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/constants/strings.dart';
-import 'package:quick_car/services/currency_service.dart';
-import 'package:quick_car/services/payment_service.dart';
 import 'package:quick_car/states/end_drive_state.dart';
-import 'package:quick_car/states/user_state.dart';
 import 'package:quick_car/view/widgets/messages.dart';
 import 'package:stripe_payment/stripe_payment.dart';
 import '../../widgets/camera.dart';
@@ -61,10 +57,7 @@ class _CarDamageDetectionState extends State<CarDamageDetection> {
     File imageFile = File(image.path);
     shownImage = imageFile;
 
-    int number = Random().nextInt(100000);
     try {
-      // File newImage = await imageFile.copy(Strings.APPLICATION_DOCUMENTS_DIRECTORY_PATH +'/image$number.png');
-      // await imageFile.delete();
       images[currIndex] = imageFile;
       setState(() {
       });
@@ -89,6 +82,7 @@ class _CarDamageDetectionState extends State<CarDamageDetection> {
     bool isDamaged = false;
     for (int i = 0; i < 2; i++) {
       isDamaged = await CarsGlobals.mlApi.isCarDamaged(images[i]);
+      print("is damaged:" + isDamaged.toString());
       if (isDamaged)
         damagesCount += 1;
     }
