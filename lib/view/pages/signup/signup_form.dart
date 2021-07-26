@@ -172,6 +172,7 @@ class SignUpFormState extends State<SignUpForm> {
     _currencyCode = currency.code;
     print("currency code: $_currencyCode");
   }
+
   _showAlertDialog(BuildContext context) {
     // set up the button
     Widget okButton = TextButton(
