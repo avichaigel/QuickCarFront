@@ -39,8 +39,9 @@ class MyCurrencyService extends ChangeNotifier {
         currentCurrency = CurrencyService().findByCode(currencyCode);
         notifyListeners();
         return true;
+      } else {
+        return goBackToDollars(false);
       }
-      return goBackToDollars(false);
     } catch (Exception) {
       print("Can't get currency rate - use dollars");
       return goBackToDollars(false);
