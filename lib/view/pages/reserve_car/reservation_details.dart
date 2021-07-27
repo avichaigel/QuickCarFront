@@ -77,7 +77,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
             SizedBox(
               width: 10,
             ),
-            Text("Contact Seller",
+            Text("Contact Owner",
                 style: TextStyle(fontSize: 20, color: Colors.grey.shade700)),
           ],
         ));
