@@ -66,7 +66,8 @@ class QuickCarSignUpApi implements SignUpApi {
       usu.id = newUserDetails["id"];
       sendCurrencyToDB(user).then((success){
         if (!success){
-          user.currencyCode = Strings.USD;
+          // user.currencyCode = Strings.USD;
+          null;
         }
       });
       return usu;
