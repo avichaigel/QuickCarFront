@@ -89,7 +89,7 @@ class CurrencyPickerState extends State<CurrencyPicker> {
                             height: 10,
                             width: 10,
                             child: CircularProgressIndicator())
-                        : Text(
+                        : Text( // if loading == false
                             "${currentCurrency.symbol} ${currentCurrency.flag}",
                             style: TextStyle(fontSize: 17))),
                 Text(

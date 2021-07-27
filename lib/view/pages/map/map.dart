@@ -87,6 +87,7 @@ class _GMapState extends State<GMap> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<MyCurrencyService>(
+      // create = define which instance of MyCurrencyService to listen to, in our case - it's the global instance
         create: (context) => CarsGlobals.currencyService,
         child: Builder(builder: (context) {
           return Scaffold(
