@@ -32,7 +32,7 @@ class UserSignUp {
     lastName: json["last_name"],
     email: json["email"],
     password: json["password"],
-    currencyCode: json.containsKey("currency")?json["currency"]:Strings.USD,
+    // currencyCode: json.containsKey("currency")?json["currency"]:Strings.USD,
   );
 
   Map<String, dynamic> toJson() => {
@@ -41,6 +41,6 @@ class UserSignUp {
     "last_name": lastName,
     "email": email,
     "password": password,
-    "currency": currencyCode,
+    // "currency": currencyCode,
   };
 }

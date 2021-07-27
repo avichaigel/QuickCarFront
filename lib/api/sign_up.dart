@@ -57,7 +57,29 @@ class QuickCarSignUpApi implements SignUpApi {
         body: jsonEncode(user.toJson()));
     if (response.statusCode == 201) {
       print("user successfully created");
+      sendCurrencyToDB(user).then((success){
+        if (!success){
+          print("change currency to USD"); //TODO find out how
+        }
+      });
       return UserSignUp.fromJson(jsonDecode(response.body));
+    }
+  }
+
+  Future<bool> sendCurrencyToDB(UserSignUp user) async {
+    var uri = Uri.parse(Strings.QUICKCAR_URL + "users/usersprofiles/" + user.id.toString() + "/");
+    var response = await client.patch(uri,
+        headers: {'Content-Type':'application/json',},
+        body: jsonEncode({
+          "currency": user.currencyCode,
+        }));
+    if (response.statusCode == 200) {
+      print("currency saved successfully");
+      return true;
+    } else {
+      print("error while saving currency");
+
+      return false;
     }
   }
 }

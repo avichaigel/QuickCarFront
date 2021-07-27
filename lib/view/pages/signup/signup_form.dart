@@ -193,13 +193,14 @@ class SignUpFormState extends State<SignUpForm> {
     nu.lastName = _lastName;
     nu.email = _email;
     nu.password = _password;
-    nu.currencyCode = _currencyCode;
+    // nu.currencyCode = _currencyCode;
     CarsGlobals.signUpApi.signUpNewUser(nu).then((value) {
       context.flow<SignUpState>().update((signUpState) =>
           signUpState.copyWith(id: value.id, formCompleted: true));
     }).onError((error, stackTrace) {
       print("error in sign up form: ${error}");
     });
+
   }
   onChooseCurrency(Currency currency){
     _currencyCode = currency.code;
