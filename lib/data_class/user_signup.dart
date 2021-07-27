@@ -15,7 +15,7 @@ class UserSignUp {
     this.lastName,
     this.email,
     this.password,
-    this.currencyCode,
+    // this.currencyCode,
   });
 
   int id;
@@ -24,7 +24,7 @@ class UserSignUp {
   String lastName;
   String email;
   String password;
-  String currencyCode;
+  // String currencyCode;
 
   factory UserSignUp.fromJson(Map<String, dynamic> json) => UserSignUp(
     username: json["username"],

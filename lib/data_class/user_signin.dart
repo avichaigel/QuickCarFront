@@ -42,11 +42,11 @@ class UserSignIn {
     userProfileId = json["user"];
     if (json["license"] != null)
       carLicense = File(json["license"]);
-    if (json["currency"] != null) {
-      currency = json["currency"];
-    } else {
-      currency = Strings.USD;
-    }
+    // if (json["currency"] != null) {
+    //   currency = json["currency"];
+    // } else {
+    //   currency = Strings.USD;
+    // }
   }
 
   Map<String, dynamic> toJson() => {

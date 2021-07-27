@@ -64,11 +64,11 @@ class QuickCarSignUpApi implements SignUpApi {
       }
       Map newUserDetails = json.decode(res.body) as Map<String, dynamic>;
       usu.id = newUserDetails["id"];
-      sendCurrencyToDB(user).then((success){
-        if (!success){
-          user.currencyCode = Strings.USD;
-        }
-      });
+      // sendCurrencyToDB(user).then((success){
+      //   if (!success){
+      //     user.currencyCode = Strings.USD;
+      //   }
+      // });
       return usu;
     } else if (response.body.contains("A user with that username already exists.")) {
       throw "Email already exists";
