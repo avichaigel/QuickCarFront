@@ -35,13 +35,18 @@ class UserSignIn {
       password: json["password"],
       firstName: json["first_name"],
       lastName: json["last_name"],
-      currency: json.containsKey("currency") ? json["currency"] : Strings.USD,
+      // currency: json.containsKey("currency") ? json["currency"] : Strings.USD,
     );
   }
   setDetailsFromUserProfile(Map<String, dynamic> json) {
     userProfileId = json["user"];
     if (json["license"] != null)
       carLicense = File(json["license"]);
+    if (json["currency"] != null) {
+      currency = json["currency"];
+    } else {
+      currency = Strings.USD;
+    }
   }
 
   Map<String, dynamic> toJson() => {
