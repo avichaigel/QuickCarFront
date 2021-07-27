@@ -160,7 +160,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                       ),
                       Flexible(
                           child: Text(
-                            car.pricePerDayUsd.toString() + "\$ per day",
+                            CarsGlobals.currencyService.getPriceInCurrency(car.pricePerDayUsd) + " per day",
                             style: TextStyle(fontSize: 22, color: Colors.black45),
                           ))
                     ],
