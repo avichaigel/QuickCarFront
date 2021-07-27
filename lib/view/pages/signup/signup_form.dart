@@ -222,7 +222,7 @@ class SignUpFormState extends State<SignUpForm> {
                   _buildEmail(),
                   _buildPassword(),
                   _buildPasswordVaildation(),
-                  CurrencyPicker(onChooseCurrency: onChooseCurrency, currentCurrency: CurrencyService().findByCode(Strings.USD),),
+                  // CurrencyPicker(onChooseCurrency: onChooseCurrency, currentCurrency: CurrencyService().findByCode(Strings.USD),),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Visibility(
