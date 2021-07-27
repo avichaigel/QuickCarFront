@@ -57,18 +57,18 @@ class QuickCarSignUpApi implements SignUpApi {
         body: jsonEncode(user.toJson()));
     if (response.statusCode == 201) {
       UserSignUp usu = UserSignUp.fromJson(jsonDecode(response.body));
-      sendCurrencyToDB(user).then((success){
-        if (!success){
-          print("change currency to USD"); //TODO find out how
-        }
-      });
       Map body = {'username': user.email, 'password': user.password };
       var res = await http.post(Uri.parse(Strings.QUICKCAR_URL +"users/login/"), body: body);
       if (res.statusCode != 200) {
-        throw 'New user was created bust cannot get it now. You can try login';
+        throw 'New user was created but cannot get it now. You can try login';
       }
       Map newUserDetails = json.decode(res.body) as Map<String, dynamic>;
       usu.id = newUserDetails["id"];
+      sendCurrencyToDB(user).then((success){
+        if (!success){
+          user.currencyCode = Strings.USD;
+        }
+      });
       return usu;
     } else if (response.body.contains("A user with that username already exists.")) {
       throw "Email already exists";
@@ -87,7 +87,6 @@ class QuickCarSignUpApi implements SignUpApi {
       return true;
     } else {
       print("error while saving currency");
-
       return false;
     }
   }
