@@ -1,9 +1,11 @@
 
+import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/constants/strings.dart';
+import 'package:quick_car/view/widgets/currency_picker.dart';
 import 'package:quick_car/view/widgets/filter_param.dart';
 import 'package:quick_car/view/widgets/search_widget.dart';
 
@@ -125,6 +127,16 @@ class ResultsViewState extends State<ResultsView> {
                               || element.model.startsWith(s)).toList();
                       });},
                       focus: _focusNode,),
+                      Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CurrencyPicker(
+                              onChooseCurrency: (Currency currency) {
+                                CarsGlobals.currencyService.setCurrentCurrency(currency.code);
+                                print(CarsGlobals.currencyService.currentCurrency);
+                              },
+                              currentCurrency: CarsGlobals.currencyService.currentCurrency;
+                          )
+                      ),
                       Padding(
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

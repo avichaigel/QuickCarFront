@@ -74,6 +74,7 @@ class QuickCarSignUpApi implements SignUpApi {
       throw "Email already exists";
     }
   }
+/*
 
   Future<bool> sendCurrencyToDB(UserSignUp user) async {
     var uri = Uri.parse(Strings.QUICKCAR_URL + "users/usersprofiles/" + user.id.toString() + "/");
@@ -90,4 +91,4 @@ class QuickCarSignUpApi implements SignUpApi {
       return false;
     }
   }
-}
+}*/
