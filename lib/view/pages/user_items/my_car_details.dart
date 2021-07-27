@@ -73,7 +73,7 @@ class _MyCarDetailsState extends State<MyCarDetails> {
     for (int i = 0; i < clonedCar.carDates.length; i++) {
       dates.add(clonedCar.carDates[i].datePeriod);
     }
-    MyCarDetailsState carDetailsState =MyCarDetailsState(clonedCar.images, clonedCar.latitude, clonedCar.longitude, dates);
+    MyCarDetailsState carDetailsState = MyCarDetailsState(clonedCar.images, clonedCar.latitude, clonedCar.longitude, dates);
     return ChangeNotifierProvider(create: (_)=>
         carDetailsState,
         child: Scaffold(
@@ -180,7 +180,8 @@ class _MyCarDetailsState extends State<MyCarDetails> {
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
               onPressed: () {
-                CarsGlobals.carsApi.updateCar(carData.id, clonedCar, carDetailsState.carDates).then((value) {
+                MyCarDetailsState currState = Provider.of<MyCarDetailsState>(context, listen: false);
+                CarsGlobals.carsApi.updateCar(carData.id, clonedCar, currState.carDates).then((value) {
                   carData.images = clonedCar.images;
                   carData.latitude = clonedCar.latitude;
                   carData.longitude = clonedCar.longitude;
