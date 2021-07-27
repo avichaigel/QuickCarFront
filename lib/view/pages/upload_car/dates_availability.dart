@@ -23,7 +23,6 @@ class _DatesAvailabilityState extends State<DatesAvailability> {
   List<dp.DatePeriod> _availabilityDates;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _availabilityDates = [];
 

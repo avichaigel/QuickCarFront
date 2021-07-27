@@ -48,8 +48,7 @@ dependencies:
   stripe_payment: ^1.1.0
   flutter_native_image: ^0.0.6
   currency_picker: ^2.0.3
-
-
+  flutter_email_sender: ^5.0.2
 
 
 

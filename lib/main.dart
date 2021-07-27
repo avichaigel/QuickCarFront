@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
           '/signup': (context) => SignupFlow(),
           'upload-car': (context) => UploadCarFlow()
         },
-        initialRoute: '/',
+        initialRoute: '/login',
       )
     );
   }

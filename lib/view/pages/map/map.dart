@@ -87,67 +87,68 @@ class _GMapState extends State<GMap> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<MyCurrencyService>(
+      // create = define which instance of MyCurrencyService to listen to, in our case - it's the global instance
         create: (context) => CarsGlobals.currencyService,
         child: Builder(builder: (context) {
           return Scaffold(
             body: SafeArea(
                 child: _initialPosition == null
                     ? Container(
-                        child: Center(
-                          child: Text(
-                            'loading map..',
-                            style: TextStyle(
-                                fontFamily: 'Avenir-Medium',
-                                color: Colors.grey[400]),
-                          ),
+                  child: Center(
+                    child: Text(
+                      'loading map..',
+                      style: TextStyle(
+                          fontFamily: 'Avenir-Medium',
+                          color: Colors.grey[400]),
+                    ),
+                  ),
+                )
+                    : Container(
+                  child: Stack(
+                    children: <Widget>[
+                      Consumer<MapState>(
+                          builder: (context, state, child) {
+                            print("map state builder");
+                            print(state.carsList.length);
+                            cars = state.carsList;
+                            _onMapCreated(_mapController);
+                            return GoogleMap(
+                              onMapCreated: _onMapCreated,
+                              initialCameraPosition: CameraPosition(
+                                target: _initialPosition,
+                                zoom: 12,
+                              ),
+                              markers: _markers,
+                              myLocationEnabled: true,
+                              myLocationButtonEnabled: true,
+                              onTap: (LatLng latLng) {
+                                print("on tap");
+                                setState(() {
+                                  if (_isCardVisible)
+                                    _isCardVisible = !_isCardVisible;
+                                });
+                              },
+                            );
+                          }),
+                      Visibility(
+                        visible: _isCardVisible,
+                        child: Container(
+                            margin: const EdgeInsets.only(bottom: 60.0),
+                            alignment: Alignment.bottomCenter,
+                            child: carCard()),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: InkWell(
+                          child: Icon(Icons.refresh),
+                          onTap: () => Provider.of<MapState>(context,
+                              listen: false)
+                              .loadCars(),
                         ),
                       )
-                    : Container(
-                        child: Stack(
-                          children: <Widget>[
-                            Consumer<MapState>(
-                                builder: (context, state, child) {
-                              print("map state builder");
-                              print(state.carsList.length);
-                              cars = state.carsList;
-                              _onMapCreated(_mapController);
-                              return GoogleMap(
-                                onMapCreated: _onMapCreated,
-                                initialCameraPosition: CameraPosition(
-                                  target: _initialPosition,
-                                  zoom: 12,
-                                ),
-                                markers: _markers,
-                                myLocationEnabled: true,
-                                myLocationButtonEnabled: true,
-                                onTap: (LatLng latLng) {
-                                  print("on tap");
-                                  setState(() {
-                                    if (_isCardVisible)
-                                      _isCardVisible = !_isCardVisible;
-                                  });
-                                },
-                              );
-                            }),
-                            Visibility(
-                              visible: _isCardVisible,
-                              child: Container(
-                                  margin: const EdgeInsets.only(bottom: 60.0),
-                                  alignment: Alignment.bottomCenter,
-                                  child: carCard()),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: InkWell(
-                                child: Icon(Icons.refresh),
-                                onTap: () => Provider.of<MapState>(context,
-                                        listen: false)
-                                    .loadCars(),
-                              ),
-                            )
-                          ],
-                        ),
-                      )),
+                    ],
+                  ),
+                )),
           );
         }));
   }
@@ -187,18 +188,18 @@ class _GMapState extends State<GMap> {
                           padding: const EdgeInsets.all(4.0),
                           child: Consumer<MyCurrencyService>(
                               builder: (context, state, child) {
-                            return Align(
-                              alignment: Alignment.topCenter,
-                              child: Text(
-                                "${state.getPriceInCurrency(currCar.pricePerDayUsd)} per day",
-                                style: TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w400),
-                                overflow: TextOverflow.visible,
-                              ),
-                            );
-                          })),
+                                return Align(
+                                  alignment: Alignment.topCenter,
+                                  child: Text(
+                                    "${state.getPriceInCurrency(currCar.pricePerDayUsd)} per day",
+                                    style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400),
+                                    overflow: TextOverflow.visible,
+                                  ),
+                                );
+                              })),
                       Padding(
                         padding: const EdgeInsets.all(4.0),
                         child: Text(currCar.type + " car"),

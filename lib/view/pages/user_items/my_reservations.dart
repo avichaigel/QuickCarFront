@@ -5,10 +5,10 @@ import 'package:provider/provider.dart';
 import 'package:quick_car/data_class/car_data.dart';
 import 'package:quick_car/data_class/reservation.dart';
 import 'package:quick_car/states/search_state.dart';
-import 'package:quick_car/states/start_drive_state.dart';
+import 'package:quick_car/states/end_drive_state.dart';
 import 'package:quick_car/states/user_state.dart';
 import '../../widgets/camera.dart';
-import 'package:quick_car/view/pages/reservation_interaction/start_drive_flow.dart';
+import 'package:quick_car/view/pages/reservation_interaction/end_drive_flow.dart';
 import 'package:quick_car/view/pages/user_items/my_reservation_details.dart';
 import 'package:quick_car/view/widgets/buttons.dart';
 import 'package:quick_car/view/widgets/messages.dart';
@@ -18,21 +18,21 @@ class MyReservations extends StatelessWidget {
   ElevatedButton buttons(Reservation reservation, BuildContext context, UserState state) {
     if (!reservation.isActive) {
       return ElevatedButton(
-        onPressed: () async {
+        onPressed: () {
           if (readyToStart(reservation)) {
-            StartDriveState sds = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => StartDriveFlow()));
-            if (sds.carImages.length == 4)
-              state.setReservationActive(reservation);
+            state.setReservationActive(reservation);
           }
-        }  ,
+        },
         child: Text("Start driving"),
         style: !readyToStart(reservation) ? disabled() : null,
       );
     } else if (reservation.isActive) {
       return ElevatedButton(
-          onPressed: () {
-            myShowDialog(context, "End driving", "Thank you for using this car!\n");
+          onPressed: () async {
+            final EndDriveState endDriveFlow = await Navigator
+                .push(context, MaterialPageRoute(builder: (BuildContext context) => EndDriveFlow()));
             state.removeReservation(reservation);
+            myShowDialog(context, "End driving", "Thank you for using this car!\n");
           },
           child: Text("End drive"),
           style: ButtonStyle(

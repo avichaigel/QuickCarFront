@@ -104,7 +104,6 @@ class _LoginState extends State<Login> {
                     },
                   ),
                 ),
-                // TODO: maybe delete it if will not be implemented
                 Padding(
                     padding: const EdgeInsets.only(bottom:30),
                     child: Align(

@@ -265,22 +265,28 @@ class _CarPhotosState extends State<CarPhotos> {
                     });
                     return;
                   }
-                  CarDetectionResponse cdr = await CarsGlobals.mlApi.isCar(images[i]);
-                  if (!cdr.isCar) {
-                    setState((){
-                      _errorMsg = "Seems that image number ${i+1} does not contain car";
-                      _errorVisibility = true;
-                      _loading = false;
-                    });
-                    return;
-                  } else {
-                    // TODO: update the state of the new car's type
-                    print("Detected type:");
-                    print(cdr.type);
-                    // context
-                    //     .flow<NewCarState>()
-                    //     .update((carState) => carState.copywith(type: ));
+                  try {
+                    CarDetectionResponse cdr = await CarsGlobals.mlApi.isCar(images[i]);
+                    if (!cdr.isCar) {
+                      setState((){
+                        _errorMsg = "Seems that image number ${i+1} does not contain car";
+                        _errorVisibility = true;
+                        _loading = false;
+                      });
+                      return;
+                    } else {
+                      print("Detected type:");
+                      print(cdr.type);
+                    }
 
+                  } catch (e) {
+                    print(e.toString());
+                    setState(() {
+                      _loading = false;
+                      _errorVisibility = true;
+                      _errorMsg = e.toString();
+                    });
+                    _continuePressed();
                   }
 
                 }

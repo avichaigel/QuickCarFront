@@ -66,10 +66,10 @@ class CurrencyPickerState extends State<CurrencyPicker> {
                               });
                               CarsGlobals.currencyService
                                   .setCurrentCurrency(currency.code)
-                                  .then((isCurrencyRateUpdated) {
+                                  .then((workedWell) {
                                 setState(() {
                                   loading = false;
-                                  if (!isCurrencyRateUpdated) {
+                                  if (!workedWell) {
                                     currency = CurrencyService().findByCode(Strings.USD);
                                     showAlertDialog(context);
                                   }
@@ -89,7 +89,7 @@ class CurrencyPickerState extends State<CurrencyPicker> {
                             height: 10,
                             width: 10,
                             child: CircularProgressIndicator())
-                        : Text(
+                        : Text( // if loading == false
                             "${currentCurrency.symbol} ${currentCurrency.flag}",
                             style: TextStyle(fontSize: 17))),
                 Text(

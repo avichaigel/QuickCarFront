@@ -10,15 +10,17 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:quick_car/constants/strings.dart';
+import 'package:quick_car/data_class/car_dates.dart';
 import '../data_class/car_data.dart';
 import 'package:quick_car/models/distance.dart';
 
 class CarsApi {
   Future<List<CarData>> getCars (Map<String, String> values) {}
-
+  Future<List<CarData>> getAllCars () {}
+  Future<List<CarDates>> getCarDates(int carId) async {}
   Future<CarData> postCar(CarData cd) async {}
   Future<CarData> postCarDates(int carId, List<DatePeriod> datePeriod) async {}
-  Future<CarData> updateCar(int id, CarData cd) async {}
+  Future<CarData> updateCar(int id, CarData cd, List<DatePeriod> datesPeriod) async {}
 
 
 }
@@ -86,7 +88,6 @@ class QuickCarCarsApi implements CarsApi {
         cd.id = json.decode(value)['id'];
         print("id: " + cd.id.toString());
       });
-      //TODO: delete it
       Timer(Duration(seconds: 3), () => print("after timer"));
       return cd;
 
@@ -103,18 +104,20 @@ class QuickCarCarsApi implements CarsApi {
   }
   Future<List<CarData>> upgradeCars(String responseBody) async {
     final _myLocation = await loc.Location().getLocation();
+    List<CarDates> carDates = await getAllCarDates();
     Map carsMap = json.decode(responseBody) as Map<String, dynamic>;
     List<CarData> list = [];
+    List<int> ids = [];
     for(int i = 0; i < carsMap['cars'].length; i++) {
       CarData cd = CarData.fromJson(carsMap['cars'][i]);
       setLocation(_myLocation, cd);
-
-
-      list.add(cd);
+      cd.carDates = carDates.where((element) => element.carId == cd.id).toList(growable: true);
+      if (!ids.contains(cd.id))
+        list.add(cd);
+      ids.add(cd.id);
     }
     return list;
   }
-
 
 
   Future<List<CarData>> getCars(Map<String, String> queryParameters) async {
@@ -131,15 +134,68 @@ class QuickCarCarsApi implements CarsApi {
       var json = response.body;
       json = "{" + '"cars":' + json + "}";
       result = upgradeCars(json);
-      print("get cars successful");
+      print("Get cars successful");
       return result;
     }
   }
-  Future<CarData> updateCar(int id,CarData cd) async {
-    await Future.delayed(Duration(seconds: 3), () {
+  Future<List<CarData>> getAllCars () async {
+    var client = http.Client();
+    Future<List<CarData>> result;
+    var uri = Strings.QUICKCAR_URL + "cars/";
+    var response = await client.get(Uri.parse(uri));
+    if (response.statusCode == 200) {
+      var json = response.body;
+      json = "{" + '"cars":' + json + "}";
+      result = upgradeCars(json);
+      print("Get all cars successful");
+      return result;
+    }
+  }
+
+
+  Future<CarData> updateCar(int id,CarData cd, List<DatePeriod> datesPeriod) async {
+    postCarDates(id, datesPeriod);
+    await Future.delayed(Duration(seconds: 1), () {
       print("end calculation");
     });
     return await cd;
+  }
+
+  Future<List<CarDates>> getCarDates(int carId) async {
+    var uri = Uri.parse(Strings.QUICKCAR_URL + "cars/cardates/");
+    var response = await client.get(uri);
+    if (response.statusCode != 200) {
+      throw "Unable to get dates availability";
+    }
+    List<dynamic> list = jsonDecode(response.body);
+    List<CarDates> dates = [];
+    for (int i = 0; i < list.length; i++) {
+      if (list[i]["car"].toString() == carId.toString()) {
+        CarDates carDates = CarDates();
+        carDates.datePeriod = DatePeriod(DateTime.parse(list[i]["dateFrom"]),DateTime.parse(list[i]["dateTo"]));
+        carDates.id = list[i]["id"];
+        dates.add(carDates);
+      }
+    }
+    return dates;
+  }
+
+  getAllCarDates() async {
+    var uri = Uri.parse(Strings.QUICKCAR_URL + "cars/cardates/");
+    var response = await client.get(uri);
+    if (response.statusCode != 200) {
+      throw "Unable to get dates availability";
+    }
+    List<dynamic> list = jsonDecode(response.body);
+    List<CarDates> dates = [];
+    for (int i = 0; i < list.length; i++) {
+        CarDates carDates = CarDates();
+        carDates.datePeriod = DatePeriod(DateTime.parse(list[i]["dateFrom"]),DateTime.parse(list[i]["dateTo"]));
+        carDates.id = list[i]["id"];
+        carDates.carId = list[i]["car"];
+        dates.add(carDates);
+    }
+    return dates;
   }
 
 }
