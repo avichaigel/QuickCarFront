@@ -16,6 +16,8 @@ class MyCurrencyService extends ChangeNotifier {
     return isChangedToDollarsSuccessfully;
   }
 
+
+
   Future<bool> setCurrentCurrency(String currencyCode) async {
     if (currencyCode == Strings.USD) {
       return goBackToDollars(true);

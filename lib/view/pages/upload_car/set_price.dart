@@ -1,4 +1,5 @@
 import 'package:flow_builder/flow_builder.dart';
+import 'package:quick_car/constants/cars_globals.dart';
 import 'package:quick_car/states/new_car_state.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,9 +15,10 @@ class _SetPriceState extends State<SetPrice> {
 
   void _continuePressed() {
     print("_continuePressed"+_controller.value.text);
+    var priceInUSD = (int.parse(_controller.value.text) * CarsGlobals.currencyService.currentCurrencyRate).round();
     context
         .flow<NewCarState>()
-        .complete((carState) => carState.copywith(pricePerDay: int.parse(_controller.value.text)));
+        .complete((carState) => carState.copywith(pricePerDay: priceInUSD));
   }
   @override
   Widget build(BuildContext context) {
@@ -50,7 +52,7 @@ class _SetPriceState extends State<SetPrice> {
                               onTap: () {
                               _controller.clear();
                               },
-                              child: Text('\$ per day'),
+                              child: Text(CarsGlobals.currencyService.currentCurrency.symbol + ' per day'),
                           )
                         )
                     ),
